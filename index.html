@@ -521,4 +521,23 @@
                 if (!t) { toast('Please complete payment first'); return; }
                 const res = await api('/api/download', { client_token: t, device_fingerprint: fingerprint, document_id: docId });
                 if (res.url) { window.open(res.url, '_blank'); }
-                else { toast(res.error || 'Download
+                else { toast(res.error || 'Download failed'); }
+            }
+
+            $('modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            window.startPay = startPay;
+            window.downloadDoc = downloadDoc;
+            window.closeModal = closeModal;
+            window.loadDocs = loadDocs;
+
+            (async () => {
+                await initFingerprint();
+                await loadDocs();
+            })();
+        })();
+    </script>
+</body>
+</html>
