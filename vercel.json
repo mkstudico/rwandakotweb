@@ -1,5 +1,9 @@
 {
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/handler.js" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/handler.js"
+    }
   ]
 }
