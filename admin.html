@@ -3,52 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Admin Panel</title>
+    <title>Admin — DocStore</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --bg: #fafbfc;
+            --bg: #f8f9fb;
             --surface: #fff;
-            --text: #1a1a2e;
+            --text: #111;
             --sub: #6b7280;
             --border: #eef0f2;
-            --accent: #1a1a2e;
+            --accent: #111;
             --red: #dc2626;
+            --red-bg: #fef2f2;
+            --red-text: #991b1b;
             --green: #059669;
             --green-bg: #ecfdf5;
-            --red-bg: #fef2f2;
+            --green-text: #065f46;
+            --orange: #ea580c;
+            --orange-bg: #fff7ed;
             --radius: 14px;
             --radius-sm: 10px;
-            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+            --tr: 0.2s cubic-bezier(0.4,0,0.2,1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
 
+        /* ── LOGIN SCREEN ── */
         .login-screen {
-            max-width: 380px;
-            margin: 80px auto;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
         .login-card {
             background: var(--surface);
             border-radius: var(--radius);
-            padding: 36px 24px;
+            padding: 40px 28px 32px;
             border: 1px solid var(--border);
             text-align: center;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
         }
-        .login-card .material-icons { font-size: 40px; color: var(--accent); margin-bottom: 8px; }
-        .login-card h1 { font-size: 1.3rem; font-weight: 600; margin-bottom: 18px; }
+        .login-card .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .login-card .icon-circle .material-icons {
+            font-size: 28px;
+            color: var(--accent);
+        }
+        .login-card h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+        .login-card .subtitle {
+            font-size: 0.82rem;
+            color: var(--sub);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--sub);
+            margin-bottom: 5px;
+        }
         .input {
             width: 100%;
             padding: 12px 14px;
@@ -56,49 +101,69 @@
             border-radius: var(--radius-sm);
             font-size: 0.9rem;
             font-family: 'Poppins', sans-serif;
-            margin-bottom: 12px;
-            transition: border var(--transition);
             outline: none;
+            transition: border var(--tr);
             -webkit-appearance: none;
         }
-        .input:focus { border-color: var(--accent); }
+        .input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
         .btn {
-            padding: 11px 20px;
-            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 30px;
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
             border: none;
             font-family: 'Poppins', sans-serif;
-            transition: all var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
+            transition: all var(--tr);
             -webkit-tap-highlight-color: transparent;
         }
         .btn .material-icons { font-size: 18px; }
-        .btn-dark { background: var(--accent); color: #fff; }
-        .btn-dark:active { background: #2d2d44; }
-        .btn-red { background: var(--red); color: #fff; }
-        .btn-red:active { background: #b91c1c; }
-        .btn-green { background: var(--green); color: #fff; }
+        .btn-dark {
+            background: var(--accent);
+            color: #fff;
+            width: 100%;
+        }
+        .btn-dark:hover { background: #2d2d44; }
+        .btn-dark:active { transform: scale(0.97); }
         .btn-outline {
             background: var(--surface);
             border: 1px solid var(--border);
             color: var(--text);
         }
-        .btn-outline:active { background: #f9fafb; }
-        .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
-        .btn-block { width: 100%; justify-content: center; }
+        .btn-outline:hover { background: #f9fafb; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-red:hover { background: #b91c1c; }
+        .btn-sm { padding: 7px 12px; font-size: 0.75rem; border-radius: 8px; }
+        .btn-icon { padding: 8px; border-radius: 8px; min-width: 36px; }
+        .error-text {
+            color: var(--red);
+            font-size: 0.78rem;
+            margin-top: 8px;
+            display: none;
+        }
+        .error-text.show { display: block; }
 
-        .dashboard { display: none; max-width: 880px; margin: 0 auto; padding: 28px 16px 60px; }
+        /* ── DASHBOARD ── */
+        .dashboard {
+            display: none;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
         .dash-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
         .dash-header h1 {
             font-size: 1.4rem;
@@ -106,8 +171,40 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            letter-spacing: -0.3px;
         }
+        .dash-header h1 .material-icons { font-size: 26px; }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .stat-card .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .stat-card .stat-icon.blue { background: #eff6ff; color: #2563eb; }
+        .stat-card .stat-icon.green { background: var(--green-bg); color: var(--green); }
+        .stat-card .stat-icon.orange { background: var(--orange-bg); color: var(--orange); }
+        .stat-card .stat-val { font-size: 1.3rem; font-weight: 700; }
+        .stat-card .stat-label { font-size: 0.72rem; color: var(--sub); }
 
+        /* Form Card */
         .form-card {
             background: var(--surface);
             border-radius: var(--radius);
@@ -122,20 +219,23 @@
             display: flex;
             align-items: center;
             gap: 7px;
+            letter-spacing: -0.2px;
         }
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-        .form-group.full { grid-column: 1/-1; }
-        .form-group label {
+        .form-group-full { grid-column: 1/-1; }
+        .field { margin-bottom: 10px; }
+        .field label {
+            display: block;
             font-size: 0.76rem;
             font-weight: 500;
             color: var(--sub);
+            margin-bottom: 4px;
         }
-        .form-group .input, .form-group textarea {
+        .field .input, .field textarea {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid var(--border);
@@ -144,19 +244,45 @@
             font-family: 'Poppins', sans-serif;
             outline: none;
             resize: vertical;
+            transition: border var(--tr);
         }
-        .form-group textarea { min-height: 65px; }
+        .field .input:focus, .field textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+        .field textarea { min-height: 65px; }
         .preview-img {
             width: 100%;
-            max-height: 120px;
+            max-height: 130px;
             object-fit: cover;
             border-radius: 8px;
             margin-top: 6px;
             border: 1px solid var(--border);
+            display: none;
         }
-        .file-status { font-size: 0.72rem; color: var(--sub); margin-top: 4px; }
+        .file-status {
+            font-size: 0.72rem;
+            color: var(--sub);
+            margin-top: 3px;
+        }
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
 
-        .docs-list { display: grid; gap: 10px; }
+        /* Docs list */
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            letter-spacing: -0.2px;
+        }
+        .doc-list { display: grid; gap: 8px; }
         .doc-row {
             background: var(--surface);
             border-radius: var(--radius-sm);
@@ -166,44 +292,61 @@
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
+            transition: box-shadow var(--tr);
         }
-        .doc-row img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
+        .doc-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .doc-thumb {
+            width: 48px;
+            height: 48px;
             border-radius: 8px;
+            object-fit: cover;
             flex-shrink: 0;
         }
-        .doc-row .icon-placeholder {
-            width: 50px;
-            height: 50px;
-            background: #f3f4f6;
+        .doc-thumb-placeholder {
+            width: 48px;
+            height: 48px;
             border-radius: 8px;
+            background: #f3f4f6;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
-        .doc-row .info { flex: 1; min-width: 140px; }
-        .doc-row .info h4 { font-size: 0.9rem; font-weight: 600; }
-        .doc-row .info span { font-size: 0.72rem; color: var(--sub); display: block; margin-top: 1px; }
-        .doc-row .actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .badge {
-            font-size: 0.66rem;
+        .doc-thumb-placeholder .material-icons { color: #d1d5db; }
+        .doc-info { flex: 1; min-width: 140px; }
+        .doc-info h4 {
+            font-size: 0.9rem;
             font-weight: 600;
-            padding: 3px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .doc-info .meta {
+            font-size: 0.72rem;
+            color: var(--sub);
+            margin-top: 1px;
+        }
+        .badge {
+            font-size: 0.64rem;
+            font-weight: 600;
+            padding: 2px 8px;
             border-radius: 20px;
             display: inline-block;
         }
-        .badge-active { background: var(--green-bg); color: #065f46; }
-        .badge-inactive { background: var(--red-bg); color: #991b1b; }
+        .badge-active { background: var(--green-bg); color: var(--green-text); }
+        .badge-hidden { background: var(--red-bg); color: var(--red-text); }
+        .doc-actions { display: flex; gap: 5px; flex-shrink: 0; }
 
+        .loading-text { text-align: center; color: var(--sub); padding: 30px; }
+
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: #1a1a2e;
+            background: #111;
             color: #fff;
             padding: 12px 22px;
             border-radius: 50px;
@@ -211,68 +354,120 @@
             font-weight: 500;
             font-family: 'Poppins', sans-serif;
             z-index: 200;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s;
             pointer-events: none;
+            white-space: nowrap;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast.err { background: #dc2626; }
+        .toast.error { background: var(--red); }
 
         @media (max-width: 540px) {
             .form-row { grid-template-columns: 1fr; }
-            .doc-row .actions { width: 100%; justify-content: flex-end; margin-top: 6px; }
+            .doc-row { flex-direction: column; align-items: flex-start; }
+            .doc-actions { width: 100%; justify-content: flex-end; margin-top: 6px; }
             .dash-header { flex-direction: column; align-items: flex-start; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ── LOGIN SCREEN ── -->
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
-            <span class="material-icons">shield</span>
-            <h1>Admin Login</h1>
-            <input type="password" class="input" id="adminKey" placeholder="Enter admin key" autocomplete="off">
-            <button class="btn btn-dark btn-block" onclick="login()"><span class="material-icons">login</span> Sign In</button>
-            <p style="color:#dc2626;font-size:0.78rem;margin-top:10px;display:none;" id="loginErr"></p>
+            <div class="icon-circle"><span class="material-icons">shield</span></div>
+            <h1>Admin Panel</h1>
+            <p class="subtitle">Enter your admin key to continue</p>
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="adminKey">Admin Key</label>
+                    <input type="password" class="input" id="adminKey" placeholder="Enter admin key" autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-dark">
+                    <span class="material-icons">login</span> Sign In
+                </button>
+            </form>
+            <p class="error-text" id="loginError">Invalid admin key. Please try again.</p>
         </div>
     </div>
 
+    <!-- ── DASHBOARD ── -->
     <div class="dashboard" id="dashboard">
         <div class="dash-header">
             <h1><span class="material-icons">dashboard</span> Document Manager</h1>
-            <button class="btn btn-outline" onclick="logout()"><span class="material-icons">logout</span> Logout</button>
+            <button class="btn btn-outline" onclick="logout()">
+                <span class="material-icons">logout</span> Logout
+            </button>
         </div>
 
-        <div class="form-card">
-            <h2 id="formTitle"><span class="material-icons">add_circle</span> Add Document</h2>
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><span class="material-icons">description</span></div>
+                <div><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Documents</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><span class="material-icons">visibility</span></div>
+                <div><div class="stat-val" id="statActive">0</div><div class="stat-label">Active</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><span class="material-icons">trending_up</span></div>
+                <div><div class="stat-val" id="statClicks">0</div><div class="stat-label">Total Views</div></div>
+            </div>
+        </div>
+
+        <!-- Add / Edit Form -->
+        <div class="form-card" id="formCard">
+            <h2 id="formTitle"><span class="material-icons">add_circle</span> Add New Document</h2>
             <div class="form-row">
-                <div class="form-group full"><label>Title *</label><input type="text" class="input" id="dTitle" placeholder="Document title"></div>
-                <div class="form-group full"><label>Description</label><textarea id="dDesc" placeholder="Brief description…"></textarea></div>
-                <div class="form-group"><label>Price (RWF) *</label><input type="number" class="input" id="dPrice" placeholder="500" min="1"></div>
-                <div class="form-group"><label>Currency</label><input type="text" class="input" id="dCurrency" value="RWF"></div>
-                <div class="form-group full">
+                <div class="field form-group-full">
+                    <label>Title *</label>
+                    <input type="text" class="input" id="dTitle" placeholder="e.g. Complete Programming Guide">
+                </div>
+                <div class="field form-group-full">
+                    <label>Description</label>
+                    <textarea id="dDesc" placeholder="Brief description of the document..."></textarea>
+                </div>
+                <div class="field">
+                    <label>Price *</label>
+                    <input type="number" class="input" id="dPrice" placeholder="500" min="1">
+                </div>
+                <div class="field">
+                    <label>Currency</label>
+                    <input type="text" class="input" id="dCurrency" value="RWF" placeholder="RWF">
+                </div>
+                <div class="field form-group-full">
                     <label>Preview Image</label>
-                    <input type="file" id="dImage" accept="image/*" style="font-size:0.8rem;">
-                    <img class="preview-img" id="imgPreview" style="display:none;">
+                    <input type="file" id="dImage" accept="image/*" style="font-size:0.8rem;font-family:'Poppins',sans-serif;">
+                    <img class="preview-img" id="imgPreview">
                     <input type="hidden" id="imgUrl">
                 </div>
-                <div class="form-group full">
+                <div class="field form-group-full">
                     <label>Document File *</label>
-                    <input type="file" id="dFile" style="font-size:0.8rem;">
+                    <input type="file" id="dFile" style="font-size:0.8rem;font-family:'Poppins',sans-serif;">
                     <span class="file-status" id="fileStatus"></span>
                     <input type="hidden" id="filePath">
                 </div>
             </div>
             <input type="hidden" id="editId">
-            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                <button class="btn btn-dark" onclick="saveDoc()" id="saveBtn"><span class="material-icons">save</span> Save</button>
-                <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel</button>
+            <div class="btn-row">
+                <button class="btn btn-dark" onclick="saveDocument()" id="saveBtn">
+                    <span class="material-icons">save</span> Save Document
+                </button>
+                <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;">
+                    <span class="material-icons">close</span> Cancel
+                </button>
             </div>
         </div>
 
-        <h2 style="font-size:1.05rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px;"><span class="material-icons">library_books</span> All Documents</h2>
-        <div class="docs-list" id="docsList"><p style="color:#9ca3af;">Loading…</p></div>
+        <!-- Document List -->
+        <div class="section-title"><span class="material-icons">library_books</span> All Documents</div>
+        <div class="doc-list" id="docsList">
+            <p class="loading-text">Loading documents...</p>
+        </div>
     </div>
 
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -280,14 +475,15 @@
             const IMGBB_KEY = '2077df548acf5a4f53658b930c7fe87a';
             let adminToken = null;
 
+            // Helpers
             function $(id) { return document.getElementById(id); }
 
-            function toast(msg, err = false) {
+            function toast(msg, isError = false) {
                 const t = $('toast');
                 t.textContent = msg;
-                t.className = 'toast show' + (err ? ' err' : '');
-                clearTimeout(t._timeout);
-                t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
+                t.className = 'toast show' + (isError ? ' error' : '');
+                clearTimeout(t._tid);
+                t._tid = setTimeout(() => t.classList.remove('show'), 2800);
             }
 
             async function api(path, body = null, method = null) {
@@ -297,71 +493,110 @@
                 };
                 if (adminToken) opts.headers['Authorization'] = 'Bearer ' + adminToken;
                 if (body) opts.body = JSON.stringify(body);
-                const r = await fetch(path, opts);
-                if (r.status === 401) { logout(); throw new Error('Unauthorized'); }
-                return r.json();
+
+                const res = await fetch(path, opts);
+
+                if (res.status === 401) {
+                    logout();
+                    throw new Error('Unauthorized');
+                }
+
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    console.error('Invalid JSON response:', text.substring(0, 200));
+                    throw new Error('Server returned invalid response');
+                }
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+
+                return data;
             }
 
-            async function login() {
-                const key = $('adminKey').value;
+            // Login
+            async function login(key) {
                 if (!key) return;
                 adminToken = key;
-                const res = await api('/api/admin/verify', {});
-                if (res.authenticated) {
-                    localStorage.setItem('adm_tok', key);
-                    $('loginScreen').style.display = 'none';
-                    $('dashboard').style.display = 'block';
-                    loadDocs();
-                } else {
+                try {
+                    const res = await api('/api/admin/verify', {});
+                    if (res.authenticated) {
+                        localStorage.setItem('adm_tok', key);
+                        $('loginScreen').style.display = 'none';
+                        $('dashboard').style.display = 'block';
+                        await loadDocuments();
+                    } else {
+                        adminToken = null;
+                        $('loginError').classList.add('show');
+                    }
+                } catch {
                     adminToken = null;
-                    $('loginErr').style.display = 'block';
-                    $('loginErr').textContent = 'Invalid key';
+                    $('loginError').classList.add('show');
                 }
             }
 
             function logout() {
                 adminToken = null;
                 localStorage.removeItem('adm_tok');
-                $('loginScreen').style.display = 'block';
+                $('loginScreen').style.display = '';
                 $('dashboard').style.display = 'none';
                 $('adminKey').value = '';
+                $('loginError').classList.remove('show');
             }
+
+            // Login form submit
+            $('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                $('loginError').classList.remove('show');
+                login($('adminKey').value);
+            });
 
             // Auto login
             const saved = localStorage.getItem('adm_tok');
             if (saved) {
-                adminToken = saved;
-                api('/api/admin/verify', {}).then(r => {
-                    if (r.authenticated) {
-                        $('loginScreen').style.display = 'none';
-                        $('dashboard').style.display = 'block';
-                        loadDocs();
-                    } else { logout(); }
-                });
+                login(saved).catch(() => {});
             }
 
+            // Image upload
             $('dImage').addEventListener('change', async function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
+
                 const reader = new FileReader();
-                reader.onload = ev => { $('imgPreview').src = ev.target.result; $('imgPreview').style.display = 'block'; };
+                reader.onload = ev => {
+                    $('imgPreview').src = ev.target.result;
+                    $('imgPreview').style.display = 'block';
+                };
                 reader.readAsDataURL(file);
+
                 const fd = new FormData();
                 fd.append('image', file);
                 try {
                     const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
                     const d = await r.json();
-                    if (d.success) { $('imgUrl').value = d.data.url; toast('Image uploaded'); }
-                    else { toast('Image upload failed', true); }
-                } catch { toast('Upload error', true); }
+                    if (d.success) {
+                        $('imgUrl').value = d.data.url;
+                        toast('Image uploaded successfully');
+                    } else {
+                        toast('Image upload failed', true);
+                    }
+                } catch {
+                    toast('Image upload error', true);
+                }
             });
 
+            // File upload
             $('dFile').addEventListener('change', async function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
-                $('fileStatus').textContent = 'Uploading…';
+
+                $('fileStatus').textContent = 'Uploading...';
                 const fd = new FormData();
                 fd.append('file', file);
+
                 try {
                     const r = await fetch('/api/admin/upload', {
                         method: 'POST',
@@ -377,10 +612,14 @@
                         $('fileStatus').textContent = '❌ ' + (d.error || 'Failed');
                         toast('Upload failed', true);
                     }
-                } catch { $('fileStatus').textContent = '❌ Error'; toast('Upload error', true); }
+                } catch {
+                    $('fileStatus').textContent = '❌ Upload error';
+                    toast('Upload error', true);
+                }
             });
 
-            async function saveDoc() {
+            // Save document
+            async function saveDocument() {
                 const title = $('dTitle').value.trim();
                 const desc = $('dDesc').value.trim();
                 const price = $('dPrice').value;
@@ -389,14 +628,27 @@
                 const fp = $('filePath').value.trim();
                 const editId = $('editId').value;
 
-                if (!title) return toast('Title required', true);
-                if (!price || parseInt(price) <= 0) return toast('Valid price required', true);
-                if (!fp && !editId) return toast('Upload document file', true);
+                if (!title) { toast('Title is required', true); return; }
+                if (!price || parseInt(price) <= 0) { toast('Valid price is required', true); return; }
+                if (!fp && !editId) { toast('Please upload the document file', true); return; }
 
-                const body = { title, description: desc, price: parseInt(price), currency: currency.toUpperCase(), image_url: img, file_path: fp };
-                const res = await api('/api/admin/documents', body);
-                if (res.error) { toast(res.error, true); }
-                else { toast('Saved!'); resetForm(); loadDocs(); }
+                const body = {
+                    title,
+                    description: desc,
+                    price: parseInt(price),
+                    currency: currency.toUpperCase(),
+                    image_url: img,
+                    file_path: fp
+                };
+
+                try {
+                    await api('/api/admin/documents', body);
+                    toast(editId ? 'Document updated!' : 'Document added!');
+                    resetForm();
+                    await loadDocuments();
+                } catch (err) {
+                    toast(err.message || 'Failed to save', true);
+                }
             }
 
             function resetForm() {
@@ -411,11 +663,12 @@
                 $('dFile').value = '';
                 $('imgPreview').style.display = 'none';
                 $('fileStatus').textContent = '';
-                $('formTitle').innerHTML = '<span class="material-icons">add_circle</span> Add Document';
+                $('formTitle').innerHTML = '<span class="material-icons">add_circle</span> Add New Document';
                 $('cancelBtn').style.display = 'none';
+                $('saveBtn').innerHTML = '<span class="material-icons">save</span> Save Document';
             }
 
-            function editDoc(doc) {
+            function editDocument(doc) {
                 $('dTitle').value = doc.title;
                 $('dDesc').value = doc.description || '';
                 $('dPrice').value = doc.price;
@@ -425,58 +678,103 @@
                 $('editId').value = doc.id;
                 $('formTitle').innerHTML = '<span class="material-icons">edit</span> Edit Document';
                 $('cancelBtn').style.display = 'inline-flex';
-                if (doc.image_url) { $('imgPreview').src = doc.image_url; $('imgPreview').style.display = 'block'; }
-                $('formCard')?.scrollIntoView({ behavior: 'smooth' });
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                $('saveBtn').innerHTML = '<span class="material-icons">save</span> Update Document';
+
+                if (doc.image_url) {
+                    $('imgPreview').src = doc.image_url;
+                    $('imgPreview').style.display = 'block';
+                }
+
+                $('formCard').scrollIntoView({ behavior: 'smooth' });
             }
 
-            async function toggleDoc(id) {
-                const r = await api(`/api/admin/documents/${id}/toggle`, {}, 'PUT');
-                if (r.error) toast(r.error, true);
-                else loadDocs();
+            async function toggleDocument(docId) {
+                try {
+                    await api(`/api/admin/documents/${docId}/toggle`, {}, 'PUT');
+                    await loadDocuments();
+                } catch (err) {
+                    toast(err.message || 'Toggle failed', true);
+                }
             }
 
-            async function deleteDoc(id, title) {
-                if (!confirm(`Delete "${title}" permanently?`)) return;
-                const r = await api(`/api/admin/documents/${id}`, {}, 'DELETE');
-                if (r.error) toast(r.error, true);
-                else { toast('Deleted'); loadDocs(); }
+            async function deleteDocument(docId, title) {
+                if (!confirm(`Permanently delete "${title}"?\n\nThis action cannot be undone.`)) return;
+                try {
+                    await api(`/api/admin/documents/${docId}`, {}, 'DELETE');
+                    toast('Document deleted');
+                    await loadDocuments();
+                } catch (err) {
+                    toast(err.message || 'Delete failed', true);
+                }
             }
 
-            async function loadDocs() {
-                const res = await api('/api/admin/documents');
+            async function loadDocuments() {
                 const list = $('docsList');
-                if (res.error) { list.innerHTML = `<p style="color:#dc2626;">${res.error}</p>`; return; }
-                if (!res.length) { list.innerHTML = '<p style="color:#9ca3af;">No documents. Add your first one above.</p>'; return; }
-                list.innerHTML = res.map(d => `
-                    <div class="doc-row">
-                        ${d.image_url
-                            ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
-                            : ''}
-                        <div class="icon-placeholder" style="${d.image_url ? 'display:none' : ''}"><span class="material-icons" style="color:#d1d5db;">description</span></div>
-                        <div class="info">
-                            <h4>${d.title} <span class="badge ${d.active ? 'badge-active' : 'badge-inactive'}">${d.active ? 'Active' : 'Hidden'}</span></h4>
-                            <span>${d.price.toLocaleString()} ${d.currency} · ${d.file_path?.split('/').pop() || ''}</span>
+                list.innerHTML = '<p class="loading-text">Loading documents...</p>';
+
+                try {
+                    const docs = await api('/api/admin/documents');
+
+                    // Update stats
+                    $('statTotal').textContent = docs.length;
+                    $('statActive').textContent = docs.filter(d => d.active).length;
+                    $('statClicks').textContent = docs.reduce((sum, d) => sum + (d.clicks || 0), 0);
+
+                    if (!docs.length) {
+                        list.innerHTML = '<p class="loading-text">No documents yet. Add your first one above.</p>';
+                        return;
+                    }
+
+                    list.innerHTML = docs.map(d => `
+                        <div class="doc-row">
+                            ${d.image_url
+                                ? `<img src="${d.image_url}" alt="" class="doc-thumb" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
+                                : ''}
+                            <div class="doc-thumb-placeholder" style="${d.image_url ? 'display:none' : ''}">
+                                <span class="material-icons">description</span>
+                            </div>
+                            <div class="doc-info">
+                                <h4>
+                                    ${d.title}
+                                    <span class="badge ${d.active ? 'badge-active' : 'badge-hidden'}">
+                                        ${d.active ? 'Active' : 'Hidden'}
+                                    </span>
+                                </h4>
+                                <span class="meta">
+                                    ${parseInt(d.price).toLocaleString()} ${d.currency} · 
+                                    ${d.clicks || 0} views · 
+                                    ${d.file_path ? d.file_path.split('/').pop() : 'No file'}
+                                </span>
+                            </div>
+                            <div class="doc-actions">
+                                <button class="btn btn-outline btn-sm btn-icon" onclick='editDocument(${JSON.stringify(d).replace(/'/g, "&#39;")})' title="Edit">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                                <button class="btn btn-outline btn-sm btn-icon" onclick="toggleDocument('${d.id}')" title="${d.active ? 'Hide' : 'Show'}">
+                                    <span class="material-icons">${d.active ? 'visibility_off' : 'visibility'}</span>
+                                </button>
+                                <button class="btn btn-red btn-sm btn-icon" onclick="deleteDocument('${d.id}', '${d.title.replace(/'/g, "\\'")}')" title="Delete">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="actions">
-                            <button class="btn btn-outline btn-sm" onclick='editDoc(${JSON.stringify(d)})'><span class="material-icons">edit</span></button>
-                            <button class="btn btn-outline btn-sm" onclick="toggleDoc('${d.id}')"><span class="material-icons">${d.active ? 'visibility_off' : 'visibility'}</span></button>
-                            <button class="btn btn-red btn-sm" onclick="deleteDoc('${d.id}','${d.title.replace(/'/g,"\\'")}')"><span class="material-icons">delete</span></button>
-                        </div>
-                    </div>
-                `).join('');
+                    `).join('');
+
+                } catch (err) {
+                    list.innerHTML = `<p class="loading-text" style="color:#dc2626;">Failed to load: ${err.message}</p>`;
+                }
             }
 
-            $('adminKey').addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
-
+            // Expose to global scope for onclick handlers
             window.login = login;
             window.logout = logout;
-            window.saveDoc = saveDoc;
+            window.saveDocument = saveDocument;
             window.resetForm = resetForm;
-            window.editDoc = editDoc;
-            window.toggleDoc = toggleDoc;
-            window.deleteDoc = deleteDoc;
-            window.loadDocs = loadDocs;
+            window.editDocument = editDocument;
+            window.toggleDocument = toggleDocument;
+            window.deleteDocument = deleteDocument;
+            window.loadDocuments = loadDocuments;
+
         })();
     </script>
 </body>
