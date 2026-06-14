@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>My Purchases — DocStore</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+    <style>
+        :root {
+            --bg: #f8f9fb;
+            --surface: #fff;
+            --text: #111;
+            --sub: #6b7280;
+            --border: #eef0f2;
+            --accent: #111;
+            --green: #059669;
+            --green-bg: #ecfdf5;
+            --green-text: #065f46;
+            --orange: #ea580c;
+            --orange-bg: #fff7ed;
+            --orange-text: #9a3412;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --red-text: #991b1b;
+            --blue: #2563eb;
+            --blue-bg: #eff6ff;
+            --blue-text: #1e40af;
+            --yellow: #ca8a04;
+            --yellow-bg: #fefce8;
+            --yellow-text: #854d0e;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --tr: 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── TOP BAR ── */
+        .topbar {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo .material-icons { font-size: 22px; }
+        .nav-links { display: flex; gap: 6px; }
+        .nav-link {
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--sub);
+            transition: all var(--tr);
+        }
+        .nav-link:hover { background: #f3f4f6; color: var(--text); }
+        .nav-link.active { background: var(--accent); color: #fff; }
+
+        /* ── CONTAINER ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        /* ── HERO BANNER ── */
+        .success-banner {
+            background: var(--green-bg);
+            border: 1px solid #a7f3d0;
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            animation: fadeSlide 0.4s ease;
+        }
+        @keyframes fadeSlide {
+            from { opacity:0; transform: translateY(-8px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+        .success-banner .banner-icon {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .success-banner .banner-icon .material-icons {
+            color: var(--green);
+            font-size: 24px;
+        }
+        .success-banner h2 { font-size: 1rem; font-weight: 600; }
+        .success-banner p { font-size: 0.78rem; color: var(--green-text); }
+
+        /* ── STATS ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stat-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .stat-dot.green { background: var(--green); }
+        .stat-dot.orange { background: var(--orange); }
+        .stat-dot.red { background: var(--red); }
+        .stat-dot.yellow { background: var(--yellow); }
+        .stat-val { font-size: 1.2rem; font-weight: 700; }
+        .stat-label { font-size: 0.7rem; color: var(--sub); }
+
+        /* ── PURCHASE LIST ── */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .purchase-list { display: grid; gap: 10px; }
+
+        .purchase-card {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            transition: box-shadow var(--tr);
+        }
+        .purchase-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+
+        .purchase-img {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .purchase-img-placeholder {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .purchase-img-placeholder .material-icons { color: #d1d5db; font-size: 24px; }
+
+        .purchase-info { flex: 1; min-width: 160px; }
+        .purchase-info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+        .purchase-info .meta {
+            font-size: 0.72rem;
+            color: var(--sub);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .purchase-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-badge .material-icons { font-size: 14px; }
+        .status-completed { background: var(--green-bg); color: var(--green-text); }
+        .status-pending { background: var(--yellow-bg); color: var(--yellow-text); }
+        .status-inprogress { background: var(--blue-bg); color: var(--blue-text); }
+        .status-failed { background: var(--red-bg); color: var(--red-text); }
+        .status-expired { background: #f3f4f6; color: #6b7280; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            transition: all var(--tr);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn .material-icons { font-size: 16px; }
+        .btn-dark { background: var(--accent); color: #fff; }
+        .btn-dark:hover { background: #333; }
+        .btn-outline { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: #f9fafb; }
+        .btn-sm { padding: 6px 14px; font-size: 0.72rem; }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+        }
+        .empty-state .material-icons { font-size: 52px; margin-bottom: 12px; }
+        .empty-state h2 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .empty-state p { font-size: 0.85rem; margin-bottom: 16px; }
+
+        .loader-wrap { text-align: center; padding: 60px 20px; color: #9ca3af; }
+        .spinner {
+            width: 30px; height: 30px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #888;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            z-index: 300;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 500px) {
+            .purchase-card { flex-direction: column; align-items: flex-start; }
+            .purchase-status { width: 100%; justify-content: space-between; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .topbar-inner { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a href="index.html" class="logo">
+                <span class="material-icons">description</span> DocStore
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Store</a>
+                <a href="cart.html" class="nav-link active">My Purchases</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" id="content">
+        <div class="loader-wrap">
+            <div class="spinner"></div>
+            <p>Loading your purchases…</p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
+
+            let fingerprint = null;
+            let payments = [];
+            let documents = {};
+            const urlParams = new URLSearchParams(window.location.search);
+            const justPaid = urlParams.get('status') === 'success';
+            const justPaidToken = urlParams.get('client_token');
+
+            function $(id) { return document.getElementById(id); }
+
+            function toast(msg) {
+                const t = $('toast');
+                t.textContent = msg;
+                t.classList.add('show');
+                clearTimeout(t._tid);
+                t._tid = setTimeout(() => t.classList.remove('show'), 3000);
+            }
+
+            async function apiCall(path, body = null) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 12000);
+                try {
+                    const opts = {
+                        method: body ? 'POST' : 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal
+                    };
+                    if (body) opts.body = JSON.stringify(body);
+                    const res = await fetch(path, opts);
+                    clearTimeout(timeout);
+                    if (!res.ok) throw new Error('Request failed');
+                    const text = await res.text();
+                    try { return JSON.parse(text); } catch { throw new Error('Invalid response'); }
+                } catch (err) {
+                    clearTimeout(timeout);
+                    throw err;
+                }
+            }
+
+            async function getFingerprint() {
+                try {
+                    const fp = await FingerprintJS.load();
+                    return (await fp.get()).visitorId;
+                } catch {
+                    return 'fb_' + btoa(navigator.userAgent + screen.width + navigator.language).replace(/[=+/]/g, '').slice(0, 48);
+                }
+            }
+
+            function getStatusBadge(status) {
+                const map = {
+                    'completed': { class: 'status-completed', icon: 'check_circle', label: 'Completed' },
+                    'pending': { class: 'status-pending', icon: 'hourglass_empty', label: 'Pending' },
+                    'failed': { class: 'status-failed', icon: 'cancel', label: 'Failed' },
+                    'expired': { class: 'status-expired', icon: 'timer_off', label: 'Expired' }
+                };
+                const s = map[status] || { class: 'status-pending', icon: 'schedule', label: 'In Progress' };
+                return `<span class="status-badge ${s.class}"><span class="material-icons">${s.icon}</span> ${s.label}</span>`;
+            }
+
+            function getStatusLabel(status) {
+                const map = {
+                    'completed': 'Completed',
+                    'pending': 'In Progress',
+                    'failed': 'Failed',
+                    'expired': 'Expired'
+                };
+                return map[status] || 'In Progress';
+            }
+
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
+                const now = new Date();
+                const diff = now - d;
+                const mins = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+
+                if (mins < 1) return 'Just now';
+                if (mins < 60) return `${mins}m ago`;
+                if (hours < 24) return `${hours}h ago`;
+                if (days < 7) return `${days}d ago`;
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function formatPrice(n, c) {
+                return `${parseInt(n).toLocaleString()} ${c || 'RWF'}`;
+            }
+
+            async function loadData() {
+                fingerprint = await getFingerprint();
+
+                // Get all payments for this device
+                try {
+                    // We need a server endpoint for this. For now, we'll poll
+                    // individual document payment statuses.
+                    // First get all documents
+                    const docs = await apiCall('/api/documents');
+                    documents = {};
+                    docs.forEach(d => { documents[d.id] = d; });
+
+                    // Check payment status for each document
+                    const results = [];
+                    for (const doc of docs) {
+                        try {
+                            const res = await apiCall('/api/check-payment', {
+                                device_fingerprint: fingerprint,
+                                document_id: doc.id
+                            });
+                            if (res.already_paid) {
+                                results.push({
+                                    document_id: doc.id,
+                                    status: 'completed',
+                                    amount: doc.price,
+                                    currency: doc.currency,
+                                    created_at: null,
+                                    downloaded_at: null
+                                });
+                            }
+                        } catch {}
+                    }
+
+                    // Also check for the just-completed payment
+                    if (justPaidToken) {
+                        try {
+                            const res = await apiCall('/api/check-payment', {
+                                client_token: justPaidToken
+                            });
+                            if (res.paid) {
+                                const exists = results.find(p => p.document_id === res.document_id);
+                                if (!exists) {
+                                    results.push({
+                                        document_id: res.document_id,
+                                        status: 'completed',
+                                        amount: res.amount,
+                                        currency: res.currency,
+                                        created_at: new Date().toISOString(),
+                                        downloaded_at: null
+                                    });
+                                }
+                            } else if (res.status) {
+                                const exists = results.find(p => p.document_id === res.document_id);
+                                if (!exists) {
+                                    results.push({
+                                        document_id: res.document_id,
+                                        status: res.status,
+                                        amount: res.amount,
+                                        currency: res.currency,
+                                        created_at: new Date().toISOString(),
+                                        downloaded_at: null
+                                    });
+                                }
+                            }
+                        } catch {}
+                    }
+
+                    // Also fetch document that was just clicked from view.html
+                    const viewedDocId = urlParams.get('doc');
+                    if (viewedDocId && justPaidToken) {
+                        const exists = results.find(p => p.document_id === viewedDocId);
+                        if (!exists && documents[viewedDocId]) {
+                            results.push({
+                                document_id: viewedDocId,
+                                status: 'pending',
+                                amount: documents[viewedDocId].price,
+                                currency: documents[viewedDocId].currency,
+                                created_at: new Date().toISOString(),
+                                downloaded_at: null
+                            });
+                        }
+                    }
+
+                    payments = results;
+
+                } catch (err) {
+                    console.error('Load error:', err);
+                    payments = [];
+                }
+            }
+
+            function render() {
+                const content = $('content');
+
+                // Stats
+                const completed = payments.filter(p => p.status === 'completed').length;
+                const pending = payments.filter(p => p.status === 'pending').length;
+                const failed = payments.filter(p => p.status === 'failed').length;
+                const totalSpent = payments
+                    .filter(p => p.status === 'completed')
+                    .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+                let html = '';
+
+                // Success banner for just-completed payment
+                if (justPaid) {
+                    html += `
+                    <div class="success-banner">
+                        <div class="banner-icon"><span class="material-icons">check_circle</span></div>
+                        <div>
+                            <h2>Payment Successful!</h2>
+                            <p>Your document is ready to download. Thank you for your purchase.</p>
+                        </div>
+                    </div>`;
+                }
+
+                // Stats
+                html += `
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-dot green"></div>
+                        <div><div class="stat-val">${completed}</div><div class="stat-label">Completed</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-dot orange"></div>
+                        <div><div class="stat-val">${pending}</div><div class="stat-label">In Progress</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-dot red"></div>
+                        <div><div class="stat-val">${failed}</div><div class="stat-label">Failed</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-dot yellow"></div>
+                        <div><div class="stat-val">${formatPrice(totalSpent, 'RWF')}</div><div class="stat-label">Total Spent</div></div>
+                    </div>
+                </div>`;
+
+                // Purchase list
+                html += '<div class="section-title"><span class="material-icons">receipt_long</span> Purchase History</div>';
+
+                if (!payments.length) {
+                    html += `
+                    <div class="empty-state">
+                        <span class="material-icons">shopping_bag</span>
+                        <h2>No purchases yet</h2>
+                        <p>Browse our document store to find something you need.</p>
+                        <a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse Store</a>
+                    </div>`;
+                } else {
+                    html += '<div class="purchase-list">';
+
+                    payments.forEach(p => {
+                        const doc = documents[p.document_id] || {};
+                        const isCompleted = p.status === 'completed';
+
+                        html += `
+                        <div class="purchase-card">
+                            ${doc.image_url
+                                ? `<img src="${doc.image_url}" alt="" class="purchase-img" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
+                                : ''}
+                            <div class="purchase-img-placeholder" style="${doc.image_url ? 'display:none' : ''}">
+                                <span class="material-icons">description</span>
+                            </div>
+                            <div class="purchase-info">
+                                <h4>${doc.title || 'Unknown Document'}</h4>
+                                <div class="meta">
+                                    <span>${formatPrice(p.amount || doc.price || 0, p.currency || doc.currency || 'RWF')}</span>
+                                    <span>·</span>
+                                    <span>${p.created_at ? formatDate(p.created_at) : ''}</span>
+                                </div>
+                            </div>
+                            <div class="purchase-status">
+                                ${getStatusBadge(p.status)}
+                                ${isCompleted
+                                    ? `<a href="view.html?doc=${p.document_id}" class="btn btn-dark btn-sm"><span class="material-icons">download</span> Download</a>`
+                                    : `<a href="view.html?doc=${p.document_id}" class="btn btn-outline btn-sm"><span class="material-icons">visibility</span> View</a>`
+                                }
+                            </div>
+                        </div>`;
+                    });
+
+                    html += '</div>';
+
+                    html += `
+                    <div style="text-align:center;margin-top:20px;">
+                        <a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse More Documents</a>
+                    </div>`;
+                }
+
+                content.innerHTML = html;
+
+                // Auto-refresh if there are pending payments
+                const hasPending = payments.some(p => p.status === 'pending');
+                if (hasPending && justPaid) {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 8000); // Refresh after 8 seconds to check for callback
+                }
+            }
+
+            // ─── INIT ────────────────────────────
+            (async () => {
+                try {
+                    await loadData();
+                    render();
+                } catch (err) {
+                    $('content').innerHTML = `
+                        <div class="empty-state">
+                            <span class="material-icons">error_outline</span>
+                            <h2>Something went wrong</h2>
+                            <p>${err.message || 'Failed to load your purchases.'}</p>
+                            <a href="index.html" class="btn btn-dark">Back to Store</a>
+                        </div>`;
+                }
+            })();
+        })();
+    </script>
+</body>
+</html>
