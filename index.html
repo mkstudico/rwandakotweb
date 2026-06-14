@@ -2,430 +2,523 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Document Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
     <style>
         :root {
-            --bg: #f8f9fb;
-            --card-bg: #fff;
+            --bg: #fafbfc;
+            --surface: #fff;
             --text: #1a1a2e;
             --sub: #6b7280;
-            --border: #e5e7eb;
+            --border: #eef0f2;
             --accent: #1a1a2e;
+            --accent-hover: #2d2d44;
             --green: #059669;
-            --radius: 14px;
+            --green-bg: #ecfdf5;
+            --green-text: #065f46;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05);
+            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        header {
-            text-align: center;
-            padding: 52px 20px 36px;
-            background: #fff;
+        /* ── Header ── */
+        .header {
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
+            padding: 40px 20px 32px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.92);
         }
-        header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; }
-        header p { color: var(--sub); margin-top: 6px; font-size: 0.9rem; }
+        .header h1 {
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .header h1 .material-icons { font-size: 28px; color: var(--accent); }
+        .header p {
+            color: var(--sub);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-top: 4px;
+        }
 
+        /* ── Grid ── */
         .container {
             max-width: 1080px;
             margin: 0 auto;
-            padding: 32px 20px 60px;
+            padding: 28px 16px 60px;
         }
-
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-            gap: 22px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
         }
 
+        /* ── Card ── */
         .card {
-            background: var(--card-bg);
+            background: var(--surface);
             border-radius: var(--radius);
             border: 1px solid var(--border);
             overflow: hidden;
-            transition: box-shadow 0.2s, transform 0.2s;
+            transition: box-shadow var(--transition), transform var(--transition);
             display: flex;
             flex-direction: column;
         }
-        .card:hover {
-            box-shadow: 0 6px 28px rgba(0,0,0,0.07);
-            transform: translateY(-2px);
+        .card:active { transform: scale(0.99); }
+        @media (hover: hover) {
+            .card:hover {
+                box-shadow: var(--shadow);
+                transform: translateY(-2px);
+            }
         }
 
-        .card-image {
+        .card-img {
             width: 100%;
             height: 180px;
-            object-fit: cover;
             background: #f3f4f6;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #d1d5db;
-            font-size: 48px;
+            overflow: hidden;
         }
-        .card-image img { width: 100%; height: 100%; object-fit: cover; }
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card-img .material-icons {
+            font-size: 56px;
+            color: #d1d5db;
+        }
 
         .card-body {
-            padding: 20px 18px;
+            padding: 18px 16px 16px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
         .card-body h3 {
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
         }
-        .card-body p {
+        .card-body .desc {
             color: var(--sub);
-            font-size: 0.83rem;
+            font-size: 0.8rem;
+            line-height: 1.5;
             flex: 1;
-            margin-bottom: 14px;
-        }
-        .price {
-            font-size: 1.35rem;
-            font-weight: 700;
             margin-bottom: 12px;
+            font-weight: 400;
         }
-        .price small {
-            font-size: 0.7rem;
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .price-row .amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .price-row .currency {
+            font-size: 0.72rem;
             color: #9ca3af;
             font-weight: 400;
         }
-        .methods {
-            display: flex; gap: 6px;
+
+        .badges {
+            display: flex;
+            gap: 6px;
             margin-bottom: 14px;
+            flex-wrap: wrap;
         }
-        .methods span {
-            font-size: 0.68rem;
-            font-weight: 600;
-            color: #6b7280;
+        .badge {
+            font-size: 0.66rem;
+            font-weight: 500;
+            color: var(--sub);
             background: #f3f4f6;
             border-radius: 20px;
-            padding: 4px 10px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
+        .badge .material-icons { font-size: 14px; }
 
         .btn {
             width: 100%;
-            padding: 11px;
-            border-radius: 10px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
             font-weight: 600;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             cursor: pointer;
             border: none;
-            font-family: inherit;
-            transition: all 0.15s;
+            font-family: 'Poppins', sans-serif;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.2px;
+            -webkit-tap-highlight-color: transparent;
         }
-        .btn-pay {
+        .btn .material-icons { font-size: 18px; }
+
+        .btn-primary {
             background: var(--accent);
             color: #fff;
         }
-        .btn-pay:hover { background: #2d2d44; }
-        .btn-paid {
-            background: #d1fae5;
-            color: #065f46;
+        .btn-primary:active { background: var(--accent-hover); }
+        @media (hover: hover) {
+            .btn-primary:hover { background: var(--accent-hover); }
         }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        .btn-paid {
+            background: var(--green-bg);
+            color: var(--green-text);
+        }
+        .btn-paid:active { background: #d1fae5; }
+
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* ── States ── */
         .loader-wrap {
-            text-align: center; padding: 60px 20px; color: #9ca3af;
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
         }
         .spinner {
-            width: 36px; height: 36px;
+            width: 32px;
+            height: 32px;
             border: 3px solid #e5e7eb;
             border-top-color: #6b7280;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
-            margin: 0 auto 16px;
+            margin: 0 auto 14px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .empty { text-align: center; color: #9ca3af; padding: 40px; grid-column: 1/-1; }
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+        }
+        .empty-state .material-icons { font-size: 48px; margin-bottom: 10px; }
 
-        /* Modal */
+        /* ── Modal ── */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.5);
-            z-index: 999;
-            align-items: center;
+            z-index: 100;
+            align-items: flex-end;
             justify-content: center;
-            backdrop-filter: blur(3px);
         }
         .modal-overlay.active { display: flex; }
+
         .modal {
-            background: #fff;
-            border-radius: 18px;
-            padding: 30px 26px;
-            max-width: 420px;
-            width: 92%;
+            background: var(--surface);
+            border-radius: 20px 20px 0 0;
+            max-width: 440px;
+            width: 100%;
+            padding: 28px 22px 32px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .modal h2 { font-size: 1.2rem; margin-bottom: 4px; }
-        .modal .price-big { font-size: 1.5rem; font-weight: 700; margin: 10px 0; }
-        .modal .muted { color: #888; font-size: 0.83rem; margin-bottom: 16px; }
-        .modal .btn-close {
-            margin-top: 12px; background: none; border: none;
-            color: #9ca3af; cursor: pointer; font-size: 0.83rem; font-family: inherit;
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @media (min-width: 480px) {
+            .modal-overlay { align-items: center; }
+            .modal {
+                border-radius: var(--radius);
+                animation: fadeIn 0.2s ease;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+        }
+
+        .modal h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .modal .subtitle {
+            color: var(--sub);
+            font-size: 0.82rem;
+            margin-bottom: 14px;
+        }
+        .modal .price-big {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 8px 0 4px;
+        }
+        .modal .note {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
         }
         .modal iframe {
-            width: 100%; height: 420px; border: 1px solid #e5e7eb;
-            border-radius: 10px; margin-top: 10px; display: none;
+            width: 100%;
+            height: 380px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            display: none;
+            margin-top: 10px;
         }
+        .modal .btn-close {
+            margin-top: 12px;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            z-index: 200;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>📚 Document Store</h1>
-        <p>Pay securely with MTN or Airtel Money</p>
+    <header class="header">
+        <h1><span class="material-icons">description</span> Document Store</h1>
+        <p>Pay with MTN or Airtel Money</p>
     </header>
 
     <div class="container">
         <div class="grid" id="docGrid">
             <div class="loader-wrap">
                 <div class="spinner"></div>
-                <p>Loading documents...</p>
+                <p>Loading documents…</p>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="payModal">
+    <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalBody"></div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
-        const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
-        const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
+        (function() {
+            const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
+            const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
+            const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
 
-        let deviceFingerprint = null;
-        let currentPayment = { docId: null, token: null };
-        let pollInterval = null;
-        const paidDocs = new Set();
+            let fingerprint = null;
+            let current = { docId: null, token: null };
+            let pollTimer = null;
+            const paidSet = new Set();
 
-        function genToken() {
-            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            let tok = 'tok_';
-            for (let i = 0; i < 28; i++) tok += chars[Math.floor(Math.random() * chars.length)];
-            return tok + '_' + Date.now().toString(36);
-        }
+            function $(id) { return document.getElementById(id); }
 
-        async function api(path, body = null) {
-            const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
-            if (body) opts.body = JSON.stringify(body);
-            const res = await fetch(path, opts);
-            return res.json();
-        }
-
-        async function initFingerprint() {
-            try {
-                const fp = await FingerprintJS.load();
-                deviceFingerprint = (await fp.get()).visitorId;
-            } catch {
-                deviceFingerprint = 'fb_' + btoa(navigator.userAgent + screen.width + navigator.language).replace(/=/g, '').slice(0, 50);
-            }
-        }
-
-        async function loadDocuments() {
-            const docs = await api('/api/documents');
-            const grid = document.getElementById('docGrid');
-
-            if (!docs || docs.length === 0) {
-                grid.innerHTML = '<p class="empty">No documents available yet.</p>';
-                return;
+            function genToken() {
+                const c = 'abcdefghijklmnopqrstuvwxyz0123456789';
+                let t = 'tk_';
+                for (let i = 0; i < 28; i++) t += c[Math.floor(Math.random() * c.length)];
+                return t + '_' + Date.now().toString(36);
             }
 
-            // Check which docs are already paid
-            for (const doc of docs) {
-                const res = await api('/api/check-payment', {
-                    device_fingerprint: deviceFingerprint,
-                    document_id: doc.id
-                });
-                if (res.already_paid) paidDocs.add(doc.id);
+            async function api(path, body = null) {
+                const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+                if (body) opts.body = JSON.stringify(body);
+                const r = await fetch(path, opts);
+                return r.json();
             }
 
-            grid.innerHTML = docs.map(doc => {
-                const paid = paidDocs.has(doc.id);
-                return `
-                    <div class="card">
-                        <div class="card-image">
-                            ${doc.image_url 
-                                ? `<img src="${doc.image_url}" alt="${doc.title}" onerror="this.parentElement.textContent='📄'">`
-                                : '📄'}
-                        </div>
-                        <div class="card-body">
-                            <h3>${doc.title}</h3>
-                            <p>${doc.description || ''}</p>
-                            <div class="price">${doc.price.toLocaleString()} <small>${doc.currency}</small></div>
-                            <div class="methods">
-                                <span>📱 MTN MoMo</span>
-                                <span>📱 Airtel Money</span>
-                            </div>
-                            ${paid
-                                ? `<button class="btn btn-paid" onclick="downloadDocument('${doc.id}')">📥 Download Again</button>`
-                                : `<button class="btn btn-pay" onclick="startPayment('${doc.id}', ${doc.price}, '${doc.currency}')">Pay & Download</button>`
-                            }
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function startPayment(docId, amount, currency) {
-            const token = genToken();
-            currentPayment = { docId, token };
-
-            const res = await api('/api/init-payment', {
-                document_id: docId,
-                device_fingerprint: deviceFingerprint,
-                client_token: token
-            });
-
-            if (res.already_paid) {
-                paidDocs.add(docId);
-                loadDocuments();
-                return;
+            function toast(msg) {
+                const t = $('toast');
+                t.textContent = msg;
+                t.classList.add('show');
+                clearTimeout(t._timeout);
+                t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
             }
 
-            if (res.error) {
-                alert('Error: ' + res.error);
-                return;
+            async function initFingerprint() {
+                try {
+                    const fp = await FingerprintJS.load();
+                    fingerprint = (await fp.get()).visitorId;
+                } catch {
+                    fingerprint = 'fb_' + btoa(navigator.userAgent + screen.width + navigator.language).replace(/=/g, '').slice(0, 48);
+                }
             }
 
-            // Show modal with AfriPay form
-            document.getElementById('modalBody').innerHTML = `
-                <h2>Complete Payment</h2>
-                <p class="muted">${res.document_title || 'Document'}</p>
-                <div class="price-big">${res.amount.toLocaleString()} ${res.currency}</div>
-                <p class="muted">Enter your phone number on the next screen</p>
-                <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayIframe" id="payForm">
-                    <input type="hidden" name="amount" value="${res.amount}">
-                    <input type="hidden" name="currency" value="${res.currency}">
-                    <input type="hidden" name="comment" value="Document: ${res.document_title || 'Purchase'}">
-                    <input type="hidden" name="client_token" value="${token}">
-                    <input type="hidden" name="return_url" value="${window.location.href}">
-                    <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
-                    <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
-                    <button type="submit" class="btn btn-pay">Proceed to Pay</button>
-                </form>
-                <iframe name="afripayIframe" id="afripayIframe"></iframe>
-                <button class="btn-close" onclick="closePayment()">Cancel</button>
-            `;
-
-            document.getElementById('payModal').classList.add('active');
-
-            // Submit form after short delay to show UI
-            setTimeout(() => {
-                document.getElementById('payForm').submit();
-                document.getElementById('afripayIframe').style.display = 'block';
-                startPolling();
-            }, 400);
-        }
-
-        function startPolling() {
-            if (pollInterval) clearInterval(pollInterval);
-            let attempts = 0;
-
-            pollInterval = setInterval(async () => {
-                attempts++;
-                
-                const res = await api('/api/check-payment', {
-                    client_token: currentPayment.token
-                });
-
-                if (res.paid && res.status === 'completed') {
-                    clearInterval(pollInterval);
-                    paidDocs.add(currentPayment.docId);
-                    closePayment();
-                    loadDocuments();
-                    // Auto download
-                    setTimeout(() => downloadDocument(currentPayment.docId), 600);
+            async function loadDocs() {
+                const docs = await api('/api/documents');
+                const grid = $('docGrid');
+                if (!docs || !docs.length) {
+                    grid.innerHTML = '<div class="empty-state"><span class="material-icons">inventory_2</span><p>No documents available yet</p></div>';
                     return;
                 }
-
-                if (attempts > 72) { // 6 minutes (5s intervals)
-                    clearInterval(pollInterval);
-                    document.getElementById('modalBody').innerHTML = `
-                        <h2>⏰ Timeout</h2>
-                        <p class="muted">Payment is taking longer than expected.</p>
-                        <p class="muted">If you completed payment, refresh this page.</p>
-                        <button class="btn btn-pay" onclick="closePayment();loadDocuments();">Close</button>
-                    `;
+                for (const d of docs) {
+                    const c = await api('/api/check-payment', { device_fingerprint: fingerprint, document_id: d.id });
+                    if (c.already_paid) paidSet.add(d.id);
                 }
-            }, 5000);
-        }
-
-        function closePayment() {
-            if (pollInterval) clearInterval(pollInterval);
-            document.getElementById('payModal').classList.remove('active');
-            currentPayment = { docId: null, token: null };
-        }
-
-        async function downloadDocument(docId) {
-            const token = currentPayment.token || (await findExistingToken(docId));
-            
-            if (!token) {
-                alert('Payment record not found. Please contact support.');
-                return;
+                grid.innerHTML = docs.map(d => {
+                    const paid = paidSet.has(d.id);
+                    return `
+                        <div class="card">
+                            <div class="card-img">
+                                ${d.image_url ? `<img src="${d.image_url}" alt="${d.title}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'material-icons\\'>description</span>'">` : '<span class="material-icons">description</span>'}
+                            </div>
+                            <div class="card-body">
+                                <h3>${d.title}</h3>
+                                <p class="desc">${d.description || ''}</p>
+                                <div class="price-row"><span class="amount">${d.price.toLocaleString()}</span><span class="currency">${d.currency}</span></div>
+                                <div class="badges">
+                                    <span class="badge"><span class="material-icons">smartphone</span> MTN</span>
+                                    <span class="badge"><span class="material-icons">smartphone</span> Airtel</span>
+                                </div>
+                                ${paid
+                                    ? `<button class="btn btn-paid" onclick="downloadDoc('${d.id}')"><span class="material-icons">download</span> Download</button>`
+                                    : `<button class="btn btn-primary" onclick="startPay('${d.id}',${d.price},'${d.currency}','${d.title.replace(/'/g,"\\'")}')"><span class="material-icons">payment</span> Pay & Download</button>`
+                                }
+                            </div>
+                        </div>`;
+                }).join('');
             }
 
-            const res = await api('/api/download', {
-                client_token: token,
-                device_fingerprint: deviceFingerprint,
-                document_id: docId
-            });
+            async function startPay(docId, amount, currency, title) {
+                const token = genToken();
+                current = { docId, token };
 
-            if (res.url) {
-                window.open(res.url, '_blank');
-            } else {
-                alert(res.error || 'Download failed. Please try again.');
-            }
-        }
-
-        async function findExistingToken(docId) {
-            // For already-paid documents, we need a valid token
-            // Generate a new token and check if already paid
-            const token = genToken();
-            const res = await api('/api/check-payment', {
-                device_fingerprint: deviceFingerprint,
-                document_id: docId
-            });
-            if (res.already_paid) {
-                // Init a dummy payment to get a valid token for download
-                const initRes = await api('/api/init-payment', {
-                    document_id: docId,
-                    device_fingerprint: deviceFingerprint,
-                    client_token: token
+                const res = await api('/api/init-payment', {
+                    document_id: docId, device_fingerprint: fingerprint, client_token: token
                 });
-                if (initRes.already_paid) return token;
+
+                if (res.already_paid) { paidSet.add(docId); loadDocs(); return; }
+                if (res.error) { toast(res.error); return; }
+
+                $('modalBody').innerHTML = `
+                    <h2>Complete Payment</h2>
+                    <p class="subtitle">${title}</p>
+                    <div class="price-big">${res.amount.toLocaleString()} ${res.currency}</div>
+                    <p class="note">Enter your phone number on the next screen</p>
+                    <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayIframe" id="payForm">
+                        <input type="hidden" name="amount" value="${res.amount}">
+                        <input type="hidden" name="currency" value="${res.currency}">
+                        <input type="hidden" name="comment" value="Document: ${title}">
+                        <input type="hidden" name="client_token" value="${token}">
+                        <input type="hidden" name="return_url" value="${location.href}">
+                        <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
+                        <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
+                        <button type="submit" class="btn btn-primary"><span class="material-icons">lock</span> Proceed to Pay</button>
+                    </form>
+                    <iframe name="afripayIframe" id="afripayIframe"></iframe>
+                    <button class="btn-close" onclick="closeModal()">Cancel</button>
+                `;
+
+                $('modalOverlay').classList.add('active');
+
+                setTimeout(() => {
+                    $('payForm').submit();
+                    const iframe = $('afripayIframe');
+                    if (iframe) iframe.style.display = 'block';
+                    startPoll();
+                }, 300);
             }
-            return null;
-        }
 
-        async function init() {
-            await initFingerprint();
-            await loadDocuments();
+            function startPoll() {
+                clearInterval(pollTimer);
+                let tries = 0;
+                pollTimer = setInterval(async () => {
+                    tries++;
+                    const res = await api('/api/check-payment', { client_token: current.token });
+                    if (res.paid && res.status === 'completed') {
+                        clearInterval(pollTimer);
+                        paidSet.add(current.docId);
+                        closeModal();
+                        loadDocs();
+                        setTimeout(() => downloadDoc(current.docId), 500);
+                        return;
+                    }
+                    if (tries > 72) {
+                        clearInterval(pollTimer);
+                        $('modalBody').innerHTML = `
+                            <h2><span class="material-icons" style="font-size:40px;">schedule</span></h2>
+                            <p class="subtitle">Payment is taking longer than expected</p>
+                            <p class="note">If you completed payment, refresh this page</p>
+                            <button class="btn btn-primary" onclick="closeModal();loadDocs();">Close</button>
+                        `;
+                    }
+                }, 5000);
+            }
 
-            document.getElementById('payModal').addEventListener('click', function(e) {
-                if (e.target === this) closePayment();
-            });
-        }
+            function closeModal() {
+                clearInterval(pollTimer);
+                $('modalOverlay').classList.remove('active');
+                current = { docId: null, token: null };
+            }
 
-        init();
-    </script>
-</body>
-</html>
+            async function downloadDoc(docId) {
+                let t = current.token;
+                if (!t) {
+                    const c = await api('/api/check-payment', { device_fingerprint: fingerprint, document_id: docId });
+                    if (c.already_paid) {
+                        t = genToken();
+                        await api('/api/init-payment', { document_id: docId, device_fingerprint: fingerprint, client_token: t });
+                    }
+                }
+                if (!t) { toast('Please complete payment first'); return; }
+                const res = await api('/api/download', { client_token: t, device_fingerprint: fingerprint, document_id: docId });
+                if (res.url) { window.open(res.url, '_blank'); }
+                else { toast(res.error || 'Download
