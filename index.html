@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Document Store</title>
+    <title>DocStore</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,232 +12,281 @@
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
     <style>
         :root {
-            --bg: #fafbfc;
+            --bg: #f8f9fb;
             --surface: #fff;
-            --text: #1a1a2e;
+            --text: #111;
             --sub: #6b7280;
             --border: #eef0f2;
-            --accent: #1a1a2e;
-            --accent-hover: #2d2d44;
+            --accent: #111;
+            --accent2: #f0f4ff;
             --green: #059669;
             --green-bg: #ecfdf5;
             --green-text: #065f46;
-            --radius: 16px;
+            --radius: 14px;
             --radius-sm: 10px;
-            --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05);
-            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.05);
+            --tr: 0.2s cubic-bezier(0.4,0,0.2,1);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ── Header ── */
-        .header {
-            background: var(--surface);
+        /* Header */
+        .topbar {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
-            padding: 40px 20px 32px;
-            text-align: center;
+            padding: 14px 20px;
             position: sticky;
             top: 0;
-            z-index: 10;
-            backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.92);
-        }
-        .header h1 {
-            font-size: clamp(1.4rem, 4vw, 1.8rem);
-            font-weight: 700;
-            letter-spacing: -0.3px;
+            z-index: 50;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 14px;
         }
-        .header h1 .material-icons { font-size: 28px; color: var(--accent); }
-        .header p {
+        .topbar .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+        .topbar .logo .material-icons { font-size: 26px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #f3f4f6;
+            border-radius: 30px;
+            padding: 3px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            padding: 8px 18px;
+            border-radius: 28px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            background: transparent;
             color: var(--sub);
-            font-size: 0.9rem;
-            font-weight: 400;
-            margin-top: 4px;
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
+            transition: all var(--tr);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .tab-btn .material-icons { font-size: 16px; }
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--text);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
-        /* ── Grid ── */
+        /* Main */
         .container {
-            max-width: 1080px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 28px 16px 60px;
+            padding: 20px 16px 60px;
         }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            letter-spacing: -0.2px;
+        }
+        .section-title .material-icons { font-size: 20px; }
+
+        /* Grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
         }
-
-        /* ── Card ── */
         .card {
             background: var(--surface);
             border-radius: var(--radius);
             border: 1px solid var(--border);
             overflow: hidden;
-            transition: box-shadow var(--transition), transform var(--transition);
+            cursor: pointer;
+            transition: box-shadow var(--tr), transform var(--tr);
             display: flex;
             flex-direction: column;
+            -webkit-tap-highlight-color: transparent;
         }
-        .card:active { transform: scale(0.99); }
-        @media (hover: hover) {
-            .card:hover {
-                box-shadow: var(--shadow);
-                transform: translateY(-2px);
-            }
-        }
+        .card:active { transform: scale(0.98); }
+        @media (hover:hover) { .card:hover { box-shadow: var(--shadow); transform: translateY(-2px); } }
 
         .card-img {
             width: 100%;
-            height: 180px;
+            height: 160px;
             background: #f3f4f6;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
         }
-        .card-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .card-img img { width:100%; height:100%; object-fit:cover; }
+        .card-img .material-icons { font-size: 48px; color: #d1d5db; }
+        .card-img .click-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 500;
         }
-        .card-img .material-icons {
-            font-size: 56px;
-            color: #d1d5db;
-        }
+        .card-img .click-badge .material-icons { font-size: 12px; color: #fff; }
 
         .card-body {
-            padding: 18px 16px 16px;
+            padding: 14px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
-        .card-body h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            letter-spacing: -0.2px;
-        }
-        .card-body .desc {
-            color: var(--sub);
-            font-size: 0.8rem;
-            line-height: 1.5;
-            flex: 1;
-            margin-bottom: 12px;
-            font-weight: 400;
-        }
-        .price-row {
+        .card-body h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 2px; letter-spacing: -0.2px; }
+        .card-body .desc { font-size: 0.75rem; color: var(--sub); line-height: 1.4; flex: 1; margin-bottom: 10px; }
+        .card-body .price {
+            font-size: 1.1rem;
+            font-weight: 700;
             display: flex;
             align-items: baseline;
-            gap: 4px;
-            margin-bottom: 10px;
+            gap: 3px;
         }
-        .price-row .amount {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-        .price-row .currency {
-            font-size: 0.72rem;
-            color: #9ca3af;
-            font-weight: 400;
-        }
+        .card-body .price small { font-size: 0.65rem; color: #9ca3af; font-weight: 400; }
 
-        .badges {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            margin-bottom: 28px;
         }
-        .badge {
-            font-size: 0.66rem;
-            font-weight: 500;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        th {
+            text-align: left;
+            padding: 12px 14px;
+            font-weight: 600;
+            font-size: 0.72rem;
             color: var(--sub);
-            background: #f3f4f6;
-            border-radius: 20px;
-            padding: 5px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr { cursor: pointer; transition: background var(--tr); }
+        tr:active { background: #f9fafb; }
+        @media (hover:hover) { tr:hover { background: #fafbfc; } }
+        .td-title {
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 8px;
         }
-        .badge .material-icons { font-size: 14px; }
+        .td-title img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
 
-        .btn {
+        /* Document View */
+        .doc-view {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+        .doc-view.active { display: block; }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 16px;
+            padding: 6px 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .doc-hero {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+        .doc-hero img {
             width: 100%;
-            padding: 11px 16px;
-            border-radius: var(--radius-sm);
+            max-height: 280px;
+            object-fit: cover;
+        }
+        .doc-hero .hero-body {
+            padding: 20px 18px;
+        }
+        .doc-hero h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+        .doc-hero .meta { font-size: 0.8rem; color: var(--sub); margin-bottom: 12px; }
+        .doc-hero .price-lg { font-size: 1.5rem; font-weight: 700; margin-bottom: 14px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 22px;
+            border-radius: 30px;
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
             border: none;
             font-family: 'Poppins', sans-serif;
-            transition: all var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            letter-spacing: -0.2px;
+            transition: all var(--tr);
             -webkit-tap-highlight-color: transparent;
         }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:active { background: #333; }
+        .btn-paid { background: var(--green-bg); color: var(--green-text); }
         .btn .material-icons { font-size: 18px; }
 
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-        }
-        .btn-primary:active { background: var(--accent-hover); }
-        @media (hover: hover) {
-            .btn-primary:hover { background: var(--accent-hover); }
-        }
-
-        .btn-paid {
-            background: var(--green-bg);
-            color: var(--green-text);
-        }
-        .btn-paid:active { background: #d1fae5; }
-
-        .btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        /* ── States ── */
-        .loader-wrap {
-            grid-column: 1/-1;
-            text-align: center;
-            padding: 60px 20px;
-            color: #9ca3af;
-        }
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid #e5e7eb;
-            border-top-color: #6b7280;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin: 0 auto 14px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .empty-state {
-            grid-column: 1/-1;
-            text-align: center;
-            padding: 50px 20px;
-            color: #9ca3af;
-        }
-        .empty-state .material-icons { font-size: 48px; margin-bottom: 10px; }
-
-        /* ── Modal ── */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -247,73 +297,41 @@
             justify-content: center;
         }
         .modal-overlay.active { display: flex; }
-
         .modal {
             background: var(--surface);
             border-radius: 20px 20px 0 0;
             max-width: 440px;
             width: 100%;
-            padding: 28px 22px 32px;
+            padding: 26px 20px 30px;
             text-align: center;
             animation: slideUp 0.3s ease;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
         }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @media (min-width: 480px) {
             .modal-overlay { align-items: center; }
-            .modal {
-                border-radius: var(--radius);
-                animation: fadeIn 0.2s ease;
-            }
-            @keyframes fadeIn {
-                from { opacity: 0; transform: scale(0.95); }
-                to { opacity: 1; transform: scale(1); }
-            }
+            .modal { border-radius: var(--radius); animation: fadeIn 0.2s ease; }
         }
-
-        .modal h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .modal .subtitle {
-            color: var(--sub);
-            font-size: 0.82rem;
-            margin-bottom: 14px;
-        }
-        .modal .price-big {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin: 8px 0 4px;
-        }
-        .modal .note {
-            color: #9ca3af;
-            font-size: 0.75rem;
-            margin-bottom: 16px;
-        }
+        .modal h2 { font-size: 1.1rem; font-weight: 600; }
+        .modal .sub { color: var(--sub); font-size: 0.8rem; margin: 4px 0 12px; }
+        .modal .price-big { font-size: 1.5rem; font-weight: 700; margin: 6px 0; }
         .modal iframe {
             width: 100%;
-            height: 380px;
+            height: 360px;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             display: none;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .modal .btn-close {
-            margin-top: 12px;
+            margin-top: 10px;
             background: none;
             border: none;
             color: #9ca3af;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 500;
-            -webkit-tap-highlight-color: transparent;
+            font-size: 0.78rem;
         }
 
         .toast {
@@ -321,36 +339,53 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: #1a1a2e;
+            background: #111;
             color: #fff;
             padding: 12px 22px;
             border-radius: 50px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 500;
             font-family: 'Poppins', sans-serif;
             z-index: 200;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s;
             pointer-events: none;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .loader-wrap { text-align: center; padding: 60px 20px; color: #9ca3af; }
+        .spinner {
+            width: 30px; height: 30px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #888;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <h1><span class="material-icons">description</span> Document Store</h1>
-        <p>Pay with MTN or Airtel Money</p>
+    <header class="topbar">
+        <div class="logo"><span class="material-icons">description</span> DocStore</div>
+        <div class="tabs" id="tabs">
+            <button class="tab-btn active" data-tab="recent"><span class="material-icons">schedule</span> Recent</button>
+            <button class="tab-btn" data-tab="suggested"><span class="material-icons">auto_awesome</span> Suggested</button>
+            <button class="tab-btn" data-tab="all"><span class="material-icons">apps</span> All</button>
+            <button class="tab-btn" data-tab="table"><span class="material-icons">view_list</span> List</button>
+        </div>
     </header>
 
     <div class="container">
-        <div class="grid" id="docGrid">
-            <div class="loader-wrap">
-                <div class="spinner"></div>
-                <p>Loading documents…</p>
-            </div>
-        </div>
+        <!-- Tabs Content -->
+        <div id="tabContent"></div>
+
+        <!-- Document Detail View -->
+        <div class="doc-view" id="docView"></div>
     </div>
 
+    <!-- Payment Modal -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalBody"></div>
     </div>
@@ -364,13 +399,15 @@
             const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
             const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
 
+            let allDocs = [];
+            let paidSet = new Set();
             let fingerprint = null;
-            let current = { docId: null, token: null };
+            let currentTab = 'recent';
+            let currentDoc = null;
             let pollTimer = null;
-            const paidSet = new Set();
+            let payToken = null;
 
             function $(id) { return document.getElementById(id); }
-
             function genToken() {
                 const c = 'abcdefghijklmnopqrstuvwxyz0123456789';
                 let t = 'tk_';
@@ -382,6 +419,7 @@
                 const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
                 if (body) opts.body = JSON.stringify(body);
                 const r = await fetch(path, opts);
+                if (!r.ok) throw new Error('API error: ' + r.status);
                 return r.json();
             }
 
@@ -389,152 +427,223 @@
                 const t = $('toast');
                 t.textContent = msg;
                 t.classList.add('show');
-                clearTimeout(t._timeout);
-                t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
+                clearTimeout(t._tid);
+                t._tid = setTimeout(() => t.classList.remove('show'), 2500);
             }
 
-            async function initFingerprint() {
+            function formatPrice(n, c) {
+                return `${parseInt(n).toLocaleString()} <small>${c || 'RWF'}</small>`;
+            }
+
+            // FINGERPRINT
+            async function initFP() {
                 try {
                     const fp = await FingerprintJS.load();
                     fingerprint = (await fp.get()).visitorId;
                 } catch {
-                    fingerprint = 'fb_' + btoa(navigator.userAgent + screen.width + navigator.language).replace(/=/g, '').slice(0, 48);
+                    fingerprint = 'fb_' + btoa(navigator.userAgent + screen.width).replace(/=/g, '').slice(0, 48);
                 }
             }
 
+            // LOAD ALL DOCS
             async function loadDocs() {
-                const docs = await api('/api/documents');
-                const grid = $('docGrid');
-                if (!docs || !docs.length) {
-                    grid.innerHTML = '<div class="empty-state"><span class="material-icons">inventory_2</span><p>No documents available yet</p></div>';
-                    return;
-                }
-                for (const d of docs) {
+                allDocs = await api('/api/documents');
+                for (const d of allDocs) {
                     const c = await api('/api/check-payment', { device_fingerprint: fingerprint, document_id: d.id });
                     if (c.already_paid) paidSet.add(d.id);
                 }
-                grid.innerHTML = docs.map(d => {
-                    const paid = paidSet.has(d.id);
-                    return `
-                        <div class="card">
-                            <div class="card-img">
-                                ${d.image_url ? `<img src="${d.image_url}" alt="${d.title}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'material-icons\\'>description</span>'">` : '<span class="material-icons">description</span>'}
-                            </div>
-                            <div class="card-body">
-                                <h3>${d.title}</h3>
-                                <p class="desc">${d.description || ''}</p>
-                                <div class="price-row"><span class="amount">${d.price.toLocaleString()}</span><span class="currency">${d.currency}</span></div>
-                                <div class="badges">
-                                    <span class="badge"><span class="material-icons">smartphone</span> MTN</span>
-                                    <span class="badge"><span class="material-icons">smartphone</span> Airtel</span>
-                                </div>
-                                ${paid
-                                    ? `<button class="btn btn-paid" onclick="downloadDoc('${d.id}')"><span class="material-icons">download</span> Download</button>`
-                                    : `<button class="btn btn-primary" onclick="startPay('${d.id}',${d.price},'${d.currency}','${d.title.replace(/'/g,"\\'")}')"><span class="material-icons">payment</span> Pay & Download</button>`
-                                }
-                            </div>
-                        </div>`;
-                }).join('');
+                renderTab(currentTab);
             }
 
-            async function startPay(docId, amount, currency, title) {
-                const token = genToken();
-                current = { docId, token };
+            // CLICK TRACKER
+            async function trackClick(docId) {
+                try { await api(`/api/documents/${docId}/click`, {}); } catch {}
+            }
 
+            // RENDER CARD
+            function cardHTML(d) {
+                const paid = paidSet.has(d.id);
+                return `
+                <div class="card" onclick="openDoc('${d.id}')">
+                    <div class="card-img">
+                        ${d.image_url ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'material-icons\\'>description</span>'">` : '<span class="material-icons">description</span>'}
+                        ${d.clicks > 0 ? `<span class="click-badge"><span class="material-icons">trending_up</span> ${d.clicks}</span>` : ''}
+                    </div>
+                    <div class="card-body">
+                        <h3>${d.title}</h3>
+                        <p class="desc">${(d.description || '').slice(0, 80)}${d.description && d.description.length > 80 ? '…' : ''}</p>
+                        <div class="price">${formatPrice(d.price, d.currency)}</div>
+                    </div>
+                </div>`;
+            }
+
+            function tableRow(d) {
+                return `
+                <tr onclick="openDoc('${d.id}')">
+                    <td><div class="td-title">${d.image_url ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''} ${d.title}</div></td>
+                    <td>${d.clicks || 0}</td>
+                    <td>${parseInt(d.price).toLocaleString()} ${d.currency}</td>
+                    <td>${paidSet.has(d.id) ? '✅ Paid' : '💳 Pay'}</td>
+                </tr>`;
+            }
+
+            // RENDER TAB
+            function renderTab(tab) {
+                currentTab = tab;
+                const tc = $('tabContent');
+                const docs = [...allDocs];
+
+                if (tab === 'recent') {
+                    const recent = docs.slice(0, 8);
+                    tc.innerHTML = `
+                        <div class="section-title"><span class="material-icons">schedule</span> Recently Added</div>
+                        <div class="grid">${recent.map(cardHTML).join('') || '<div class="empty-state">No documents yet</div>'}</div>`;
+                } else if (tab === 'suggested') {
+                    const sorted = docs.sort((a, b) => (b.clicks || 0) - (a.clicks || 0)).slice(0, 8);
+                    tc.innerHTML = `
+                        <div class="section-title"><span class="material-icons">auto_awesome</span> Most Popular</div>
+                        <div class="grid">${sorted.map(cardHTML).join('') || '<div class="empty-state">No data yet</div>'}</div>`;
+                } else if (tab === 'all') {
+                    tc.innerHTML = `
+                        <div class="section-title"><span class="material-icons">apps</span> All Documents</div>
+                        <div class="grid">${docs.map(cardHTML).join('') || '<div class="empty-state">No documents</div>'}</div>`;
+                } else if (tab === 'table') {
+                    tc.innerHTML = `
+                        <div class="section-title"><span class="material-icons">view_list</span> All Documents</div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Document</th><th>Views</th><th>Price</th><th>Status</th></tr></thead>
+                                <tbody>${docs.map(tableRow).join('') || '<tr><td colspan="4" style="text-align:center;color:#9ca3af;">No documents</td></tr>'}</tbody>
+                            </table>
+                        </div>`;
+                }
+            }
+
+            // TAB SWITCHING
+            $('tabs').addEventListener('click', function(e) {
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                $('docView').classList.remove('active');
+                $('tabContent').style.display = 'block';
+                renderTab(btn.dataset.tab);
+            });
+
+            // OPEN DOCUMENT
+            window.openDoc = async function(docId) {
+                await trackClick(docId);
+                const doc = allDocs.find(d => d.id === docId) || await api(`/api/documents/${docId}`);
+                if (!doc) return;
+                currentDoc = doc;
+                const paid = paidSet.has(docId);
+
+                $('tabContent').style.display = 'none';
+                const dv = $('docView');
+                dv.innerHTML = `
+                    <button class="back-btn" onclick="closeDoc()"><span class="material-icons">arrow_back</span> Back</button>
+                    <div class="doc-hero">
+                        ${doc.image_url ? `<img src="${doc.image_url}" alt="" onerror="this.style.display='none'">` : ''}
+                        <div class="hero-body">
+                            <h2>${doc.title}</h2>
+                            <p class="meta">${doc.description || ''}</p>
+                            <div class="price-lg">${formatPrice(doc.price, doc.currency)}</div>
+                            ${paid
+                                ? `<button class="btn btn-paid" onclick="downloadNow('${doc.id}')"><span class="material-icons">download</span> Download</button>`
+                                : `<button class="btn btn-primary" onclick="startPayment('${doc.id}',${doc.price},'${doc.currency}','${doc.title.replace(/'/g,"\\'")}')"><span class="material-icons">lock</span> Pay to Download</button>`
+                            }
+                        </div>
+                    </div>`;
+                dv.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            window.closeDoc = function() {
+                $('docView').classList.remove('active');
+                $('tabContent').style.display = 'block';
+                currentDoc = null;
+                renderTab(currentTab);
+            };
+
+            // PAYMENT
+            window.startPayment = async function(docId, amount, currency, title) {
+                payToken = genToken();
                 const res = await api('/api/init-payment', {
-                    document_id: docId, device_fingerprint: fingerprint, client_token: token
+                    document_id: docId, device_fingerprint: fingerprint, client_token: payToken
                 });
-
-                if (res.already_paid) { paidSet.add(docId); loadDocs(); return; }
+                if (res.already_paid) { paidSet.add(docId); openDoc(docId); return; }
                 if (res.error) { toast(res.error); return; }
 
                 $('modalBody').innerHTML = `
                     <h2>Complete Payment</h2>
-                    <p class="subtitle">${title}</p>
+                    <p class="sub">${title}</p>
                     <div class="price-big">${res.amount.toLocaleString()} ${res.currency}</div>
-                    <p class="note">Enter your phone number on the next screen</p>
-                    <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayIframe" id="payForm">
+                    <p class="sub" style="margin-top:4px;">Enter phone number on next screen</p>
+                    <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayFrame" id="payForm">
                         <input type="hidden" name="amount" value="${res.amount}">
                         <input type="hidden" name="currency" value="${res.currency}">
-                        <input type="hidden" name="comment" value="Document: ${title}">
-                        <input type="hidden" name="client_token" value="${token}">
-                        <input type="hidden" name="return_url" value="${location.href}">
+                        <input type="hidden" name="comment" value="${title}">
+                        <input type="hidden" name="client_token" value="${payToken}">
+                        <input type="hidden" name="return_url" value="${location.origin}${location.pathname}">
                         <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
                         <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
-                        <button type="submit" class="btn btn-primary"><span class="material-icons">lock</span> Proceed to Pay</button>
+                        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;"><span class="material-icons">payment</span> Pay Now</button>
                     </form>
-                    <iframe name="afripayIframe" id="afripayIframe"></iframe>
-                    <button class="btn-close" onclick="closeModal()">Cancel</button>
-                `;
-
+                    <iframe name="afripayFrame" id="afripayFrame"></iframe>
+                    <button class="btn-close" onclick="closeModal()">Cancel</button>`;
                 $('modalOverlay').classList.add('active');
 
                 setTimeout(() => {
                     $('payForm').submit();
-                    const iframe = $('afripayIframe');
+                    const iframe = $('afripayFrame');
                     if (iframe) iframe.style.display = 'block';
-                    startPoll();
+                    startPoll(docId);
                 }, 300);
-            }
+            };
 
-            function startPoll() {
+            function startPoll(docId) {
                 clearInterval(pollTimer);
                 let tries = 0;
                 pollTimer = setInterval(async () => {
                     tries++;
-                    const res = await api('/api/check-payment', { client_token: current.token });
-                    if (res.paid && res.status === 'completed') {
+                    const res = await api('/api/check-payment', { client_token: payToken });
+                    if (res.paid) {
                         clearInterval(pollTimer);
-                        paidSet.add(current.docId);
+                        paidSet.add(docId);
                         closeModal();
-                        loadDocs();
-                        setTimeout(() => downloadDoc(current.docId), 500);
+                        openDoc(docId);
                         return;
                     }
                     if (tries > 72) {
                         clearInterval(pollTimer);
-                        $('modalBody').innerHTML = `
-                            <h2><span class="material-icons" style="font-size:40px;">schedule</span></h2>
-                            <p class="subtitle">Payment is taking longer than expected</p>
-                            <p class="note">If you completed payment, refresh this page</p>
-                            <button class="btn btn-primary" onclick="closeModal();loadDocs();">Close</button>
-                        `;
+                        $('modalBody').innerHTML = `<h2><span class="material-icons" style="font-size:40px;">schedule</span></h2><p class="sub">Taking longer than expected</p><p class="sub">Refresh if you completed payment</p><button class="btn btn-primary" onclick="closeModal();openDoc('${docId}')">Close</button>`;
                     }
                 }, 5000);
             }
 
-            function closeModal() {
+            window.closeModal = function() {
                 clearInterval(pollTimer);
                 $('modalOverlay').classList.remove('active');
-                current = { docId: null, token: null };
-            }
+                payToken = null;
+            };
 
-            async function downloadDoc(docId) {
-                let t = current.token;
-                if (!t) {
-                    const c = await api('/api/check-payment', { device_fingerprint: fingerprint, document_id: docId });
-                    if (c.already_paid) {
-                        t = genToken();
-                        await api('/api/init-payment', { document_id: docId, device_fingerprint: fingerprint, client_token: t });
-                    }
+            window.downloadNow = async function(docId) {
+                let t = payToken || genToken();
+                if (!payToken) {
+                    await api('/api/init-payment', { document_id: docId, device_fingerprint: fingerprint, client_token: t });
                 }
-                if (!t) { toast('Please complete payment first'); return; }
                 const res = await api('/api/download', { client_token: t, device_fingerprint: fingerprint, document_id: docId });
                 if (res.url) { window.open(res.url, '_blank'); }
                 else { toast(res.error || 'Download failed'); }
-            }
+            };
 
             $('modalOverlay').addEventListener('click', function(e) {
                 if (e.target === this) closeModal();
             });
 
-            window.startPay = startPay;
-            window.downloadDoc = downloadDoc;
-            window.closeModal = closeModal;
-            window.loadDocs = loadDocs;
-
+            // INIT
             (async () => {
-                await initFingerprint();
+                await initFP();
                 await loadDocs();
             })();
         })();
