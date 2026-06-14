@@ -2,477 +2,482 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — Document Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --bg: #f9fafb;
-            --card: #fff;
-            --text: #111;
+            --bg: #fafbfc;
+            --surface: #fff;
+            --text: #1a1a2e;
             --sub: #6b7280;
-            --border: #e5e7eb;
-            --accent: #111;
+            --border: #eef0f2;
+            --accent: #1a1a2e;
             --red: #dc2626;
             --green: #059669;
-            --radius: 12px;
+            --green-bg: #ecfdf5;
+            --red-bg: #fef2f2;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        .login-wrap {
-            max-width: 400px;
+
+        .login-screen {
+            max-width: 380px;
             margin: 80px auto;
             padding: 20px;
         }
         .login-card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 36px 28px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 36px 24px;
             border: 1px solid var(--border);
             text-align: center;
         }
-        .login-card h1 { font-size: 1.4rem; margin-bottom: 20px; }
-        .login-card input {
+        .login-card .material-icons { font-size: 40px; color: var(--accent); margin-bottom: 8px; }
+        .login-card h1 { font-size: 1.3rem; font-weight: 600; margin-bottom: 18px; }
+        .input {
             width: 100%;
-            padding: 12px;
+            padding: 12px 14px;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 1rem;
-            margin-bottom: 14px;
-            font-family: inherit;
-        }
-        .btn {
-            padding: 11px 22px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 12px;
+            transition: border var(--transition);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .input:focus { border-color: var(--accent); }
+        .btn {
+            padding: 11px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
             border: none;
-            font-family: inherit;
-            transition: 0.15s;
+            font-family: 'Poppins', sans-serif;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            -webkit-tap-highlight-color: transparent;
         }
+        .btn .material-icons { font-size: 18px; }
         .btn-dark { background: var(--accent); color: #fff; }
-        .btn-dark:hover { background: #333; }
+        .btn-dark:active { background: #2d2d44; }
         .btn-red { background: var(--red); color: #fff; }
-        .btn-red:hover { background: #b91c1c; }
+        .btn-red:active { background: #b91c1c; }
         .btn-green { background: var(--green); color: #fff; }
-        .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text); }
-
-        .dashboard { display: none; max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        .dash-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 28px;
+        .btn-outline {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
         }
-        .dash-header h1 { font-size: 1.5rem; }
+        .btn-outline:active { background: #f9fafb; }
+        .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        .dashboard { display: none; max-width: 880px; margin: 0 auto; padding: 28px 16px 60px; }
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .dash-header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         .form-card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 24px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 22px 18px;
             border: 1px solid var(--border);
-            margin-bottom: 28px;
+            margin-bottom: 22px;
         }
-        .form-card h2 { font-size: 1.1rem; margin-bottom: 16px; }
+        .form-card h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 14px;
+            gap: 12px;
         }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
         .form-group.full { grid-column: 1/-1; }
-        .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--sub); }
-        .form-group input, .form-group textarea {
+        .form-group label {
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--sub);
+        }
+        .form-group .input, .form-group textarea {
+            width: 100%;
             padding: 10px 12px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 0.9rem;
-            font-family: inherit;
+            font-size: 0.85rem;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
             resize: vertical;
         }
-        .form-group textarea { min-height: 70px; }
-
+        .form-group textarea { min-height: 65px; }
         .preview-img {
             width: 100%;
-            max-height: 140px;
+            max-height: 120px;
             object-fit: cover;
             border-radius: 8px;
-            margin-top: 8px;
+            margin-top: 6px;
             border: 1px solid var(--border);
         }
+        .file-status { font-size: 0.72rem; color: var(--sub); margin-top: 4px; }
 
-        .docs-list { display: grid; gap: 14px; }
+        .docs-list { display: grid; gap: 10px; }
         .doc-row {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 16px 18px;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 14px;
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .doc-row img {
-            width: 56px; height: 56px;
-            object-fit: cover; border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
             flex-shrink: 0;
         }
-        .doc-row .info { flex: 1; }
-        .doc-row .info h4 { font-size: 0.95rem; margin-bottom: 2px; }
-        .doc-row .info span {
-            font-size: 0.78rem; color: var(--sub);
+        .doc-row .icon-placeholder {
+            width: 50px;
+            height: 50px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
-        .doc-row .actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .doc-row .info { flex: 1; min-width: 140px; }
+        .doc-row .info h4 { font-size: 0.9rem; font-weight: 600; }
+        .doc-row .info span { font-size: 0.72rem; color: var(--sub); display: block; margin-top: 1px; }
+        .doc-row .actions { display: flex; gap: 6px; flex-shrink: 0; }
         .badge {
-            font-size: 0.7rem; font-weight: 600;
-            padding: 3px 8px; border-radius: 20px;
+            font-size: 0.66rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 20px;
+            display: inline-block;
         }
-        .badge-active { background: #d1fae5; color: #065f46; }
-        .badge-inactive { background: #fee2e2; color: #991b1b; }
+        .badge-active { background: var(--green-bg); color: #065f46; }
+        .badge-inactive { background: var(--red-bg); color: #991b1b; }
 
         .toast {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #111;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a2e;
             color: #fff;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-size: 0.8rem;
             font-weight: 500;
-            z-index: 999;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: 0.3s;
+            font-family: 'Poppins', sans-serif;
+            z-index: 200;
+            transition: transform 0.3s ease;
+            pointer-events: none;
         }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.error { background: #dc2626; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.err { background: #dc2626; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 540px) {
             .form-row { grid-template-columns: 1fr; }
-            .doc-row { flex-wrap: wrap; }
-            .doc-row .actions { width: 100%; justify-content: flex-end; }
+            .doc-row .actions { width: 100%; justify-content: flex-end; margin-top: 6px; }
+            .dash-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 
-    <div class="login-wrap" id="loginScreen">
+    <div class="login-screen" id="loginScreen">
         <div class="login-card">
-            <h1>🔐 Admin Login</h1>
-            <input type="password" id="adminKey" placeholder="Enter admin key" autofocus>
-            <button class="btn btn-dark" onclick="login()" style="width:100%">Login</button>
-            <p id="loginError" style="color:#dc2626;font-size:0.83rem;margin-top:10px;display:none;"></p>
+            <span class="material-icons">shield</span>
+            <h1>Admin Login</h1>
+            <input type="password" class="input" id="adminKey" placeholder="Enter admin key" autocomplete="off">
+            <button class="btn btn-dark btn-block" onclick="login()"><span class="material-icons">login</span> Sign In</button>
+            <p style="color:#dc2626;font-size:0.78rem;margin-top:10px;display:none;" id="loginErr"></p>
         </div>
     </div>
 
     <div class="dashboard" id="dashboard">
         <div class="dash-header">
-            <h1>📋 Document Manager</h1>
-            <button class="btn btn-outline" onclick="logout()">Logout</button>
+            <h1><span class="material-icons">dashboard</span> Document Manager</h1>
+            <button class="btn btn-outline" onclick="logout()"><span class="material-icons">logout</span> Logout</button>
         </div>
 
-        <!-- Add Document Form -->
-        <div class="form-card" id="addForm">
-            <h2 id="formTitle">➕ Add New Document</h2>
+        <div class="form-card">
+            <h2 id="formTitle"><span class="material-icons">add_circle</span> Add Document</h2>
             <div class="form-row">
-                <div class="form-group full">
-                    <label>Title *</label>
-                    <input type="text" id="docTitle" placeholder="Document title">
-                </div>
-                <div class="form-group full">
-                    <label>Description</label>
-                    <textarea id="docDesc" placeholder="Brief description..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Price (RWF) *</label>
-                    <input type="number" id="docPrice" placeholder="500" min="1">
-                </div>
-                <div class="form-group">
-                    <label>Currency</label>
-                    <input type="text" id="docCurrency" value="RWF" placeholder="RWF">
-                </div>
+                <div class="form-group full"><label>Title *</label><input type="text" class="input" id="dTitle" placeholder="Document title"></div>
+                <div class="form-group full"><label>Description</label><textarea id="dDesc" placeholder="Brief description…"></textarea></div>
+                <div class="form-group"><label>Price (RWF) *</label><input type="number" class="input" id="dPrice" placeholder="500" min="1"></div>
+                <div class="form-group"><label>Currency</label><input type="text" class="input" id="dCurrency" value="RWF"></div>
                 <div class="form-group full">
                     <label>Preview Image</label>
-                    <input type="file" id="docImage" accept="image/*">
-                    <img class="preview-img" id="imagePreview" style="display:none;">
-                    <input type="hidden" id="imageUrl">
-                    <small style="color:#9ca3af;">Uploads via ImgBB</small>
+                    <input type="file" id="dImage" accept="image/*" style="font-size:0.8rem;">
+                    <img class="preview-img" id="imgPreview" style="display:none;">
+                    <input type="hidden" id="imgUrl">
                 </div>
                 <div class="form-group full">
                     <label>Document File *</label>
-                    <input type="file" id="docFile">
+                    <input type="file" id="dFile" style="font-size:0.8rem;">
+                    <span class="file-status" id="fileStatus"></span>
                     <input type="hidden" id="filePath">
-                    <small style="color:#9ca3af;" id="fileStatus"></small>
                 </div>
             </div>
-            <input type="hidden" id="editDocId">
-            <button class="btn btn-dark" onclick="saveDocument()" id="saveBtn">💾 Save Document</button>
-            <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel</button>
+            <input type="hidden" id="editId">
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <button class="btn btn-dark" onclick="saveDoc()" id="saveBtn"><span class="material-icons">save</span> Save</button>
+                <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel</button>
+            </div>
         </div>
 
-        <!-- Documents List -->
-        <h2 style="font-size:1.1rem;margin-bottom:14px;">📚 All Documents</h2>
-        <div class="docs-list" id="docsList">
-            <p style="color:#9ca3af;">Loading...</p>
-        </div>
+        <h2 style="font-size:1.05rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px;"><span class="material-icons">library_books</span> All Documents</h2>
+        <div class="docs-list" id="docsList"><p style="color:#9ca3af;">Loading…</p></div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        const IMGBB_API_KEY = '2077df548acf5a4f53658b930c7fe87a';
-        let adminToken = null;
+        (function() {
+            const IMGBB_KEY = '2077df548acf5a4f53658b930c7fe87a';
+            let adminToken = null;
 
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast show' + (isError ? ' error' : '');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
+            function $(id) { return document.getElementById(id); }
 
-        async function api(path, body = null, method = null) {
-            const opts = {
-                method: method || (body ? 'POST' : 'GET'),
-                headers: { 'Content-Type': 'application/json' }
-            };
-            if (adminToken) opts.headers['Authorization'] = 'Bearer ' + adminToken;
-            if (body) opts.body = JSON.stringify(body);
-            const res = await fetch(path, opts);
-            if (res.status === 401) { logout(); throw new Error('Unauthorized'); }
-            return res.json();
-        }
-
-        async function login() {
-            const key = document.getElementById('adminKey').value;
-            if (!key) return;
-            
-            adminToken = key;
-            const res = await api('/api/admin/verify', {});
-            
-            if (res.authenticated) {
-                localStorage.setItem('admin_token', key);
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                loadDocuments();
-            } else {
-                adminToken = null;
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').textContent = 'Invalid admin key';
+            function toast(msg, err = false) {
+                const t = $('toast');
+                t.textContent = msg;
+                t.className = 'toast show' + (err ? ' err' : '');
+                clearTimeout(t._timeout);
+                t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
             }
-        }
 
-        function logout() {
-            adminToken = null;
-            localStorage.removeItem('admin_token');
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('adminKey').value = '';
-        }
+            async function api(path, body = null, method = null) {
+                const opts = {
+                    method: method || (body ? 'POST' : 'GET'),
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (adminToken) opts.headers['Authorization'] = 'Bearer ' + adminToken;
+                if (body) opts.body = JSON.stringify(body);
+                const r = await fetch(path, opts);
+                if (r.status === 401) { logout(); throw new Error('Unauthorized'); }
+                return r.json();
+            }
 
-        // Auto-login from localStorage
-        if (localStorage.getItem('admin_token')) {
-            adminToken = localStorage.getItem('admin_token');
-            api('/api/admin/verify', {}).then(res => {
+            async function login() {
+                const key = $('adminKey').value;
+                if (!key) return;
+                adminToken = key;
+                const res = await api('/api/admin/verify', {});
                 if (res.authenticated) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                    loadDocuments();
+                    localStorage.setItem('adm_tok', key);
+                    $('loginScreen').style.display = 'none';
+                    $('dashboard').style.display = 'block';
+                    loadDocs();
                 } else {
-                    logout();
+                    adminToken = null;
+                    $('loginErr').style.display = 'block';
+                    $('loginErr').textContent = 'Invalid key';
                 }
+            }
+
+            function logout() {
+                adminToken = null;
+                localStorage.removeItem('adm_tok');
+                $('loginScreen').style.display = 'block';
+                $('dashboard').style.display = 'none';
+                $('adminKey').value = '';
+            }
+
+            // Auto login
+            const saved = localStorage.getItem('adm_tok');
+            if (saved) {
+                adminToken = saved;
+                api('/api/admin/verify', {}).then(r => {
+                    if (r.authenticated) {
+                        $('loginScreen').style.display = 'none';
+                        $('dashboard').style.display = 'block';
+                        loadDocs();
+                    } else { logout(); }
+                });
+            }
+
+            $('dImage').addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = ev => { $('imgPreview').src = ev.target.result; $('imgPreview').style.display = 'block'; };
+                reader.readAsDataURL(file);
+                const fd = new FormData();
+                fd.append('image', file);
+                try {
+                    const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
+                    const d = await r.json();
+                    if (d.success) { $('imgUrl').value = d.data.url; toast('Image uploaded'); }
+                    else { toast('Image upload failed', true); }
+                } catch { toast('Upload error', true); }
             });
-        }
 
-        // Image upload to ImgBB
-        document.getElementById('docImage').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+            $('dFile').addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                $('fileStatus').textContent = 'Uploading…';
+                const fd = new FormData();
+                fd.append('file', file);
+                try {
+                    const r = await fetch('/api/admin/upload', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + adminToken },
+                        body: fd
+                    });
+                    const d = await r.json();
+                    if (d.file_path) {
+                        $('filePath').value = d.file_path;
+                        $('fileStatus').textContent = '✅ ' + d.filename;
+                        toast('File uploaded');
+                    } else {
+                        $('fileStatus').textContent = '❌ ' + (d.error || 'Failed');
+                        toast('Upload failed', true);
+                    }
+                } catch { $('fileStatus').textContent = '❌ Error'; toast('Upload error', true); }
+            });
 
-            // Preview
-            const reader = new FileReader();
-            reader.onload = ev => {
-                document.getElementById('imagePreview').src = ev.target.result;
-                document.getElementById('imagePreview').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            async function saveDoc() {
+                const title = $('dTitle').value.trim();
+                const desc = $('dDesc').value.trim();
+                const price = $('dPrice').value;
+                const currency = $('dCurrency').value.trim() || 'RWF';
+                const img = $('imgUrl').value.trim();
+                const fp = $('filePath').value.trim();
+                const editId = $('editId').value;
 
-            // Upload to ImgBB
-            const formData = new FormData();
-            formData.append('image', file);
+                if (!title) return toast('Title required', true);
+                if (!price || parseInt(price) <= 0) return toast('Valid price required', true);
+                if (!fp && !editId) return toast('Upload document file', true);
 
-            try {
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('imageUrl').value = data.data.url;
-                    showToast('Image uploaded successfully');
-                } else {
-                    showToast('Image upload failed', true);
-                }
-            } catch (err) {
-                showToast('Image upload error', true);
-            }
-        });
-
-        // File upload to Supabase Storage via our API
-        document.getElementById('docFile').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            document.getElementById('fileStatus').textContent = 'Uploading...';
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const res = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + adminToken },
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.file_path) {
-                    document.getElementById('filePath').value = data.file_path;
-                    document.getElementById('fileStatus').textContent = `✅ Uploaded: ${data.filename}`;
-                    showToast('File uploaded');
-                } else {
-                    document.getElementById('fileStatus').textContent = '❌ ' + (data.error || 'Upload failed');
-                    showToast('File upload failed', true);
-                }
-            } catch (err) {
-                document.getElementById('fileStatus').textContent = '❌ Upload error';
-                showToast('Upload error', true);
-            }
-        });
-
-        async function saveDocument() {
-            const title = document.getElementById('docTitle').value.trim();
-            const description = document.getElementById('docDesc').value.trim();
-            const price = document.getElementById('docPrice').value;
-            const currency = document.getElementById('docCurrency').value.trim() || 'RWF';
-            const imageUrl = document.getElementById('imageUrl').value.trim();
-            const filePath = document.getElementById('filePath').value.trim();
-            const editId = document.getElementById('editDocId').value;
-
-            if (!title) return showToast('Title is required', true);
-            if (!price || parseInt(price) <= 0) return showToast('Valid price required', true);
-            if (!filePath && !editId) return showToast('Please upload the document file', true);
-
-            const body = {
-                title,
-                description,
-                price: parseInt(price),
-                currency: currency.toUpperCase(),
-                image_url: imageUrl,
-                file_path: filePath
-            };
-
-            const res = await api('/api/admin/documents', body);
-            
-            if (res.error) {
-                showToast(res.error, true);
-            } else {
-                showToast('Document saved!');
-                resetForm();
-                loadDocuments();
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('docTitle').value = '';
-            document.getElementById('docDesc').value = '';
-            document.getElementById('docPrice').value = '';
-            document.getElementById('docCurrency').value = 'RWF';
-            document.getElementById('imageUrl').value = '';
-            document.getElementById('filePath').value = '';
-            document.getElementById('editDocId').value = '';
-            document.getElementById('docImage').value = '';
-            document.getElementById('docFile').value = '';
-            document.getElementById('imagePreview').style.display = 'none';
-            document.getElementById('fileStatus').textContent = '';
-            document.getElementById('formTitle').textContent = '➕ Add New Document';
-            document.getElementById('cancelBtn').style.display = 'none';
-        }
-
-        function editDocument(doc) {
-            document.getElementById('docTitle').value = doc.title;
-            document.getElementById('docDesc').value = doc.description || '';
-            document.getElementById('docPrice').value = doc.price;
-            document.getElementById('docCurrency').value = doc.currency;
-            document.getElementById('imageUrl').value = doc.image_url || '';
-            document.getElementById('filePath').value = doc.file_path;
-            document.getElementById('editDocId').value = doc.id;
-            document.getElementById('formTitle').textContent = '✏️ Edit Document';
-            document.getElementById('cancelBtn').style.display = 'inline-block';
-            
-            if (doc.image_url) {
-                document.getElementById('imagePreview').src = doc.image_url;
-                document.getElementById('imagePreview').style.display = 'block';
+                const body = { title, description: desc, price: parseInt(price), currency: currency.toUpperCase(), image_url: img, file_path: fp };
+                const res = await api('/api/admin/documents', body);
+                if (res.error) { toast(res.error, true); }
+                else { toast('Saved!'); resetForm(); loadDocs(); }
             }
 
-            document.getElementById('addForm').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        async function toggleDocument(docId) {
-            const res = await api(`/api/admin/documents/${docId}/toggle`, {}, 'PUT');
-            if (res.error) showToast(res.error, true);
-            else loadDocuments();
-        }
-
-        async function deleteDocument(docId, title) {
-            if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-            const res = await api(`/api/admin/documents/${docId}`, {}, 'DELETE');
-            if (res.error) showToast(res.error, true);
-            else {
-                showToast('Document deleted');
-                loadDocuments();
-            }
-        }
-
-        async function loadDocuments() {
-            const res = await api('/api/admin/documents');
-            const list = document.getElementById('docsList');
-
-            if (res.error) {
-                list.innerHTML = '<p style="color:#dc2626;">Failed to load: ' + res.error + '</p>';
-                return;
+            function resetForm() {
+                $('dTitle').value = '';
+                $('dDesc').value = '';
+                $('dPrice').value = '';
+                $('dCurrency').value = 'RWF';
+                $('imgUrl').value = '';
+                $('filePath').value = '';
+                $('editId').value = '';
+                $('dImage').value = '';
+                $('dFile').value = '';
+                $('imgPreview').style.display = 'none';
+                $('fileStatus').textContent = '';
+                $('formTitle').innerHTML = '<span class="material-icons">add_circle</span> Add Document';
+                $('cancelBtn').style.display = 'none';
             }
 
-            if (!res.length) {
-                list.innerHTML = '<p style="color:#9ca3af;">No documents yet. Add your first one above.</p>';
-                return;
+            function editDoc(doc) {
+                $('dTitle').value = doc.title;
+                $('dDesc').value = doc.description || '';
+                $('dPrice').value = doc.price;
+                $('dCurrency').value = doc.currency;
+                $('imgUrl').value = doc.image_url || '';
+                $('filePath').value = doc.file_path;
+                $('editId').value = doc.id;
+                $('formTitle').innerHTML = '<span class="material-icons">edit</span> Edit Document';
+                $('cancelBtn').style.display = 'inline-flex';
+                if (doc.image_url) { $('imgPreview').src = doc.image_url; $('imgPreview').style.display = 'block'; }
+                $('formCard')?.scrollIntoView({ behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            list.innerHTML = res.map(doc => `
-                <div class="doc-row">
-                    ${doc.image_url 
-                        ? `<img src="${doc.image_url}" alt="" onerror="this.style.display='none'">`
-                        : `<div style="width:56px;height:56px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">📄</div>`}
-                    <div class="info">
-                        <h4>${doc.title} <span class="badge ${doc.active ? 'badge-active' : 'badge-inactive'}">${doc.active ? 'Active' : 'Hidden'}</span></h4>
-                        <span>${doc.price.toLocaleString()} ${doc.currency} · ${doc.file_path.split('/').pop()}</span>
+            async function toggleDoc(id) {
+                const r = await api(`/api/admin/documents/${id}/toggle`, {}, 'PUT');
+                if (r.error) toast(r.error, true);
+                else loadDocs();
+            }
+
+            async function deleteDoc(id, title) {
+                if (!confirm(`Delete "${title}" permanently?`)) return;
+                const r = await api(`/api/admin/documents/${id}`, {}, 'DELETE');
+                if (r.error) toast(r.error, true);
+                else { toast('Deleted'); loadDocs(); }
+            }
+
+            async function loadDocs() {
+                const res = await api('/api/admin/documents');
+                const list = $('docsList');
+                if (res.error) { list.innerHTML = `<p style="color:#dc2626;">${res.error}</p>`; return; }
+                if (!res.length) { list.innerHTML = '<p style="color:#9ca3af;">No documents. Add your first one above.</p>'; return; }
+                list.innerHTML = res.map(d => `
+                    <div class="doc-row">
+                        ${d.image_url
+                            ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
+                            : ''}
+                        <div class="icon-placeholder" style="${d.image_url ? 'display:none' : ''}"><span class="material-icons" style="color:#d1d5db;">description</span></div>
+                        <div class="info">
+                            <h4>${d.title} <span class="badge ${d.active ? 'badge-active' : 'badge-inactive'}">${d.active ? 'Active' : 'Hidden'}</span></h4>
+                            <span>${d.price.toLocaleString()} ${d.currency} · ${d.file_path?.split('/').pop() || ''}</span>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-outline btn-sm" onclick='editDoc(${JSON.stringify(d)})'><span class="material-icons">edit</span></button>
+                            <button class="btn btn-outline btn-sm" onclick="toggleDoc('${d.id}')"><span class="material-icons">${d.active ? 'visibility_off' : 'visibility'}</span></button>
+                            <button class="btn btn-red btn-sm" onclick="deleteDoc('${d.id}','${d.title.replace(/'/g,"\\'")}')"><span class="material-icons">delete</span></button>
+                        </div>
                     </div>
-                    <div class="actions">
-                        <button class="btn btn-outline" onclick='editDocument(${JSON.stringify(doc)})'>✏️</button>
-                        <button class="btn btn-outline" onclick="toggleDocument('${doc.id}')">${doc.active ? '👁️' : '👁️‍🗨️'}</button>
-                        <button class="btn btn-red" onclick="deleteDocument('${doc.id}', '${doc.title.replace(/'/g, "\\'")}')">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+                `).join('');
+            }
 
-        // Enter key to login
-        document.getElementById('adminKey').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') login();
-        });
+            $('adminKey').addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+
+            window.login = login;
+            window.logout = logout;
+            window.saveDoc = saveDoc;
+            window.resetForm = resetForm;
+            window.editDoc = editDoc;
+            window.toggleDoc = toggleDoc;
+            window.deleteDoc = deleteDoc;
+            window.loadDocs = loadDocs;
+        })();
     </script>
 </body>
 </html>
