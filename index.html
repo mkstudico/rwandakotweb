@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
     <style>
         :root {
             --bg: #f8f9fb;
@@ -18,16 +17,19 @@
             --sub: #6b7280;
             --border: #eef0f2;
             --accent: #111;
-            --accent2: #f0f4ff;
+            --accent-light: #f3f4f6;
             --green: #059669;
             --green-bg: #ecfdf5;
             --green-text: #065f46;
-            --radius: 14px;
+            --orange: #ea580c;
+            --radius: 16px;
             --radius-sm: 10px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.05);
             --tr: 0.2s cubic-bezier(0.4,0,0.2,1);
         }
+
         * { margin:0; padding:0; box-sizing:border-box; }
+
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg);
@@ -36,89 +38,110 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
+        /* ── TOP BAR ── */
         .topbar {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.92);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             padding: 14px 20px;
             position: sticky;
             top: 0;
             z-index: 50;
+        }
+        .topbar-inner {
+            max-width: 1100px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 14px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        .topbar .logo {
-            font-size: 1.2rem;
+        .logo {
+            font-size: 1.15rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
             letter-spacing: -0.3px;
+            flex-shrink: 0;
         }
-        .topbar .logo .material-icons { font-size: 26px; }
+        .logo .material-icons { font-size: 24px; }
 
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            background: #f3f4f6;
+        .search-wrap {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-wrap .material-icons {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 20px;
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 42px;
+            border: 1px solid var(--border);
             border-radius: 30px;
-            padding: 3px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab-btn {
-            padding: 8px 18px;
-            border-radius: 28px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            background: transparent;
-            color: var(--sub);
+            font-size: 0.85rem;
             font-family: 'Poppins', sans-serif;
-            white-space: nowrap;
+            background: #f9fafb;
+            outline: none;
             transition: all var(--tr);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            -webkit-appearance: none;
         }
-        .tab-btn .material-icons { font-size: 16px; }
-        .tab-btn.active {
+        .search-input:focus {
+            border-color: #d1d5db;
             background: var(--surface);
-            color: var(--text);
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
         }
+        .search-input::placeholder { color: #b0b7c3; }
 
-        /* Main */
+        /* ── MAIN CONTAINER ── */
         .container {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 20px 16px 60px;
+            padding: 24px 16px 60px;
         }
-        .section-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
+
+        /* ── SECTION ── */
+        .section {
+            margin-bottom: 36px;
+        }
+        .section-header {
             display: flex;
             align-items: center;
-            gap: 7px;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             letter-spacing: -0.2px;
         }
-        .section-title .material-icons { font-size: 20px; }
+        .section-title .material-icons { font-size: 20px; color: var(--accent); }
+        .section-count {
+            font-size: 0.72rem;
+            color: var(--sub);
+            font-weight: 400;
+            background: var(--accent-light);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
 
-        /* Grid */
+        /* ── GRID ── */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 14px;
-            margin-bottom: 28px;
         }
         .card {
             background: var(--surface);
@@ -130,9 +153,13 @@
             display: flex;
             flex-direction: column;
             -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+            color: inherit;
         }
         .card:active { transform: scale(0.98); }
-        @media (hover:hover) { .card:hover { box-shadow: var(--shadow); transform: translateY(-2px); } }
+        @media (hover:hover) {
+            .card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+        }
 
         .card-img {
             width: 100%;
@@ -146,58 +173,77 @@
         }
         .card-img img { width:100%; height:100%; object-fit:cover; }
         .card-img .material-icons { font-size: 48px; color: #d1d5db; }
-        .card-img .click-badge {
+        .card-badge {
             position: absolute;
             top: 10px;
             right: 10px;
             background: rgba(0,0,0,0.6);
             color: #fff;
-            font-size: 0.65rem;
-            padding: 3px 8px;
+            font-size: 0.64rem;
+            padding: 3px 9px;
             border-radius: 20px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 3px;
-            font-weight: 500;
         }
-        .card-img .click-badge .material-icons { font-size: 12px; color: #fff; }
+        .card-badge .material-icons { font-size: 12px; color: #fff; }
 
         .card-body {
-            padding: 14px;
+            padding: 14px 15px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
-        .card-body h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 2px; letter-spacing: -0.2px; }
-        .card-body .desc { font-size: 0.75rem; color: var(--sub); line-height: 1.4; flex: 1; margin-bottom: 10px; }
+        .card-body h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+            letter-spacing: -0.2px;
+            line-height: 1.3;
+        }
+        .card-body .desc {
+            font-size: 0.74rem;
+            color: var(--sub);
+            line-height: 1.4;
+            flex: 1;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         .card-body .price {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             display: flex;
             align-items: baseline;
             gap: 3px;
         }
-        .card-body .price small { font-size: 0.65rem; color: #9ca3af; font-weight: 400; }
+        .card-body .price small {
+            font-size: 0.64rem;
+            color: #9ca3af;
+            font-weight: 400;
+        }
 
-        /* Table */
+        /* ── TABLE ── */
         .table-wrap {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             border-radius: var(--radius);
             border: 1px solid var(--border);
             background: var(--surface);
-            margin-bottom: 28px;
         }
-        table {
+        .table-wrap table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.82rem;
         }
-        th {
+        .table-wrap th {
             text-align: left;
             padding: 12px 14px;
             font-weight: 600;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: var(--sub);
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -205,20 +251,27 @@
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
-        td {
-            padding: 12px 14px;
+        .table-wrap td {
+            padding: 11px 14px;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
-        tr:last-child td { border-bottom: none; }
-        tr { cursor: pointer; transition: background var(--tr); }
-        tr:active { background: #f9fafb; }
-        @media (hover:hover) { tr:hover { background: #fafbfc; } }
+        .table-wrap tr:last-child td { border-bottom: none; }
+        .table-wrap tbody tr {
+            cursor: pointer;
+            transition: background var(--tr);
+        }
+        .table-wrap tbody tr:active { background: #f9fafb; }
+        @media (hover:hover) {
+            .table-wrap tbody tr:hover { background: #fafbfc; }
+        }
         .td-title {
-            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
+            font-weight: 500;
+            color: var(--text);
+            text-decoration: none;
         }
         .td-title img {
             width: 32px;
@@ -226,135 +279,37 @@
             border-radius: 6px;
             object-fit: cover;
         }
-
-        /* Document View */
-        .doc-view {
-            display: none;
-            animation: fadeIn 0.25s ease;
-        }
-        @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
-        .doc-view.active { display: block; }
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
+        .td-status {
+            font-size: 0.72rem;
             font-weight: 500;
-            color: var(--accent);
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-family: 'Poppins', sans-serif;
-            margin-bottom: 16px;
-            padding: 6px 0;
-            -webkit-tap-highlight-color: transparent;
         }
-        .doc-hero {
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            margin-bottom: 18px;
-        }
-        .doc-hero img {
-            width: 100%;
-            max-height: 280px;
-            object-fit: cover;
-        }
-        .doc-hero .hero-body {
-            padding: 20px 18px;
-        }
-        .doc-hero h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
-        .doc-hero .meta { font-size: 0.8rem; color: var(--sub); margin-bottom: 12px; }
-        .doc-hero .price-lg { font-size: 1.5rem; font-weight: 700; margin-bottom: 14px; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 11px 22px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: none;
-            font-family: 'Poppins', sans-serif;
-            transition: all var(--tr);
-            -webkit-tap-highlight-color: transparent;
-        }
-        .btn-primary { background: var(--accent); color: #fff; }
-        .btn-primary:active { background: #333; }
-        .btn-paid { background: var(--green-bg); color: var(--green-text); }
-        .btn .material-icons { font-size: 18px; }
+        .td-status.paid { color: var(--green); }
+        .td-status.unpaid { color: var(--sub); }
 
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--surface);
-            border-radius: 20px 20px 0 0;
-            max-width: 440px;
-            width: 100%;
-            padding: 26px 20px 30px;
+        /* ── EMPTY ── */
+        .empty-state {
             text-align: center;
-            animation: slideUp 0.3s ease;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @media (min-width: 480px) {
-            .modal-overlay { align-items: center; }
-            .modal { border-radius: var(--radius); animation: fadeIn 0.2s ease; }
-        }
-        .modal h2 { font-size: 1.1rem; font-weight: 600; }
-        .modal .sub { color: var(--sub); font-size: 0.8rem; margin: 4px 0 12px; }
-        .modal .price-big { font-size: 1.5rem; font-weight: 700; margin: 6px 0; }
-        .modal iframe {
-            width: 100%;
-            height: 360px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            display: none;
-            margin-top: 8px;
-        }
-        .modal .btn-close {
-            margin-top: 10px;
-            background: none;
-            border: none;
+            padding: 50px 20px;
             color: #9ca3af;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.78rem;
+        }
+        .empty-state .material-icons {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+            font-weight: 400;
         }
 
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #111;
-            color: #fff;
-            padding: 12px 22px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            font-family: 'Poppins', sans-serif;
-            z-index: 200;
-            transition: transform 0.3s;
-            pointer-events: none;
+        /* ── LOADER ── */
+        .loader-wrap {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-
-        .loader-wrap { text-align: center; padding: 60px 20px; color: #9ca3af; }
         .spinner {
-            width: 30px; height: 30px;
+            width: 30px;
+            height: 30px;
             border: 3px solid #e5e7eb;
             border-top-color: #888;
             border-radius: 50%;
@@ -362,289 +317,211 @@
             margin: 0 auto 12px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 500px) {
+            .topbar-inner { gap: 10px; }
+            .search-wrap { order: 3; width: 100%; }
+            .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .card-img { height: 130px; }
+            .card-body { padding: 10px 12px; }
+            .card-body h3 { font-size: 0.8rem; }
+            .card-body .price { font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
 
     <header class="topbar">
-        <div class="logo"><span class="material-icons">description</span> DocStore</div>
-        <div class="tabs" id="tabs">
-            <button class="tab-btn active" data-tab="recent"><span class="material-icons">schedule</span> Recent</button>
-            <button class="tab-btn" data-tab="suggested"><span class="material-icons">auto_awesome</span> Suggested</button>
-            <button class="tab-btn" data-tab="all"><span class="material-icons">apps</span> All</button>
-            <button class="tab-btn" data-tab="table"><span class="material-icons">view_list</span> List</button>
+        <div class="topbar-inner">
+            <div class="logo">
+                <span class="material-icons">description</span>
+                DocStore
+            </div>
+            <div class="search-wrap">
+                <span class="material-icons">search</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search documents..." autocomplete="off">
+            </div>
         </div>
     </header>
 
-    <div class="container">
-        <!-- Tabs Content -->
-        <div id="tabContent"></div>
-
-        <!-- Document Detail View -->
-        <div class="doc-view" id="docView"></div>
+    <div class="container" id="content">
+        <div class="loader-wrap">
+            <div class="spinner"></div>
+            <p>Loading documents…</p>
+        </div>
     </div>
-
-    <!-- Payment Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modalBody"></div>
-    </div>
-
-    <div class="toast" id="toast"></div>
 
     <script>
         (function() {
             const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
-            const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
-            const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
 
             let allDocs = [];
             let paidSet = new Set();
-            let fingerprint = null;
-            let currentTab = 'recent';
-            let currentDoc = null;
-            let pollTimer = null;
-            let payToken = null;
+            let searchTerm = '';
+            let debounceTimer = null;
 
             function $(id) { return document.getElementById(id); }
-            function genToken() {
-                const c = 'abcdefghijklmnopqrstuvwxyz0123456789';
-                let t = 'tk_';
-                for (let i = 0; i < 28; i++) t += c[Math.floor(Math.random() * c.length)];
-                return t + '_' + Date.now().toString(36);
-            }
 
-            async function api(path, body = null) {
-                const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
-                if (body) opts.body = JSON.stringify(body);
-                const r = await fetch(path, opts);
-                if (!r.ok) throw new Error('API error: ' + r.status);
+            async function api(path) {
+                const r = await fetch(path);
+                if (!r.ok) throw new Error('API error');
                 return r.json();
-            }
-
-            function toast(msg) {
-                const t = $('toast');
-                t.textContent = msg;
-                t.classList.add('show');
-                clearTimeout(t._tid);
-                t._tid = setTimeout(() => t.classList.remove('show'), 2500);
             }
 
             function formatPrice(n, c) {
                 return `${parseInt(n).toLocaleString()} <small>${c || 'RWF'}</small>`;
             }
 
-            // FINGERPRINT
-            async function initFP() {
-                try {
-                    const fp = await FingerprintJS.load();
-                    fingerprint = (await fp.get()).visitorId;
-                } catch {
-                    fingerprint = 'fb_' + btoa(navigator.userAgent + screen.width).replace(/=/g, '').slice(0, 48);
-                }
-            }
-
-            // LOAD ALL DOCS
-            async function loadDocs() {
-                allDocs = await api('/api/documents');
-                for (const d of allDocs) {
-                    const c = await api('/api/check-payment', { device_fingerprint: fingerprint, document_id: d.id });
-                    if (c.already_paid) paidSet.add(d.id);
-                }
-                renderTab(currentTab);
-            }
-
-            // CLICK TRACKER
-            async function trackClick(docId) {
-                try { await api(`/api/documents/${docId}/click`, {}); } catch {}
-            }
-
-            // RENDER CARD
+            // ── BUILD CARD HTML ──
             function cardHTML(d) {
-                const paid = paidSet.has(d.id);
                 return `
-                <div class="card" onclick="openDoc('${d.id}')">
+                <a href="view.html?doc=${d.id}" class="card" onclick="trackClick('${d.id}')">
                     <div class="card-img">
-                        ${d.image_url ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'material-icons\\'>description</span>'">` : '<span class="material-icons">description</span>'}
-                        ${d.clicks > 0 ? `<span class="click-badge"><span class="material-icons">trending_up</span> ${d.clicks}</span>` : ''}
+                        ${d.image_url
+                            ? `<img src="${d.image_url}" alt="${d.title}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'material-icons\\'>description</span>'">`
+                            : '<span class="material-icons">description</span>'}
+                        ${(d.clicks || 0) > 0 ? `<span class="card-badge"><span class="material-icons">trending_up</span>${d.clicks}</span>` : ''}
                     </div>
                     <div class="card-body">
                         <h3>${d.title}</h3>
-                        <p class="desc">${(d.description || '').slice(0, 80)}${d.description && d.description.length > 80 ? '…' : ''}</p>
+                        <p class="desc">${d.description || ''}</p>
                         <div class="price">${formatPrice(d.price, d.currency)}</div>
                     </div>
-                </div>`;
+                </a>`;
             }
 
+            // ── BUILD TABLE ROW ──
             function tableRow(d) {
                 return `
-                <tr onclick="openDoc('${d.id}')">
-                    <td><div class="td-title">${d.image_url ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''} ${d.title}</div></td>
-                    <td>${d.clicks || 0}</td>
+                <tr onclick="window.location.href='view.html?doc=${d.id}';trackClick('${d.id}');">
+                    <td>
+                        <span class="td-title">
+                            ${d.image_url ? `<img src="${d.image_url}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+                            ${d.title}
+                        </span>
+                    </td>
+                    <td>${(d.clicks || 0).toLocaleString()}</td>
                     <td>${parseInt(d.price).toLocaleString()} ${d.currency}</td>
-                    <td>${paidSet.has(d.id) ? '✅ Paid' : '💳 Pay'}</td>
+                    <td class="td-status ${paidSet.has(d.id) ? 'paid' : 'unpaid'}">${paidSet.has(d.id) ? 'Paid' : 'Available'}</td>
                 </tr>`;
             }
 
-            // RENDER TAB
-            function renderTab(tab) {
-                currentTab = tab;
-                const tc = $('tabContent');
-                const docs = [...allDocs];
+            // ── FILTER DOCS ──
+            function filterDocs() {
+                if (!searchTerm.trim()) return allDocs;
+                const q = searchTerm.toLowerCase().trim();
+                return allDocs.filter(d =>
+                    d.title.toLowerCase().includes(q) ||
+                    (d.description || '').toLowerCase().includes(q)
+                );
+            }
 
-                if (tab === 'recent') {
-                    const recent = docs.slice(0, 8);
-                    tc.innerHTML = `
-                        <div class="section-title"><span class="material-icons">schedule</span> Recently Added</div>
-                        <div class="grid">${recent.map(cardHTML).join('') || '<div class="empty-state">No documents yet</div>'}</div>`;
-                } else if (tab === 'suggested') {
-                    const sorted = docs.sort((a, b) => (b.clicks || 0) - (a.clicks || 0)).slice(0, 8);
-                    tc.innerHTML = `
-                        <div class="section-title"><span class="material-icons">auto_awesome</span> Most Popular</div>
-                        <div class="grid">${sorted.map(cardHTML).join('') || '<div class="empty-state">No data yet</div>'}</div>`;
-                } else if (tab === 'all') {
-                    tc.innerHTML = `
-                        <div class="section-title"><span class="material-icons">apps</span> All Documents</div>
-                        <div class="grid">${docs.map(cardHTML).join('') || '<div class="empty-state">No documents</div>'}</div>`;
-                } else if (tab === 'table') {
-                    tc.innerHTML = `
-                        <div class="section-title"><span class="material-icons">view_list</span> All Documents</div>
+            // ── RENDER ALL SECTIONS ──
+            function render() {
+                const docs = filterDocs();
+                const content = $('content');
+
+                if (!docs.length) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <span class="material-icons">search_off</span>
+                            <p>${searchTerm ? 'No documents match your search' : 'No documents available yet'}</p>
+                        </div>`;
+                    return;
+                }
+
+                // Recent: newest 8
+                const recent = [...docs].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 8);
+                // Suggested: most clicked 8
+                const suggested = [...docs].sort((a, b) => (b.clicks || 0) - (a.clicks || 0)).slice(0, 8);
+
+                content.innerHTML = `
+                    <!-- Suggested -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span class="material-icons">auto_awesome</span> Suggested
+                            </div>
+                            <span class="section-count">${suggested.length} doc${suggested.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="grid">${suggested.map(cardHTML).join('')}</div>
+                    </div>
+
+                    <!-- Recent -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span class="material-icons">schedule</span> Recent
+                            </div>
+                            <span class="section-count">${recent.length} doc${recent.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="grid">${recent.map(cardHTML).join('')}</div>
+                    </div>
+
+                    <!-- All Grid -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span class="material-icons">apps</span> All Documents
+                            </div>
+                            <span class="section-count">${docs.length} doc${docs.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="grid">${docs.map(cardHTML).join('')}</div>
+                    </div>
+
+                    <!-- List / Table -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span class="material-icons">view_list</span> All Documents (List)
+                            </div>
+                            <span class="section-count">${docs.length} doc${docs.length !== 1 ? 's' : ''}</span>
+                        </div>
                         <div class="table-wrap">
                             <table>
-                                <thead><tr><th>Document</th><th>Views</th><th>Price</th><th>Status</th></tr></thead>
-                                <tbody>${docs.map(tableRow).join('') || '<tr><td colspan="4" style="text-align:center;color:#9ca3af;">No documents</td></tr>'}</tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Document</th>
+                                        <th>Views</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${docs.map(tableRow).join('')}
+                                </tbody>
                             </table>
-                        </div>`;
-                }
-            }
-
-            // TAB SWITCHING
-            $('tabs').addEventListener('click', function(e) {
-                const btn = e.target.closest('.tab-btn');
-                if (!btn) return;
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                $('docView').classList.remove('active');
-                $('tabContent').style.display = 'block';
-                renderTab(btn.dataset.tab);
-            });
-
-            // OPEN DOCUMENT
-            window.openDoc = async function(docId) {
-                await trackClick(docId);
-                const doc = allDocs.find(d => d.id === docId) || await api(`/api/documents/${docId}`);
-                if (!doc) return;
-                currentDoc = doc;
-                const paid = paidSet.has(docId);
-
-                $('tabContent').style.display = 'none';
-                const dv = $('docView');
-                dv.innerHTML = `
-                    <button class="back-btn" onclick="closeDoc()"><span class="material-icons">arrow_back</span> Back</button>
-                    <div class="doc-hero">
-                        ${doc.image_url ? `<img src="${doc.image_url}" alt="" onerror="this.style.display='none'">` : ''}
-                        <div class="hero-body">
-                            <h2>${doc.title}</h2>
-                            <p class="meta">${doc.description || ''}</p>
-                            <div class="price-lg">${formatPrice(doc.price, doc.currency)}</div>
-                            ${paid
-                                ? `<button class="btn btn-paid" onclick="downloadNow('${doc.id}')"><span class="material-icons">download</span> Download</button>`
-                                : `<button class="btn btn-primary" onclick="startPayment('${doc.id}',${doc.price},'${doc.currency}','${doc.title.replace(/'/g,"\\'")}')"><span class="material-icons">lock</span> Pay to Download</button>`
-                            }
                         </div>
-                    </div>`;
-                dv.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
-            window.closeDoc = function() {
-                $('docView').classList.remove('active');
-                $('tabContent').style.display = 'block';
-                currentDoc = null;
-                renderTab(currentTab);
-            };
-
-            // PAYMENT
-            window.startPayment = async function(docId, amount, currency, title) {
-                payToken = genToken();
-                const res = await api('/api/init-payment', {
-                    document_id: docId, device_fingerprint: fingerprint, client_token: payToken
-                });
-                if (res.already_paid) { paidSet.add(docId); openDoc(docId); return; }
-                if (res.error) { toast(res.error); return; }
-
-                $('modalBody').innerHTML = `
-                    <h2>Complete Payment</h2>
-                    <p class="sub">${title}</p>
-                    <div class="price-big">${res.amount.toLocaleString()} ${res.currency}</div>
-                    <p class="sub" style="margin-top:4px;">Enter phone number on next screen</p>
-                    <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayFrame" id="payForm">
-                        <input type="hidden" name="amount" value="${res.amount}">
-                        <input type="hidden" name="currency" value="${res.currency}">
-                        <input type="hidden" name="comment" value="${title}">
-                        <input type="hidden" name="client_token" value="${payToken}">
-                        <input type="hidden" name="return_url" value="${location.origin}${location.pathname}">
-                        <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
-                        <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
-                        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;"><span class="material-icons">payment</span> Pay Now</button>
-                    </form>
-                    <iframe name="afripayFrame" id="afripayFrame"></iframe>
-                    <button class="btn-close" onclick="closeModal()">Cancel</button>`;
-                $('modalOverlay').classList.add('active');
-
-                setTimeout(() => {
-                    $('payForm').submit();
-                    const iframe = $('afripayFrame');
-                    if (iframe) iframe.style.display = 'block';
-                    startPoll(docId);
-                }, 300);
-            };
-
-            function startPoll(docId) {
-                clearInterval(pollTimer);
-                let tries = 0;
-                pollTimer = setInterval(async () => {
-                    tries++;
-                    const res = await api('/api/check-payment', { client_token: payToken });
-                    if (res.paid) {
-                        clearInterval(pollTimer);
-                        paidSet.add(docId);
-                        closeModal();
-                        openDoc(docId);
-                        return;
-                    }
-                    if (tries > 72) {
-                        clearInterval(pollTimer);
-                        $('modalBody').innerHTML = `<h2><span class="material-icons" style="font-size:40px;">schedule</span></h2><p class="sub">Taking longer than expected</p><p class="sub">Refresh if you completed payment</p><button class="btn btn-primary" onclick="closeModal();openDoc('${docId}')">Close</button>`;
-                    }
-                }, 5000);
+                    </div>
+                `;
             }
 
-            window.closeModal = function() {
-                clearInterval(pollTimer);
-                $('modalOverlay').classList.remove('active');
-                payToken = null;
+            // ── TRACK CLICK ──
+            window.trackClick = async function(docId) {
+                try {
+                    await fetch(`/api/documents/${docId}/click`, { method: 'POST' });
+                } catch {}
             };
 
-            window.downloadNow = async function(docId) {
-                let t = payToken || genToken();
-                if (!payToken) {
-                    await api('/api/init-payment', { document_id: docId, device_fingerprint: fingerprint, client_token: t });
-                }
-                const res = await api('/api/download', { client_token: t, device_fingerprint: fingerprint, document_id: docId });
-                if (res.url) { window.open(res.url, '_blank'); }
-                else { toast(res.error || 'Download failed'); }
-            };
-
-            $('modalOverlay').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
+            // ── SEARCH WITH DEBOUNCE ──
+            $('searchInput').addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    searchTerm = this.value;
+                    render();
+                }, 300);
             });
 
-            // INIT
+            // ── INIT ──
             (async () => {
-                await initFP();
-                await loadDocs();
+                try {
+                    allDocs = await api('/api/documents');
+                } catch {
+                    allDocs = [];
+                }
+                render();
             })();
         })();
     </script>
