@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Document Manager</title>
+    <style>
+        :root {
+            --bg: #f9fafb;
+            --card: #fff;
+            --text: #111;
+            --sub: #6b7280;
+            --border: #e5e7eb;
+            --accent: #111;
+            --red: #dc2626;
+            --green: #059669;
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        .login-wrap {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 20px;
+        }
+        .login-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 36px 28px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .login-card h1 { font-size: 1.4rem; margin-bottom: 20px; }
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 14px;
+            font-family: inherit;
+        }
+        .btn {
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-dark { background: var(--accent); color: #fff; }
+        .btn-dark:hover { background: #333; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-red:hover { background: #b91c1c; }
+        .btn-green { background: var(--green); color: #fff; }
+        .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text); }
+
+        .dashboard { display: none; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .dash-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px;
+        }
+        .dash-header h1 { font-size: 1.5rem; }
+
+        .form-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+        .form-card h2 { font-size: 1.1rem; margin-bottom: 16px; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group.full { grid-column: 1/-1; }
+        .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--sub); }
+        .form-group input, .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .form-group textarea { min-height: 70px; }
+
+        .preview-img {
+            width: 100%;
+            max-height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .docs-list { display: grid; gap: 14px; }
+        .doc-row {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .doc-row img {
+            width: 56px; height: 56px;
+            object-fit: cover; border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .doc-row .info { flex: 1; }
+        .doc-row .info h4 { font-size: 0.95rem; margin-bottom: 2px; }
+        .doc-row .info span {
+            font-size: 0.78rem; color: var(--sub);
+        }
+        .doc-row .actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .badge {
+            font-size: 0.7rem; font-weight: 600;
+            padding: 3px 8px; border-radius: 20px;
+        }
+        .badge-active { background: #d1fae5; color: #065f46; }
+        .badge-inactive { background: #fee2e2; color: #991b1b; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #111;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #dc2626; }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .doc-row { flex-wrap: wrap; }
+            .doc-row .actions { width: 100%; justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrap" id="loginScreen">
+        <div class="login-card">
+            <h1>🔐 Admin Login</h1>
+            <input type="password" id="adminKey" placeholder="Enter admin key" autofocus>
+            <button class="btn btn-dark" onclick="login()" style="width:100%">Login</button>
+            <p id="loginError" style="color:#dc2626;font-size:0.83rem;margin-top:10px;display:none;"></p>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="dash-header">
+            <h1>📋 Document Manager</h1>
+            <button class="btn btn-outline" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Add Document Form -->
+        <div class="form-card" id="addForm">
+            <h2 id="formTitle">➕ Add New Document</h2>
+            <div class="form-row">
+                <div class="form-group full">
+                    <label>Title *</label>
+                    <input type="text" id="docTitle" placeholder="Document title">
+                </div>
+                <div class="form-group full">
+                    <label>Description</label>
+                    <textarea id="docDesc" placeholder="Brief description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Price (RWF) *</label>
+                    <input type="number" id="docPrice" placeholder="500" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Currency</label>
+                    <input type="text" id="docCurrency" value="RWF" placeholder="RWF">
+                </div>
+                <div class="form-group full">
+                    <label>Preview Image</label>
+                    <input type="file" id="docImage" accept="image/*">
+                    <img class="preview-img" id="imagePreview" style="display:none;">
+                    <input type="hidden" id="imageUrl">
+                    <small style="color:#9ca3af;">Uploads via ImgBB</small>
+                </div>
+                <div class="form-group full">
+                    <label>Document File *</label>
+                    <input type="file" id="docFile">
+                    <input type="hidden" id="filePath">
+                    <small style="color:#9ca3af;" id="fileStatus"></small>
+                </div>
+            </div>
+            <input type="hidden" id="editDocId">
+            <button class="btn btn-dark" onclick="saveDocument()" id="saveBtn">💾 Save Document</button>
+            <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel</button>
+        </div>
+
+        <!-- Documents List -->
+        <h2 style="font-size:1.1rem;margin-bottom:14px;">📚 All Documents</h2>
+        <div class="docs-list" id="docsList">
+            <p style="color:#9ca3af;">Loading...</p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const IMGBB_API_KEY = '2077df548acf5a4f53658b930c7fe87a';
+        let adminToken = null;
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        async function api(path, body = null, method = null) {
+            const opts = {
+                method: method || (body ? 'POST' : 'GET'),
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (adminToken) opts.headers['Authorization'] = 'Bearer ' + adminToken;
+            if (body) opts.body = JSON.stringify(body);
+            const res = await fetch(path, opts);
+            if (res.status === 401) { logout(); throw new Error('Unauthorized'); }
+            return res.json();
+        }
+
+        async function login() {
+            const key = document.getElementById('adminKey').value;
+            if (!key) return;
+            
+            adminToken = key;
+            const res = await api('/api/admin/verify', {});
+            
+            if (res.authenticated) {
+                localStorage.setItem('admin_token', key);
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadDocuments();
+            } else {
+                adminToken = null;
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginError').textContent = 'Invalid admin key';
+            }
+        }
+
+        function logout() {
+            adminToken = null;
+            localStorage.removeItem('admin_token');
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminKey').value = '';
+        }
+
+        // Auto-login from localStorage
+        if (localStorage.getItem('admin_token')) {
+            adminToken = localStorage.getItem('admin_token');
+            api('/api/admin/verify', {}).then(res => {
+                if (res.authenticated) {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    loadDocuments();
+                } else {
+                    logout();
+                }
+            });
+        }
+
+        // Image upload to ImgBB
+        document.getElementById('docImage').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Preview
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById('imagePreview').src = ev.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to ImgBB
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('imageUrl').value = data.data.url;
+                    showToast('Image uploaded successfully');
+                } else {
+                    showToast('Image upload failed', true);
+                }
+            } catch (err) {
+                showToast('Image upload error', true);
+            }
+        });
+
+        // File upload to Supabase Storage via our API
+        document.getElementById('docFile').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileStatus').textContent = 'Uploading...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/admin/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + adminToken },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.file_path) {
+                    document.getElementById('filePath').value = data.file_path;
+                    document.getElementById('fileStatus').textContent = `✅ Uploaded: ${data.filename}`;
+                    showToast('File uploaded');
+                } else {
+                    document.getElementById('fileStatus').textContent = '❌ ' + (data.error || 'Upload failed');
+                    showToast('File upload failed', true);
+                }
+            } catch (err) {
+                document.getElementById('fileStatus').textContent = '❌ Upload error';
+                showToast('Upload error', true);
+            }
+        });
+
+        async function saveDocument() {
+            const title = document.getElementById('docTitle').value.trim();
+            const description = document.getElementById('docDesc').value.trim();
+            const price = document.getElementById('docPrice').value;
+            const currency = document.getElementById('docCurrency').value.trim() || 'RWF';
+            const imageUrl = document.getElementById('imageUrl').value.trim();
+            const filePath = document.getElementById('filePath').value.trim();
+            const editId = document.getElementById('editDocId').value;
+
+            if (!title) return showToast('Title is required', true);
+            if (!price || parseInt(price) <= 0) return showToast('Valid price required', true);
+            if (!filePath && !editId) return showToast('Please upload the document file', true);
+
+            const body = {
+                title,
+                description,
+                price: parseInt(price),
+                currency: currency.toUpperCase(),
+                image_url: imageUrl,
+                file_path: filePath
+            };
+
+            const res = await api('/api/admin/documents', body);
+            
+            if (res.error) {
+                showToast(res.error, true);
+            } else {
+                showToast('Document saved!');
+                resetForm();
+                loadDocuments();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docDesc').value = '';
+            document.getElementById('docPrice').value = '';
+            document.getElementById('docCurrency').value = 'RWF';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('filePath').value = '';
+            document.getElementById('editDocId').value = '';
+            document.getElementById('docImage').value = '';
+            document.getElementById('docFile').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('fileStatus').textContent = '';
+            document.getElementById('formTitle').textContent = '➕ Add New Document';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function editDocument(doc) {
+            document.getElementById('docTitle').value = doc.title;
+            document.getElementById('docDesc').value = doc.description || '';
+            document.getElementById('docPrice').value = doc.price;
+            document.getElementById('docCurrency').value = doc.currency;
+            document.getElementById('imageUrl').value = doc.image_url || '';
+            document.getElementById('filePath').value = doc.file_path;
+            document.getElementById('editDocId').value = doc.id;
+            document.getElementById('formTitle').textContent = '✏️ Edit Document';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+            
+            if (doc.image_url) {
+                document.getElementById('imagePreview').src = doc.image_url;
+                document.getElementById('imagePreview').style.display = 'block';
+            }
+
+            document.getElementById('addForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function toggleDocument(docId) {
+            const res = await api(`/api/admin/documents/${docId}/toggle`, {}, 'PUT');
+            if (res.error) showToast(res.error, true);
+            else loadDocuments();
+        }
+
+        async function deleteDocument(docId, title) {
+            if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+            const res = await api(`/api/admin/documents/${docId}`, {}, 'DELETE');
+            if (res.error) showToast(res.error, true);
+            else {
+                showToast('Document deleted');
+                loadDocuments();
+            }
+        }
+
+        async function loadDocuments() {
+            const res = await api('/api/admin/documents');
+            const list = document.getElementById('docsList');
+
+            if (res.error) {
+                list.innerHTML = '<p style="color:#dc2626;">Failed to load: ' + res.error + '</p>';
+                return;
+            }
+
+            if (!res.length) {
+                list.innerHTML = '<p style="color:#9ca3af;">No documents yet. Add your first one above.</p>';
+                return;
+            }
+
+            list.innerHTML = res.map(doc => `
+                <div class="doc-row">
+                    ${doc.image_url 
+                        ? `<img src="${doc.image_url}" alt="" onerror="this.style.display='none'">`
+                        : `<div style="width:56px;height:56px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">📄</div>`}
+                    <div class="info">
+                        <h4>${doc.title} <span class="badge ${doc.active ? 'badge-active' : 'badge-inactive'}">${doc.active ? 'Active' : 'Hidden'}</span></h4>
+                        <span>${doc.price.toLocaleString()} ${doc.currency} · ${doc.file_path.split('/').pop()}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-outline" onclick='editDocument(${JSON.stringify(doc)})'>✏️</button>
+                        <button class="btn btn-outline" onclick="toggleDocument('${doc.id}')">${doc.active ? '👁️' : '👁️‍🗨️'}</button>
+                        <button class="btn btn-red" onclick="deleteDocument('${doc.id}', '${doc.title.replace(/'/g, "\\'")}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Enter key to login
+        document.getElementById('adminKey').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>
