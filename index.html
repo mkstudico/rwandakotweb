@@ -1,1 +1,230 @@
-Hello
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Store</title>
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+    <style>
+        :root {
+            --bg: #f8f9fb;
+            --card-bg: #fff;
+            --text: #1a1a2e;
+            --sub: #6b7280;
+            --border: #e5e7eb;
+            --accent: #1a1a2e;
+            --green: #059669;
+            --radius: 14px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        header {
+            text-align: center;
+            padding: 52px 20px 36px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+        }
+        header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; }
+        header p { color: var(--sub); margin-top: 6px; font-size: 0.9rem; }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            box-shadow: 0 6px 28px rgba(0,0,0,0.07);
+            transform: translateY(-2px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d1d5db;
+            font-size: 48px;
+        }
+        .card-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        .card-body {
+            padding: 20px 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-body h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .card-body p {
+            color: var(--sub);
+            font-size: 0.83rem;
+            flex: 1;
+            margin-bottom: 14px;
+        }
+        .price {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .price small {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            font-weight: 400;
+        }
+        .methods {
+            display: flex; gap: 6px;
+            margin-bottom: 14px;
+        }
+        .methods span {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #6b7280;
+            background: #f3f4f6;
+            border-radius: 20px;
+            padding: 4px 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .btn-pay {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-pay:hover { background: #2d2d44; }
+        .btn-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .loader-wrap {
+            text-align: center; padding: 60px 20px; color: #9ca3af;
+        }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #6b7280;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty { text-align: center; color: #9ca3af; padding: 40px; grid-column: 1/-1; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 18px;
+            padding: 30px 26px;
+            max-width: 420px;
+            width: 92%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .modal h2 { font-size: 1.2rem; margin-bottom: 4px; }
+        .modal .price-big { font-size: 1.5rem; font-weight: 700; margin: 10px 0; }
+        .modal .muted { color: #888; font-size: 0.83rem; margin-bottom: 16px; }
+        .modal .btn-close {
+            margin-top: 12px; background: none; border: none;
+            color: #9ca3af; cursor: pointer; font-size: 0.83rem; font-family: inherit;
+        }
+        .modal iframe {
+            width: 100%; height: 420px; border: 1px solid #e5e7eb;
+            border-radius: 10px; margin-top: 10px; display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📚 Document Store</h1>
+        <p>Pay securely with MTN or Airtel Money</p>
+    </header>
+
+    <div class="container">
+        <div class="grid" id="docGrid">
+            <div class="loader-wrap">
+                <div class="spinner"></div>
+                <p>Loading documents...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="payModal">
+        <div class="modal" id="modalBody"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
+        const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
+        const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
+
+        let deviceFingerprint = null;
+        let currentPayment = { docId: null, token: null };
+        let pollInterval = null;
+        const paidDocs = new Set();
+
+        function genToken() {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let tok = 'tok_';
+            for (let i = 0; i < 28; i++) tok += chars[Math.floor(Math.random() * chars.length)];
+            return tok + '_' + Date.now().toString(36);
+        }
+
+        async function api(path, body = null) {
+            const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+            if (body) opts.body = JSON.stringify(body);
+            const res = await fetch(path
