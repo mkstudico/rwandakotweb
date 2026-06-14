@@ -39,7 +39,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ── SKELETON LOADING ── */
         .skeleton {
             background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
             background-size: 200% 100%;
@@ -57,14 +56,12 @@
         .sk-price { height:36px; width:35%; margin-bottom:14px; }
         .sk-btn { height:50px; width:100%; border-radius:30px; }
 
-        /* ── CONTAINER ── */
         .container {
             max-width: 700px;
             margin: 0 auto;
             padding: 20px 16px 80px;
         }
 
-        /* ── BACK ── */
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -81,7 +78,6 @@
         }
         .back-link:hover { background: #f3f4f6; }
 
-        /* ── HERO ── */
         .hero {
             background: var(--surface);
             border-radius: var(--radius);
@@ -139,7 +135,6 @@
             font-weight: 400;
         }
 
-        /* ── BUTTONS ── */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -176,7 +171,6 @@
         .btn-paid:hover { background: #d1fae5; }
         .btn-paid:active { transform: scale(0.97); }
 
-        /* ── INFO CARDS ── */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -206,7 +200,6 @@
         .info-card .ic-val { font-size: 1.1rem; font-weight: 700; }
         .info-card .ic-label { font-size: 0.7rem; color: var(--sub); }
 
-        /* ── ERROR / STATES ── */
         .state-wrap {
             text-align: center;
             padding: 60px 20px;
@@ -215,7 +208,7 @@
         .state-wrap h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
         .state-wrap p { color: var(--sub); font-size: 0.85rem; margin-bottom: 16px; }
 
-        /* ── MODAL ── */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -291,14 +284,6 @@
         }
         .modal .payment-methods .dot.mtn { background: #f5a623; }
         .modal .payment-methods .dot.airtel { background: #e53935; }
-        .modal iframe {
-            width: 100%;
-            height: 380px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            display: none;
-            margin-top: 10px;
-        }
         .modal .btn-close {
             margin-top: 12px;
             background: none;
@@ -310,18 +295,6 @@
         }
         .modal .btn-close:hover { color: #666; }
 
-        .modal .error-inline {
-            background: var(--red-bg);
-            color: var(--red);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 0.78rem;
-            margin-top: 10px;
-            display: none;
-        }
-        .modal .error-inline.show { display: block; }
-
-        /* ── TOAST ── */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -343,6 +316,34 @@
         .toast.show { transform: translateX(-50%) translateY(0); }
         .toast.err { background: var(--red); }
 
+        /* Instruction steps in modal */
+        .steps {
+            text-align: left;
+            margin: 12px 0;
+            padding: 0;
+            list-style: none;
+        }
+        .steps li {
+            font-size: 0.78rem;
+            color: var(--sub);
+            padding: 6px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .steps li .step-num {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            color: var(--text);
+        }
+
         @media (max-width: 500px) {
             .hero-body { padding: 18px 14px; }
             .hero-body .doc-title { font-size: 1.15rem; }
@@ -354,7 +355,6 @@
 <body>
 
     <div class="container" id="pageContent">
-        <!-- Skeleton loader -->
         <div class="back-link" style="pointer-events:none;"><span class="material-icons">arrow_back</span> Back</div>
         <div class="hero">
             <div class="hero-img-wrap"><div class="skeleton sk-img"></div></div>
@@ -368,6 +368,17 @@
         </div>
     </div>
 
+    <!-- Hidden form for AfriPay submission -->
+    <form id="afripayForm" action="https://www.afripay.africa/checkout/index.php" method="POST" target="_blank" style="display:none;">
+        <input type="hidden" name="amount" id="af_amount">
+        <input type="hidden" name="currency" id="af_currency">
+        <input type="hidden" name="comment" id="af_comment">
+        <input type="hidden" name="client_token" id="af_client_token">
+        <input type="hidden" name="return_url" id="af_return_url">
+        <input type="hidden" name="app_id" id="af_app_id">
+        <input type="hidden" name="app_secret" id="af_app_secret">
+    </form>
+
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalBody"></div>
     </div>
@@ -378,25 +389,22 @@
         (function() {
             'use strict';
 
-            // ─── CONFIG ──────────────────────────
             const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
             const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
             const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
             const AFRIPAY_CHECKOUT_URL = 'https://www.afripay.africa/checkout/index.php';
             const POLL_INTERVAL_MS = 4000;
-            const POLL_MAX_ATTEMPTS = 90; // 6 minutes
-            const DOWNLOAD_LINK_EXPIRY_SECONDS = 600;
+            const POLL_MAX_ATTEMPTS = 90;
 
-            // ─── STATE ───────────────────────────
             let doc = null;
             let fingerprint = null;
             let isPaid = false;
             let payToken = null;
             let pollTimer = null;
             let pollAttempts = 0;
+            let paymentWindow = null;
 
-            // ─── HELPERS ─────────────────────────
             function $(id) { return document.getElementById(id); }
 
             function genToken() {
@@ -417,7 +425,6 @@
             async function apiCall(path, body = null) {
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 15000);
-
                 try {
                     const opts = {
                         method: body ? 'POST' : 'GET',
@@ -425,23 +432,16 @@
                         signal: controller.signal
                     };
                     if (body) opts.body = JSON.stringify(body);
-
                     const res = await fetch(path, opts);
                     clearTimeout(timeout);
-
                     if (!res.ok) {
                         const text = await res.text();
                         let msg = 'Request failed';
                         try { msg = JSON.parse(text).error || msg; } catch {}
                         throw new Error(msg);
                     }
-
                     const text = await res.text();
-                    try {
-                        return JSON.parse(text);
-                    } catch {
-                        throw new Error('Invalid server response');
-                    }
+                    try { return JSON.parse(text); } catch { throw new Error('Invalid server response'); }
                 } catch (err) {
                     clearTimeout(timeout);
                     if (err.name === 'AbortError') throw new Error('Request timed out');
@@ -453,7 +453,6 @@
                 return `${parseInt(amount).toLocaleString()} ${currency || 'RWF'}`;
             }
 
-            // ─── FINGERPRINT ─────────────────────
             async function getFingerprint() {
                 try {
                     const fp = await FingerprintJS.load();
@@ -471,7 +470,6 @@
                 }
             }
 
-            // ─── GET DOC ID FROM URL ─────────────
             const urlParams = new URLSearchParams(window.location.search);
             const docId = urlParams.get('doc');
 
@@ -490,9 +488,6 @@
                 throw new Error('Invalid or missing doc ID');
             }
 
-            // ─── RENDER SKELETON (already shown) ──
-
-            // ─── LOAD DOCUMENT ───────────────────
             async function loadDocument() {
                 try {
                     doc = await apiCall(`/api/documents/${docId}`);
@@ -508,7 +503,6 @@
                 }
             }
 
-            // ─── CHECK PAYMENT STATUS ────────────
             async function checkPaymentStatus() {
                 try {
                     const result = await apiCall('/api/check-payment', {
@@ -516,29 +510,19 @@
                         document_id: docId
                     });
                     isPaid = result.already_paid === true;
-                } catch {
-                    isPaid = false;
-                }
+                } catch { isPaid = false; }
             }
 
-            // ─── TRACK VIEW ──────────────────────
             async function trackView() {
-                try {
-                    await fetch(`/api/documents/${docId}/click`, { method: 'POST' });
-                } catch {
-                    // Silent fail — tracking is non-critical
-                }
+                try { await fetch(`/api/documents/${docId}/click`, { method: 'POST' }); } catch {}
             }
 
-            // ─── RENDER PAGE ─────────────────────
             function render() {
                 const hasImage = doc.image_url && doc.image_url.trim().length > 0;
-
                 $('pageContent').innerHTML = `
                     <a href="index.html" class="back-link">
                         <span class="material-icons">arrow_back</span> Back to store
                     </a>
-
                     <div class="hero">
                         <div class="hero-img-wrap">
                             ${hasImage
@@ -555,7 +539,6 @@
                                 <span class="val">${parseInt(doc.price).toLocaleString()}</span>
                                 <span class="cur">${doc.currency || 'RWF'}</span>
                             </div>
-
                             ${isPaid
                                 ? `<button class="btn btn-paid" onclick="downloadDocument()">
                                     <span class="material-icons">download</span> Download Document
@@ -566,27 +549,34 @@
                             }
                         </div>
                     </div>
-
                     <div class="info-grid">
                         <div class="info-card">
                             <div class="ic-icon views"><span class="material-icons">visibility</span></div>
-                            <div>
-                                <div class="ic-val">${(doc.clicks || 0).toLocaleString()}</div>
-                                <div class="ic-label">Total Views</div>
-                            </div>
+                            <div><div class="ic-val">${(doc.clicks || 0).toLocaleString()}</div><div class="ic-label">Total Views</div></div>
                         </div>
                         <div class="info-card">
                             <div class="ic-icon payments"><span class="material-icons">payment</span></div>
-                            <div>
-                                <div class="ic-val">${isPaid ? 'Paid' : 'Pending'}</div>
-                                <div class="ic-label">Your Status</div>
-                            </div>
+                            <div><div class="ic-val">${isPaid ? 'Paid' : 'Pending'}</div><div class="ic-label">Your Status</div></div>
                         </div>
                     </div>
                 `;
             }
 
-            // ─── INITIATE PAYMENT ─────────────────
+            // ─── SUBMIT TO AFRIPAY VIA HIDDEN FORM ───
+            function submitToAfripay(amount, currency, comment, token, returnUrl) {
+                // Populate the hidden form
+                $('af_amount').value = parseInt(amount);
+                $('af_currency').value = currency;
+                $('af_comment').value = comment;
+                $('af_client_token').value = token;
+                $('af_return_url').value = returnUrl;
+                $('af_app_id').value = AFRIPAY_APP_ID;
+                $('af_app_secret').value = AFRIPAY_SECRET;
+
+                // Submit the form — opens in new tab
+                $('afripayForm').submit();
+            }
+
             window.initiatePayment = async function() {
                 if (!doc || !fingerprint) {
                     toast('Please wait, loading...', true);
@@ -624,8 +614,10 @@
                         return;
                     }
 
-                    // Show payment modal
-                    showPaymentModal(result);
+                    const returnUrl = `${window.location.origin}${window.location.pathname}?doc=${docId}`;
+
+                    // Show confirmation modal
+                    showPaymentModal(result, returnUrl);
 
                 } catch (err) {
                     toast(err.message || 'Failed to initiate payment', true);
@@ -636,10 +628,7 @@
                 }
             };
 
-            // ─── PAYMENT MODAL ───────────────────
-            function showPaymentModal(paymentData) {
-                const returnUrl = `${window.location.origin}${window.location.pathname}?doc=${docId}`;
-
+            function showPaymentModal(paymentData, returnUrl) {
                 $('modalBody').innerHTML = `
                     <div class="modal-icon"><span class="material-icons">payment</span></div>
                     <h2>Complete Payment</h2>
@@ -651,48 +640,43 @@
                         <span><span class="dot airtel"></span> Airtel Money</span>
                     </div>
 
-                    <p class="modal-note">You will be prompted to enter your phone number</p>
+                    <ol class="steps">
+                        <li><span class="step-num">1</span> Click "Proceed to Pay" below</li>
+                        <li><span class="step-num">2</span> Enter your phone number on AfriPay</li>
+                        <li><span class="step-num">3</span> Approve the payment on your phone</li>
+                        <li><span class="step-num">4</span> Come back here — your download will be ready</li>
+                    </ol>
 
-                    <form action="${AFRIPAY_CHECKOUT_URL}" method="post" target="afripayFrame" id="payForm">
-                        <input type="hidden" name="amount" value="${paymentData.amount}">
-                        <input type="hidden" name="currency" value="${paymentData.currency}">
-                        <input type="hidden" name="comment" value="${doc.title}">
-                        <input type="hidden" name="client_token" value="${payToken}">
-                        <input type="hidden" name="return_url" value="${returnUrl}">
-                        <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
-                        <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
-                        <button type="submit" class="btn btn-primary" id="modalPayBtn">
-                            <span class="material-icons">lock</span> Pay ${formatPrice(paymentData.amount, paymentData.currency)}
-                        </button>
-                    </form>
+                    <button class="btn btn-primary" onclick="openAfripay('${paymentData.amount}', '${paymentData.currency}', '${doc.title.replace(/'/g, "\\'")}', '${payToken}', '${returnUrl}')">
+                        <span class="material-icons">open_in_new</span> Proceed to Pay
+                    </button>
 
-                    <iframe name="afripayFrame" id="afripayFrame" title="AfriPay Payment"></iframe>
-                    <div class="error-inline" id="modalError"></div>
-                    <button class="btn-close" onclick="closePaymentModal()">Cancel Payment</button>
+                    <p class="modal-note" style="margin-top:10px;">AfriPay will open in a new tab</p>
+                    <button class="btn-close" onclick="closePaymentModal()">Cancel</button>
                 `;
 
                 $('modalOverlay').classList.add('active');
-
-                // Submit form after brief delay
-                setTimeout(() => {
-                    const form = $('payForm');
-                    if (form) {
-                        form.submit();
-                        const iframe = $('afripayFrame');
-                        if (iframe) iframe.style.display = 'block';
-                        startPaymentPolling();
-                    }
-                }, 400);
             }
 
-            // ─── POLL FOR PAYMENT CONFIRMATION ────
+            window.openAfripay = function(amount, currency, comment, token, returnUrl) {
+                // Close modal
+                $('modalOverlay').classList.remove('active');
+
+                // Submit to AfriPay (opens new tab)
+                submitToAfripay(amount, currency, comment, token, returnUrl);
+
+                // Start polling for payment confirmation
+                startPaymentPolling();
+
+                toast('Complete payment in the new tab, then come back here');
+            };
+
             function startPaymentPolling() {
                 clearInterval(pollTimer);
                 pollAttempts = 0;
 
                 pollTimer = setInterval(async () => {
                     pollAttempts++;
-
                     try {
                         const result = await apiCall('/api/check-payment', {
                             client_token: payToken
@@ -701,7 +685,6 @@
                         if (result.paid && result.status === 'completed') {
                             clearInterval(pollTimer);
                             isPaid = true;
-                            closePaymentModal();
                             render();
                             toast('Payment confirmed! Your document is ready.');
                             return;
@@ -709,26 +692,20 @@
 
                         if (result.status === 'failed') {
                             clearInterval(pollTimer);
-                            const modalError = $('modalError');
-                            if (modalError) {
-                                modalError.textContent = 'Payment was not successful. Please try again.';
-                                modalError.classList.add('show');
+                            toast('Payment was not successful. Please try again.', true);
+                            // Re-enable button
+                            const payBtn = $('payBtn');
+                            if (payBtn) {
+                                payBtn.disabled = false;
+                                payBtn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
                             }
                             return;
                         }
-                    } catch {
-                        // Silently retry on network errors
-                    }
+                    } catch {}
 
                     if (pollAttempts >= POLL_MAX_ATTEMPTS) {
                         clearInterval(pollTimer);
-                        $('modalBody').innerHTML = `
-                            <div class="modal-icon"><span class="material-icons">schedule</span></div>
-                            <h2>Taking Too Long</h2>
-                            <p class="modal-sub">Payment verification is taking longer than expected.</p>
-                            <p class="modal-note">If you completed the payment, refresh this page. Your document will be available.</p>
-                            <button class="btn btn-primary" onclick="closePaymentModal();render();">Close & Refresh</button>
-                        `;
+                        toast('Payment check timed out. Refresh if you paid.', true);
                     }
                 }, POLL_INTERVAL_MS);
             }
@@ -738,8 +715,6 @@
                 $('modalOverlay').classList.remove('active');
                 payToken = null;
                 pollAttempts = 0;
-
-                // Re-enable pay button if still on page
                 const payBtn = $('payBtn');
                 if (payBtn && !isPaid) {
                     payBtn.disabled = false;
@@ -747,7 +722,6 @@
                 }
             };
 
-            // Close modal on overlay click
             $('modalOverlay').addEventListener('click', function(e) {
                 if (e.target === this) closePaymentModal();
             });
@@ -755,19 +729,14 @@
             // ─── DOWNLOAD ─────────────────────────
             window.downloadDocument = async function() {
                 let token = payToken;
-
-                // If no active payment token (returning user), generate one
                 if (!token) {
                     token = genToken();
                     try {
-                        const initResult = await apiCall('/api/init-payment', {
+                        await apiCall('/api/init-payment', {
                             document_id: docId,
                             device_fingerprint: fingerprint,
                             client_token: token
                         });
-                        if (initResult.already_paid) {
-                            // Token registered, proceed
-                        }
                     } catch (err) {
                         toast('Failed to prepare download. Please refresh.', true);
                         return;
@@ -782,7 +751,6 @@
                     });
 
                     if (result.url) {
-                        // Open download in same tab (will trigger download)
                         window.location.href = result.url;
                     } else {
                         toast(result.error || 'Download failed', true);
@@ -792,31 +760,37 @@
                 }
             };
 
+            // ─── CHECK IF RETURNING FROM AFRIPAY ──
+            async function checkReturnFromAfripay() {
+                const statusParam = urlParams.get('status');
+                const tokenParam = urlParams.get('client_token');
+
+                if (statusParam === 'success' && tokenParam) {
+                    payToken = tokenParam;
+                    // Wait a moment for callback to process
+                    await new Promise(r => setTimeout(r, 2000));
+                    try {
+                        const result = await apiCall('/api/check-payment', { client_token: payToken });
+                        if (result.paid) {
+                            isPaid = true;
+                            toast('Payment successful! Your document is ready.');
+                        }
+                    } catch {}
+                }
+            }
+
             // ─── INIT ────────────────────────────
             (async function init() {
                 try {
-                    // Get fingerprint first (parallel with doc load)
                     const fingerprintPromise = getFingerprint();
-
-                    // Load document
                     await loadDocument();
-
-                    // Wait for fingerprint
                     fingerprint = await fingerprintPromise;
-
-                    // Check payment & track view in parallel
-                    await Promise.all([
-                        checkPaymentStatus(),
-                        trackView()
-                    ]);
-
-                    // Render the page
+                    await checkReturnFromAfripay();
+                    await checkPaymentStatus();
+                    await trackView();
                     render();
                 } catch (err) {
-                    // Errors already handled in loadDocument
-                    if (!doc) {
-                        console.error('Init error:', err.message);
-                    }
+                    if (!doc) console.error('Init error:', err.message);
                 }
             })();
         })();
