@@ -227,4 +227,205 @@
         async function api(path, body = null) {
             const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
             if (body) opts.body = JSON.stringify(body);
-            const res = await fetch(path
+            const res = await fetch(path, opts);
+            return res.json();
+        }
+
+        async function initFingerprint() {
+            try {
+                const fp = await FingerprintJS.load();
+                deviceFingerprint = (await fp.get()).visitorId;
+            } catch {
+                deviceFingerprint = 'fb_' + btoa(navigator.userAgent + screen.width + navigator.language).replace(/=/g, '').slice(0, 50);
+            }
+        }
+
+        async function loadDocuments() {
+            const docs = await api('/api/documents');
+            const grid = document.getElementById('docGrid');
+
+            if (!docs || docs.length === 0) {
+                grid.innerHTML = '<p class="empty">No documents available yet.</p>';
+                return;
+            }
+
+            // Check which docs are already paid
+            for (const doc of docs) {
+                const res = await api('/api/check-payment', {
+                    device_fingerprint: deviceFingerprint,
+                    document_id: doc.id
+                });
+                if (res.already_paid) paidDocs.add(doc.id);
+            }
+
+            grid.innerHTML = docs.map(doc => {
+                const paid = paidDocs.has(doc.id);
+                return `
+                    <div class="card">
+                        <div class="card-image">
+                            ${doc.image_url 
+                                ? `<img src="${doc.image_url}" alt="${doc.title}" onerror="this.parentElement.textContent='📄'">`
+                                : '📄'}
+                        </div>
+                        <div class="card-body">
+                            <h3>${doc.title}</h3>
+                            <p>${doc.description || ''}</p>
+                            <div class="price">${doc.price.toLocaleString()} <small>${doc.currency}</small></div>
+                            <div class="methods">
+                                <span>📱 MTN MoMo</span>
+                                <span>📱 Airtel Money</span>
+                            </div>
+                            ${paid
+                                ? `<button class="btn btn-paid" onclick="downloadDocument('${doc.id}')">📥 Download Again</button>`
+                                : `<button class="btn btn-pay" onclick="startPayment('${doc.id}', ${doc.price}, '${doc.currency}')">Pay & Download</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function startPayment(docId, amount, currency) {
+            const token = genToken();
+            currentPayment = { docId, token };
+
+            const res = await api('/api/init-payment', {
+                document_id: docId,
+                device_fingerprint: deviceFingerprint,
+                client_token: token
+            });
+
+            if (res.already_paid) {
+                paidDocs.add(docId);
+                loadDocuments();
+                return;
+            }
+
+            if (res.error) {
+                alert('Error: ' + res.error);
+                return;
+            }
+
+            // Show modal with AfriPay form
+            document.getElementById('modalBody').innerHTML = `
+                <h2>Complete Payment</h2>
+                <p class="muted">${res.document_title || 'Document'}</p>
+                <div class="price-big">${res.amount.toLocaleString()} ${res.currency}</div>
+                <p class="muted">Enter your phone number on the next screen</p>
+                <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayIframe" id="payForm">
+                    <input type="hidden" name="amount" value="${res.amount}">
+                    <input type="hidden" name="currency" value="${res.currency}">
+                    <input type="hidden" name="comment" value="Document: ${res.document_title || 'Purchase'}">
+                    <input type="hidden" name="client_token" value="${token}">
+                    <input type="hidden" name="return_url" value="${window.location.href}">
+                    <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
+                    <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
+                    <button type="submit" class="btn btn-pay">Proceed to Pay</button>
+                </form>
+                <iframe name="afripayIframe" id="afripayIframe"></iframe>
+                <button class="btn-close" onclick="closePayment()">Cancel</button>
+            `;
+
+            document.getElementById('payModal').classList.add('active');
+
+            // Submit form after short delay to show UI
+            setTimeout(() => {
+                document.getElementById('payForm').submit();
+                document.getElementById('afripayIframe').style.display = 'block';
+                startPolling();
+            }, 400);
+        }
+
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            let attempts = 0;
+
+            pollInterval = setInterval(async () => {
+                attempts++;
+                
+                const res = await api('/api/check-payment', {
+                    client_token: currentPayment.token
+                });
+
+                if (res.paid && res.status === 'completed') {
+                    clearInterval(pollInterval);
+                    paidDocs.add(currentPayment.docId);
+                    closePayment();
+                    loadDocuments();
+                    // Auto download
+                    setTimeout(() => downloadDocument(currentPayment.docId), 600);
+                    return;
+                }
+
+                if (attempts > 72) { // 6 minutes (5s intervals)
+                    clearInterval(pollInterval);
+                    document.getElementById('modalBody').innerHTML = `
+                        <h2>⏰ Timeout</h2>
+                        <p class="muted">Payment is taking longer than expected.</p>
+                        <p class="muted">If you completed payment, refresh this page.</p>
+                        <button class="btn btn-pay" onclick="closePayment();loadDocuments();">Close</button>
+                    `;
+                }
+            }, 5000);
+        }
+
+        function closePayment() {
+            if (pollInterval) clearInterval(pollInterval);
+            document.getElementById('payModal').classList.remove('active');
+            currentPayment = { docId: null, token: null };
+        }
+
+        async function downloadDocument(docId) {
+            const token = currentPayment.token || (await findExistingToken(docId));
+            
+            if (!token) {
+                alert('Payment record not found. Please contact support.');
+                return;
+            }
+
+            const res = await api('/api/download', {
+                client_token: token,
+                device_fingerprint: deviceFingerprint,
+                document_id: docId
+            });
+
+            if (res.url) {
+                window.open(res.url, '_blank');
+            } else {
+                alert(res.error || 'Download failed. Please try again.');
+            }
+        }
+
+        async function findExistingToken(docId) {
+            // For already-paid documents, we need a valid token
+            // Generate a new token and check if already paid
+            const token = genToken();
+            const res = await api('/api/check-payment', {
+                device_fingerprint: deviceFingerprint,
+                document_id: docId
+            });
+            if (res.already_paid) {
+                // Init a dummy payment to get a valid token for download
+                const initRes = await api('/api/init-payment', {
+                    document_id: docId,
+                    device_fingerprint: deviceFingerprint,
+                    client_token: token
+                });
+                if (initRes.already_paid) return token;
+            }
+            return null;
+        }
+
+        async function init() {
+            await initFingerprint();
+            await loadDocuments();
+
+            document.getElementById('payModal').addEventListener('click', function(e) {
+                if (e.target === this) closePayment();
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
