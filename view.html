@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>View Document — DocStore</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+    <style>
+        :root {
+            --bg: #f8f9fb;
+            --surface: #fff;
+            --text: #111;
+            --sub: #6b7280;
+            --border: #eef0f2;
+            --accent: #111;
+            --green: #059669;
+            --green-bg: #ecfdf5;
+            --green-text: #065f46;
+            --red: #dc2626;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --tr: 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px 16px 60px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            text-decoration: none;
+            margin-bottom: 18px;
+            padding: 8px 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .hero {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+        .hero img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        .hero .hero-body { padding: 22px 18px; }
+        .hero h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.3px; }
+        .hero .meta { font-size: 0.82rem; color: var(--sub); margin-bottom: 14px; line-height: 1.5; }
+        .hero .price-lg { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 26px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            transition: all var(--tr);
+            -webkit-tap-highlight-color: transparent;
+            width: 100%;
+        }
+        .btn .material-icons { font-size: 18px; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:active { background: #333; }
+        .btn-paid { background: var(--green-bg); color: var(--green-text); }
+        .btn-paid:active { background: #d1fae5; }
+
+        .info-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+        .info-card h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--surface);
+            border-radius: 20px 20px 0 0;
+            max-width: 440px;
+            width: 100%;
+            padding: 26px 20px 30px;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @media (min-width: 480px) {
+            .modal-overlay { align-items: center; }
+            .modal { border-radius: var(--radius); animation: fadeIn 0.2s ease; }
+        }
+        @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal h2 { font-size: 1.1rem; font-weight: 600; }
+        .modal .sub { color: var(--sub); font-size: 0.8rem; margin: 4px 0 12px; }
+        .modal .price-big { font-size: 1.5rem; font-weight: 700; margin: 6px 0; }
+        .modal iframe {
+            width: 100%;
+            height: 360px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            display: none;
+            margin-top: 8px;
+        }
+        .modal .btn-close {
+            margin-top: 10px;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.78rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #111;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            z-index: 200;
+            transition: transform 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .loader-wrap { text-align: center; padding: 80px 20px; color: #9ca3af; }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #888;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="pageContent">
+        <div class="loader-wrap">
+            <div class="spinner"></div>
+            <p>Loading document…</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalBody"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
+            const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
+            const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
+
+            let doc = null;
+            let fingerprint = null;
+            let isPaid = false;
+            let payToken = null;
+            let pollTimer = null;
+
+            function $(id) { return document.getElementById(id); }
+
+            function genToken() {
+                const c = 'abcdefghijklmnopqrstuvwxyz0123456789';
+                let t = 'tk_';
+                for (let i = 0; i < 28; i++) t += c[Math.floor(Math.random() * c.length)];
+                return t + '_' + Date.now().toString(36);
+            }
+
+            async function api(path, body = null) {
+                const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+                if (body) opts.body = JSON.stringify(body);
+                const r = await fetch(path, opts);
+                if (!r.ok) throw new Error('API error');
+                return r.json();
+            }
+
+            function toast(msg) {
+                const t = $('toast');
+                t.textContent = msg;
+                t.classList.add('show');
+                clearTimeout(t._tid);
+                t._tid = setTimeout(() => t.classList.remove('show'), 2500);
+            }
+
+            // Get doc ID from URL
+            const params = new URLSearchParams(window.location.search);
+            const docId = params.get('doc');
+
+            if (!docId) {
+                $('pageContent').innerHTML = '<div class="loader-wrap"><p>No document specified.</p><a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Go back</a></div>';
+                throw new Error('No doc ID');
+            }
+
+            async function init() {
+                try {
+                    // Fingerprint
+                    const fp = await FingerprintJS.load();
+                    fingerprint = (await fp.get()).visitorId;
+                } catch {
+                    fingerprint = 'fb_' + btoa(navigator.userAgent + screen.width).replace(/=/g, '').slice(0, 48);
+                }
+
+                try {
+                    doc = await api(`/api/documents/${docId}`);
+                } catch {
+                    $('pageContent').innerHTML = '<div class="loader-wrap"><p>Document not found.</p><a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to store</a></div>';
+                    return;
+                }
+
+                // Track click
+                try { await fetch(`/api/documents/${docId}/click`, { method: 'POST' }); } catch {}
+
+                // Check if paid
+                try {
+                    const c = await api('/api/check-payment', { device_fingerprint: fingerprint, document_id: docId });
+                    isPaid = c.already_paid;
+                } catch { isPaid = false; }
+
+                render();
+            }
+
+            function render() {
+                $('pageContent').innerHTML = `
+                    <a href="index.html" class="back-link">
+                        <span class="material-icons">arrow_back</span> Back to store
+                    </a>
+                    <div class="hero">
+                        ${doc.image_url ? `<img src="${doc.image_url}" alt="${doc.title}" onerror="this.style.display='none'">` : ''}
+                        <div class="hero-body">
+                            <h1>${doc.title}</h1>
+                            <p class="meta">${doc.description || 'No description provided.'}</p>
+                            <div class="price-lg">${parseInt(doc.price).toLocaleString()} ${doc.currency}</div>
+                            ${isPaid
+                                ? `<button class="btn btn-paid" onclick="downloadDoc()"><span class="material-icons">download</span> Download Document</button>`
+                                : `<button class="btn btn-primary" onclick="startPayment()"><span class="material-icons">lock</span> Pay to Download</button>`
+                            }
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h3><span class="material-icons">visibility</span> Views</h3>
+                        <p style="font-size:0.85rem;color:var(--sub);">${(doc.clicks || 0).toLocaleString()} people viewed this</p>
+                    </div>
+                `;
+            }
+
+            window.startPayment = async function() {
+                payToken = genToken();
+                const res = await api('/api/init-payment', {
+                    document_id: docId,
+                    device_fingerprint: fingerprint,
+                    client_token: payToken
+                });
+
+                if (res.already_paid) { isPaid = true; render(); return; }
+                if (res.error) { toast(res.error); return; }
+
+                $('modalBody').innerHTML = `
+                    <h2>Complete Payment</h2>
+                    <p class="sub">${doc.title}</p>
+                    <div class="price-big">${res.amount.toLocaleString()} ${res.currency}</div>
+                    <p class="sub" style="margin-top:4px;">Enter phone number on next screen</p>
+                    <form action="https://www.afripay.africa/checkout/index.php" method="post" target="afripayFrame" id="payForm">
+                        <input type="hidden" name="amount" value="${res.amount}">
+                        <input type="hidden" name="currency" value="${res.currency}">
+                        <input type="hidden" name="comment" value="${doc.title}">
+                        <input type="hidden" name="client_token" value="${payToken}">
+                        <input type="hidden" name="return_url" value="${location.origin}${location.pathname}?doc=${docId}">
+                        <input type="hidden" name="app_id" value="${AFRIPAY_APP_ID}">
+                        <input type="hidden" name="app_secret" value="${AFRIPAY_SECRET}">
+                        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;"><span class="material-icons">payment</span> Pay Now</button>
+                    </form>
+                    <iframe name="afripayFrame" id="afripayFrame"></iframe>
+                    <button class="btn-close" onclick="closeModal()">Cancel</button>`;
+
+                $('modalOverlay').classList.add('active');
+
+                setTimeout(() => {
+                    $('payForm').submit();
+                    const iframe = $('afripayFrame');
+                    if (iframe) iframe.style.display = 'block';
+                    startPoll();
+                }, 300);
+            };
+
+            function startPoll() {
+                clearInterval(pollTimer);
+                let tries = 0;
+                pollTimer = setInterval(async () => {
+                    tries++;
+                    const res = await api('/api/check-payment', { client_token: payToken });
+                    if (res.paid) {
+                        clearInterval(pollTimer);
+                        isPaid = true;
+                        closeModal();
+                        render();
+                        return;
+                    }
+                    if (tries > 72) {
+                        clearInterval(pollTimer);
+                        $('modalBody').innerHTML = `<h2><span class="material-icons" style="font-size:40px;">schedule</span></h2><p class="sub">Taking longer than expected</p><p class="sub">Refresh if you completed payment</p><button class="btn btn-primary" onclick="closeModal();render();">Close</button>`;
+                    }
+                }, 5000);
+            }
+
+            window.closeModal = function() {
+                clearInterval(pollTimer);
+                $('modalOverlay').classList.remove('active');
+                payToken = null;
+            };
+
+            window.downloadDoc = async function() {
+                const t = payToken || genToken();
+                if (!payToken) {
+                    await api('/api/init-payment', { document_id: docId, device_fingerprint: fingerprint, client_token: t });
+                }
+                const res = await api('/api/download', { client_token: t, device_fingerprint: fingerprint, document_id: docId });
+                if (res.url) { window.open(res.url, '_blank'); }
+                else { toast(res.error || 'Download failed'); }
+            };
+
+            $('modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            init();
+        })();
+    </script>
+</body>
+</html>
