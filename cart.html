@@ -50,6 +50,14 @@
         .nav-link.active{background:var(--accent);color:#fff}
         .container{max-width:900px;margin:0 auto;padding:24px 16px 60px}
 
+        .back-link{
+            display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
+            font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
+            margin-bottom:20px;border-radius:30px;transition:background var(--tr);
+            -webkit-tap-highlight-color:transparent;
+        }
+        .back-link:hover{background:#f3f4f6}
+
         .banner{
             border-radius:var(--radius);padding:20px 18px;display:flex;
             align-items:center;gap:14px;margin-bottom:24px;
@@ -62,6 +70,9 @@
         .banner.pending{background:var(--yellow-bg);border:1px solid #fde68a}
         .banner.pending .banner-icon .material-icons{color:var(--yellow)}
         .banner.pending h2,.banner.pending p{color:var(--yellow-text)}
+        .banner.checking{background:var(--blue-bg);border:1px solid #bfdbfe}
+        .banner.checking .banner-icon .material-icons{color:var(--blue)}
+        .banner.checking h2,.banner.checking p{color:var(--blue-text)}
         .banner-icon{
             width:44px;height:44px;border-radius:50%;background:#fff;
             display:flex;align-items:center;justify-content:center;flex-shrink:0;
@@ -200,9 +211,10 @@
             var fingerprint = null;
             var payments = [];
             var params = new URLSearchParams(window.location.search);
-            var justPaidToken = params.get('token') || params.get('client_token');
-            var showSuccess = params.get('status') === 'success' || !!justPaidToken;
+            var checkingToken = params.get('token') || params.get('client_token') || null;
             var autoCheckInterval = null;
+            var paymentVerified = false;
+            var paymentFailed = false;
 
             function $(id) { return document.getElementById(id); }
 
@@ -278,6 +290,36 @@
                 }
             }
 
+            async function verifyCurrentPayment() {
+                if (!checkingToken) return;
+
+                try {
+                    var result = await apiCall('/api/check-payment', { client_token: checkingToken });
+
+                    if (result.paid && result.status === 'completed') {
+                        paymentVerified = true;
+                        paymentFailed = false;
+                        // Reload payments to get updated list
+                        await loadPayments();
+                        return true;
+                    }
+
+                    if (result.status === 'failed') {
+                        paymentVerified = false;
+                        paymentFailed = true;
+                        await loadPayments();
+                        return false;
+                    }
+
+                    // Still pending
+                    paymentVerified = false;
+                    paymentFailed = false;
+                    return null;
+                } catch(e) {
+                    return null;
+                }
+            }
+
             function render() {
                 var completed = payments.filter(function(p) { return p.status === 'completed'; });
                 var pending = payments.filter(function(p) { return p.status === 'pending'; });
@@ -285,14 +327,36 @@
                 var totalSpent = completed.reduce(function(s, p) { return s + (p.amount || 0); }, 0);
                 var html = '';
 
-                // Banner
-                if (showSuccess) {
+                // Back button
+                html += '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to Store</a>';
+
+                // Banner — only show AFTER real verification
+                if (paymentVerified) {
                     html +=
                         '<div class="banner success">' +
                             '<div class="banner-icon"><span class="material-icons">check_circle</span></div>' +
                             '<div>' +
-                                '<h2>Payment Received!</h2>' +
-                                '<p>We are confirming your payment. This page updates automatically.</p>' +
+                                '<h2>Payment Confirmed!</h2>' +
+                                '<p>Your payment has been verified. Your document is ready to download.</p>' +
+                            '</div>' +
+                        '</div>';
+                } else if (paymentFailed) {
+                    html +=
+                        '<div class="banner" style="background:var(--red-bg);border:1px solid #fecaca;">' +
+                            '<div class="banner-icon"><span class="material-icons" style="color:var(--red);">cancel</span></div>' +
+                            '<div>' +
+                                '<h2 style="color:var(--red-text);">Payment Failed</h2>' +
+                                '<p style="color:var(--red-text);">Your payment was not successful. Please try again.</p>' +
+                            '</div>' +
+                        '</div>';
+                } else if (checkingToken) {
+                    // Still checking — show a neutral "checking" banner
+                    html +=
+                        '<div class="banner checking">' +
+                            '<div class="banner-icon"><span class="material-icons">sync</span></div>' +
+                            '<div>' +
+                                '<h2>Verifying Payment</h2>' +
+                                '<p>We are confirming your payment with AfriPay. This usually takes a few seconds.</p>' +
                             '</div>' +
                         '</div>';
                 } else if (pending.length > 0) {
@@ -301,7 +365,7 @@
                             '<div class="banner-icon"><span class="material-icons">hourglass_empty</span></div>' +
                             '<div>' +
                                 '<h2>Payments in Progress</h2>' +
-                                '<p>Waiting for confirmation from AfriPay. This may take a few moments.</p>' +
+                                '<p>You have pending payments waiting for confirmation.</p>' +
                             '</div>' +
                         '</div>';
                 }
@@ -318,7 +382,7 @@
                 // Purchase list
                 html += '<div class="section-title"><span class="material-icons">receipt_long</span> Purchase History</div>';
 
-                if (!payments.length) {
+                if (!payments.length && !checkingToken) {
                     html +=
                         '<div class="empty-state">' +
                             '<span class="material-icons">shopping_bag</span>' +
@@ -326,12 +390,22 @@
                             '<p>Browse our document store to find what you need.</p>' +
                             '<a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse Store</a>' +
                         '</div>';
+                } else if (!payments.length && checkingToken) {
+                    html +=
+                        '<div style="text-align:center;padding:30px;color:var(--sub);">' +
+                            '<div class="spinner" style="margin:0 auto 16px;"></div>' +
+                            '<p style="font-size:.85rem;">Waiting for payment confirmation...</p>' +
+                        '</div>';
                 } else {
                     html += '<div class="list">';
 
                     payments.forEach(function(p) {
                         var done = p.status === 'completed';
+                        var isPending = p.status === 'pending';
+                        var isFailed = p.status === 'failed';
                         var img = p.document_image || '';
+                        var actionLabel = done ? 'Download' : (isFailed ? 'Retry' : 'View');
+                        var actionIcon = done ? 'download' : (isFailed ? 'refresh' : 'visibility');
 
                         html +=
                             '<div class="card">' +
@@ -344,76 +418,107 @@
                                         '<span>·</span>' +
                                         '<span>' + timeAgo(p.created_at) + '</span>' +
                                         (p.transaction_ref ? '<span>·</span><span>Ref: ' + p.transaction_ref + '</span>' : '') +
+                                        (isPending && p.client_token === checkingToken ? '<span>·</span><span style="color:var(--blue);">Checking...</span>' : '') +
                                     '</div>' +
                                 '</div>' +
                                 '<div class="card-actions">' +
                                     statusBadge(p.status) +
-                                    (done
-                                        ? '<a href="view.html?doc=' + p.document_id + '" class="btn btn-dark"><span class="material-icons">download</span> Download</a>'
-                                        : '<a href="view.html?doc=' + p.document_id + '" class="btn btn-outline"><span class="material-icons">' + (p.status === 'failed' ? 'refresh' : 'visibility') + '</span> ' + (p.status === 'failed' ? 'Retry' : 'View') + '</a>'
-                                    ) +
+                                    '<a href="view.html?doc=' + p.document_id + '" class="btn ' + (done ? 'btn-dark' : 'btn-outline') + '"><span class="material-icons">' + actionIcon + '</span> ' + actionLabel + '</a>' +
                                 '</div>' +
                             '</div>';
                     });
 
                     html += '</div>';
-
-                    html +=
-                        '<div style="text-align:center;margin-top:20px;">' +
-                            '<a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse More Documents</a>' +
-                        '</div>';
                 }
+
+                html +=
+                    '<div style="text-align:center;margin-top:24px;">' +
+                        '<a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse More Documents</a>' +
+                    '</div>';
 
                 $('content').innerHTML = html;
 
-                // Auto-check for pending payment confirmation
-                var hasPending = pending.length > 0;
-                if (hasPending && justPaidToken) {
-                    startAutoCheck();
+                // If verified, auto-redirect after a moment
+                if (paymentVerified && checkingToken) {
+                    setTimeout(function() {
+                        var compPayment = payments.find(function(p) {
+                            return p.status === 'completed' && p.client_token === checkingToken;
+                        }) || completed[0];
+
+                        if (compPayment) {
+                            window.location.href = 'view.html?doc=' + compPayment.document_id;
+                        }
+                    }, 3000);
                 }
             }
 
             function startAutoCheck() {
+                if (!checkingToken) return;
+
                 clearInterval(autoCheckInterval);
                 var attempts = 0;
 
-                autoCheckInterval = setInterval(async function() {
-                    attempts++;
-                    try {
-                        var check = await apiCall('/api/check-payment', { client_token: justPaidToken });
+                // Do first check immediately
+                verifyCurrentPayment().then(function(result) {
+                    if (result === true || result === false) {
+                        render();
+                        if (result === true) return; // Will auto-redirect
+                        if (result === false) {
+                            checkingToken = null; // Stop checking
+                            return;
+                        }
+                    }
+                    // Still pending, start polling
+                    startPolling();
+                });
 
-                        if (check.paid && check.status === 'completed') {
+                function startPolling() {
+                    autoCheckInterval = setInterval(async function() {
+                        attempts++;
+                        var result = await verifyCurrentPayment();
+
+                        if (result === true) {
                             clearInterval(autoCheckInterval);
-                            // Reload to show updated status
-                            window.location.href = 'view.html?doc=' + check.document_id;
+                            render();
                             return;
                         }
 
-                        if (check.status === 'failed') {
+                        if (result === false) {
                             clearInterval(autoCheckInterval);
-                            // Reload to show failed status
-                            await loadPayments();
-                            showSuccess = false;
+                            checkingToken = null;
                             render();
                             toast('Payment was not successful. Please try again.');
                             return;
                         }
-                    } catch(e) {}
 
-                    if (attempts >= 60) {
-                        clearInterval(autoCheckInterval);
-                        toast('Confirmation is taking longer than usual. Please refresh.');
-                    }
-                }, 4000);
+                        if (attempts >= 60) {
+                            clearInterval(autoCheckInterval);
+                            render();
+                            toast('Verification is taking longer than expected. You can refresh to check again.');
+                        }
+                    }, 4000);
+                }
             }
 
             // ─── INIT ────────────────────────────
             (async function init() {
                 try {
                     await loadPayments();
-                    render();
+
+                    if (checkingToken) {
+                        // Verify first, then render based on real status
+                        var verified = await verifyCurrentPayment();
+                        render();
+                        if (verified === null) {
+                            // Still pending — start polling
+                            startAutoCheck();
+                        }
+                    } else {
+                        render();
+                    }
                 } catch(e) {
                     $('content').innerHTML =
+                        '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to Store</a>' +
                         '<div class="empty-state">' +
                             '<span class="material-icons">error_outline</span>' +
                             '<h2>Something went wrong</h2>' +
