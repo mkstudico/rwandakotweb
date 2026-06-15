@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title id="ogTitle">Document — DocStore</title>
     <meta property="og:title" id="ogMetaTitle" content="Document — DocStore">
-    <meta property="og:description" id="ogMetaDesc" content="Purchase and download securely via MTN or Airtel Money.">
+    <meta property="og:description" id="ogMetaDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
     <meta property="og:image" id="ogMetaImage" content="">
     <meta property="og:url" content="">
     <meta property="og:type" content="product">
     <meta property="og:site_name" content="DocStore">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" id="twTitle" content="Document — DocStore">
-    <meta name="twitter:description" id="twDesc" content="Purchase and download securely via MTN or Airtel Money.">
+    <meta name="twitter:description" id="twDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
     <meta name="twitter:image" id="twImage" content="">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,12 +25,22 @@
             --bg:#f8f9fb; --surface:#fff; --text:#111; --sub:#6b7280;
             --border:#eef0f2; --accent:#111; --accent-hover:#2d2d44;
             --green:#059669; --green-bg:#ecfdf5; --green-text:#065f46;
-            --red:#dc2626; --radius:18px; --radius-sm:12px;
+            --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
+            --radius:18px; --radius-sm:12px;
             --tr:0.2s cubic-bezier(0.4,0,0.2,1);
         }
+
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-        .skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+
+        body{
+            font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);
+            min-height:100vh;-webkit-font-smoothing:antialiased;
+        }
+
+        .skeleton{
+            background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);
+            background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;
+        }
         @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         .sk-img{width:100%;height:260px;border-radius:0}
         .sk-title{height:28px;width:60%;margin-bottom:10px}
@@ -38,20 +48,53 @@
         .sk-text.short{width:50%}
         .sk-price{height:36px;width:35%;margin-bottom:14px}
         .sk-btn{height:50px;width:100%;border-radius:30px}
+
         .container{max-width:700px;margin:0 auto;padding:20px 16px 80px}
-        .back-link{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;margin-bottom:18px;border-radius:30px;transition:background var(--tr);-webkit-tap-highlight-color:transparent}
+
+        .back-link{
+            display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
+            font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
+            margin-bottom:18px;border-radius:30px;transition:background var(--tr);
+            -webkit-tap-highlight-color:transparent;
+        }
         .back-link:hover{background:#f3f4f6}
-        .hero{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03)}
-        .hero-img-wrap{position:relative;background:#f3f4f6;min-height:200px;display:flex;align-items:center;justify-content:center}
+
+        .hero{
+            background:var(--surface);border-radius:var(--radius);
+            border:1px solid var(--border);overflow:hidden;
+            box-shadow:0 1px 3px rgba(0,0,0,.03);
+        }
+        .hero-img-wrap{
+            position:relative;background:#f3f4f6;min-height:200px;
+            display:flex;align-items:center;justify-content:center;
+        }
         .hero-img-wrap img{width:100%;max-height:320px;object-fit:cover;display:block}
         .hero-img-wrap .img-fallback{font-size:64px;color:#d1d5db}
         .hero-body{padding:24px 20px}
-        .hero-body .doc-title{font-size:1.35rem;font-weight:700;margin-bottom:6px;letter-spacing:-.4px;line-height:1.3}
-        .hero-body .doc-desc{font-size:.85rem;color:var(--sub);line-height:1.6;margin-bottom:16px}
-        .hero-body .price-display{display:flex;align-items:baseline;gap:6px;margin-bottom:18px}
-        .hero-body .price-display .val{font-size:1.6rem;font-weight:700;letter-spacing:-.5px}
-        .hero-body .price-display .cur{font-size:.78rem;color:#9ca3af;font-weight:400}
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:30px;font-weight:600;font-size:.88rem;cursor:pointer;border:none;font-family:'Poppins',sans-serif;transition:all var(--tr);-webkit-tap-highlight-color:transparent;width:100%;letter-spacing:-.2px}
+        .hero-body .doc-title{
+            font-size:1.35rem;font-weight:700;margin-bottom:6px;
+            letter-spacing:-.4px;line-height:1.3;
+        }
+        .hero-body .doc-desc{
+            font-size:.85rem;color:var(--sub);line-height:1.6;margin-bottom:16px;
+        }
+        .hero-body .price-display{
+            display:flex;align-items:baseline;gap:6px;margin-bottom:18px;
+        }
+        .hero-body .price-display .val{
+            font-size:1.6rem;font-weight:700;letter-spacing:-.5px;
+        }
+        .hero-body .price-display .cur{
+            font-size:.78rem;color:#9ca3af;font-weight:400;
+        }
+
+        .btn{
+            display:inline-flex;align-items:center;justify-content:center;
+            gap:8px;padding:14px 28px;border-radius:30px;font-weight:600;
+            font-size:.88rem;cursor:pointer;border:none;
+            font-family:'Poppins',sans-serif;transition:all var(--tr);
+            -webkit-tap-highlight-color:transparent;width:100%;letter-spacing:-.2px;
+        }
         .btn .material-icons{font-size:20px}
         .btn-primary{background:var(--accent);color:#fff}
         .btn-primary:hover{background:var(--accent-hover)}
@@ -60,28 +103,61 @@
         .btn-paid{background:var(--green-bg);color:var(--green-text)}
         .btn-paid:hover{background:#d1fae5}
         .btn-paid:active{transform:scale(.97)}
+        .btn-expired{background:var(--red-bg);color:var(--red-text)}
+
         .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-        .info-card{background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);padding:16px;display:flex;align-items:center;gap:10px}
-        .info-card .ic-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .info-card{
+            background:var(--surface);border-radius:var(--radius-sm);
+            border:1px solid var(--border);padding:16px;
+            display:flex;align-items:center;gap:10px;
+        }
+        .info-card .ic-icon{
+            width:40px;height:40px;border-radius:10px;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        }
         .info-card .ic-icon.views{background:#eff6ff;color:#2563eb}
         .info-card .ic-icon.payments{background:#fef3c7;color:#d97706}
         .info-card .ic-val{font-size:1.1rem;font-weight:700}
         .info-card .ic-label{font-size:.7rem;color:var(--sub)}
-        .timer-badge{display:inline-flex;align-items:center;gap:6px;background:#fef3c7;color:#92400e;padding:8px 14px;border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px}
+
+        .timer-badge{
+            display:inline-flex;align-items:center;gap:6px;
+            background:#fef3c7;color:#92400e;padding:8px 14px;
+            border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
+        }
+        .timer-badge.expired{background:var(--red-bg);color:var(--red-text)}
+
         .state-wrap{text-align:center;padding:60px 20px}
         .state-wrap .material-icons{font-size:56px;color:#d1d5db;margin-bottom:12px}
         .state-wrap h2{font-size:1.2rem;font-weight:600;margin-bottom:6px}
         .state-wrap p{color:var(--sub);font-size:.85rem;margin-bottom:16px}
-        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:50px;font-size:.8rem;font-weight:500;font-family:'Poppins',sans-serif;z-index:300;transition:transform .3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+        .toast{
+            position:fixed;bottom:24px;left:50%;
+            transform:translateX(-50%) translateY(120px);
+            background:#1a1a2e;color:#fff;padding:12px 24px;
+            border-radius:50px;font-size:.8rem;font-weight:500;
+            font-family:'Poppins',sans-serif;z-index:300;
+            transition:transform .3s ease;pointer-events:none;
+            white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.2);
+        }
         .toast.show{transform:translateX(-50%) translateY(0)}
         .toast.err{background:var(--red)}
-        @media(max-width:500px){.hero-body{padding:18px 14px}.hero-body .doc-title{font-size:1.15rem}.info-grid{grid-template-columns:1fr}.hero-img-wrap{min-height:180px}}
+
+        @media(max-width:500px){
+            .hero-body{padding:18px 14px}
+            .hero-body .doc-title{font-size:1.15rem}
+            .info-grid{grid-template-columns:1fr}
+            .hero-img-wrap{min-height:180px}
+        }
     </style>
 </head>
 <body>
 
     <div class="container" id="pageContent">
-        <div class="back-link" style="pointer-events:none;"><span class="material-icons">arrow_back</span> Back</div>
+        <div class="back-link" style="pointer-events:none;">
+            <span class="material-icons">arrow_back</span> Back
+        </div>
         <div class="hero">
             <div class="hero-img-wrap"><div class="skeleton sk-img"></div></div>
             <div class="hero-body">
@@ -100,57 +176,64 @@
         (function() {
             'use strict';
 
-            const SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
-            const AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
-            const AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
-            const AFRIPAY_URL = 'https://www.afripay.africa/checkout/index.php';
-            const DOWNLOAD_WINDOW_MINUTES = 30;
+            var SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
+            var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
+            var AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
+            var AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
+            var AFRIPAY_URL = 'https://www.afripay.africa/checkout/index.php';
+            var DOWNLOAD_WINDOW_MINUTES = 30;
 
-            let doc = null;
-            let fingerprint = null;
-            let isPaid = false;
-            let payToken = null;
-            let paidAt = null;
+            var doc = null;
+            var fingerprint = null;
+            var isPaid = false;
+            var withinWindow = false;
+            var payToken = null;
+            var paidAt = null;
 
             function $(id) { return document.getElementById(id); }
 
             function genToken() {
-                const c = 'abcdefghijklmnopqrstuvwxyz0123456789';
-                const r = Array.from({length:28},()=>c[Math.floor(Math.random()*c.length)]).join('');
-                return 'tk_'+r+'_'+Date.now().toString(36);
+                var c = 'abcdefghijklmnopqrstuvwxyz0123456789';
+                var r = '';
+                for (var i = 0; i < 28; i++) r += c[Math.floor(Math.random() * c.length)];
+                return 'tk_' + r + '_' + Date.now().toString(36);
             }
 
             function toast(msg, isError) {
-                const t = $('toast');
+                var t = $('toast');
                 t.textContent = msg;
                 t.className = 'toast show' + (isError ? ' err' : '');
                 clearTimeout(t._tid);
-                t._tid = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+                t._tid = setTimeout(function() { t.classList.remove('show'); }, 3000);
             }
 
-            function setMeta(p, c) {
-                var el = document.querySelector('meta[property="'+p+'"]') || document.querySelector('meta[name="'+p+'"]');
-                if (el && c) el.setAttribute('content', c);
+            function setMeta(prop, content) {
+                var el = document.querySelector('meta[property="' + prop + '"]') ||
+                         document.querySelector('meta[name="' + prop + '"]');
+                if (el && content) el.setAttribute('content', content);
             }
 
             async function apiCall(path, body) {
                 var ctrl = new AbortController();
-                var t = setTimeout(function(){ ctrl.abort(); }, 15000);
+                var timeout = setTimeout(function() { ctrl.abort(); }, 15000);
                 try {
-                    var opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal };
+                    var opts = {
+                        method: body ? 'POST' : 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: ctrl.signal
+                    };
                     if (body) opts.body = JSON.stringify(body);
-                    var r = await fetch(path, opts);
-                    clearTimeout(t);
-                    var txt = await r.text();
-                    if (!r.ok) {
+                    var res = await fetch(path, opts);
+                    clearTimeout(timeout);
+                    var txt = await res.text();
+                    if (!res.ok) {
                         var msg = 'Request failed';
                         try { msg = JSON.parse(txt).error || msg; } catch(e) {}
                         throw new Error(msg);
                     }
                     try { return JSON.parse(txt); } catch(e) { throw new Error('Invalid response'); }
                 } catch(err) {
-                    clearTimeout(t);
+                    clearTimeout(timeout);
                     if (err.name === 'AbortError') throw new Error('Request timed out');
                     throw err;
                 }
@@ -161,19 +244,30 @@
                     var fp = await FingerprintJS.load();
                     return (await fp.get()).visitorId;
                 } catch(e) {
-                    var c = [navigator.userAgent, screen.width+'x'+screen.height, navigator.language, new Date().getTimezoneOffset(), navigator.hardwareConcurrency||''];
-                    return 'fb_'+btoa(c.join('|')).replace(/[=+/]/g,'').slice(0,48);
+                    var comps = [navigator.userAgent, screen.width + 'x' + screen.height, navigator.language, new Date().getTimezoneOffset(), navigator.hardwareConcurrency || ''];
+                    return 'fb_' + btoa(comps.join('|')).replace(/[=+/]/g, '').slice(0, 48);
                 }
             }
 
-            function formatPrice(n, c) { return parseInt(n).toLocaleString() + ' ' + (c || 'RWF'); }
-            function vu(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id); }
+            function formatPrice(n, c) {
+                return parseInt(n).toLocaleString() + ' ' + (c || 'RWF');
+            }
+
+            function vu(id) {
+                return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+            }
 
             var params = new URLSearchParams(window.location.search);
             var docId = params.get('doc');
 
             if (!docId || !vu(docId)) {
-                $('pageContent').innerHTML = '<div class="state-wrap"><span class="material-icons">error_outline</span><h2>Invalid Document</h2><p>No valid document specified.</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 28px;">Browse Documents</a></div>';
+                $('pageContent').innerHTML =
+                    '<div class="state-wrap">' +
+                        '<span class="material-icons">error_outline</span>' +
+                        '<h2>Invalid Document</h2>' +
+                        '<p>No valid document was specified.</p>' +
+                        '<a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 28px;">Browse Documents</a>' +
+                    '</div>';
                 return;
             }
 
@@ -181,63 +275,89 @@
                 try {
                     doc = await apiCall('/api/documents/' + docId);
                 } catch(err) {
-                    $('pageContent').innerHTML = '<div class="state-wrap"><span class="material-icons">folder_off</span><h2>Document Not Found</h2><p>'+err.message+'</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 28px;">Back to Store</a></div>';
+                    $('pageContent').innerHTML =
+                        '<div class="state-wrap">' +
+                            '<span class="material-icons">folder_off</span>' +
+                            '<h2>Document Not Found</h2>' +
+                            '<p>' + err.message + '</p>' +
+                            '<a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 28px;">Back to Store</a>' +
+                        '</div>';
                     throw err;
                 }
             }
 
             async function checkPayment() {
                 try {
-                    var r = await apiCall('/api/check-payment', { device_fingerprint: fingerprint, document_id: docId });
+                    var r = await apiCall('/api/check-payment', {
+                        device_fingerprint: fingerprint,
+                        document_id: docId
+                    });
                     isPaid = r.already_paid === true;
-                    if (r.payment && r.payment.created_at) paidAt = new Date(r.payment.created_at);
-                } catch(e) { isPaid = false; }
+                    withinWindow = r.within_window === true;
+                    if (r.payment && r.payment.created_at) {
+                        paidAt = new Date(r.payment.created_at);
+                    }
+                } catch(e) {
+                    isPaid = false;
+                    withinWindow = false;
+                }
             }
 
             function getTimeRemaining() {
                 if (!paidAt) return -1;
-                var diff = DOWNLOAD_WINDOW_MINUTES - ((new Date() - paidAt) / 60000);
+                var diff = DOWNLOAD_WINDOW_MINUTES - ((Date.now() - paidAt.getTime()) / 60000);
                 return Math.max(0, Math.floor(diff));
             }
 
             function render() {
+                if (!doc) return;
+
                 var hasImg = doc.image_url && doc.image_url.trim().length > 0;
                 var timeLeft = getTimeRemaining();
-                var downloadExpired = isPaid && timeLeft <= 0;
+                var expired = isPaid && !withinWindow;
+                var canDownload = isPaid && withinWindow;
                 var timerHtml = '';
 
-                if (isPaid && !downloadExpired) {
+                if (canDownload) {
                     timerHtml = '<div class="timer-badge"><span class="material-icons">timer</span> Download available for ' + timeLeft + ' more minutes</div>';
-                } else if (downloadExpired) {
-                    timerHtml = '<div class="timer-badge" style="background:#fef2f2;color:#991b1b;"><span class="material-icons">timer_off</span> Download window expired</div>';
+                } else if (expired) {
+                    timerHtml = '<div class="timer-badge expired"><span class="material-icons">timer_off</span> Download window expired — purchase again</div>';
                 }
 
                 $('pageContent').innerHTML =
                     '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to store</a>' +
                     '<div class="hero">' +
                         '<div class="hero-img-wrap">' +
-                            (hasImg ? '<img src="'+doc.image_url+'" alt="'+doc.title+'" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
-                            '<span class="img-fallback" style="'+(hasImg?'display:none':'display:flex')+';align-items:center;justify-content:center;width:100%;height:200px;"><span class="material-icons" style="font-size:64px;color:#d1d5db;">description</span></span>' +
+                            (hasImg ? '<img src="' + doc.image_url + '" alt="' + doc.title + '" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
+                            '<span class="img-fallback" style="' + (hasImg ? 'display:none' : 'display:flex') + ';align-items:center;justify-content:center;width:100%;height:200px;">' +
+                                '<span class="material-icons" style="font-size:64px;color:#d1d5db;">description</span>' +
+                            '</span>' +
                         '</div>' +
                         '<div class="hero-body">' +
-                            '<h1 class="doc-title">'+doc.title+'</h1>' +
-                            '<p class="doc-desc">'+(doc.description||'No description.')+'</p>' +
-                            '<div class="price-display"><span class="val">'+parseInt(doc.price).toLocaleString()+'</span><span class="cur">'+(doc.currency||'RWF')+'</span></div>' +
+                            '<h1 class="doc-title">' + doc.title + '</h1>' +
+                            '<p class="doc-desc">' + (doc.description || 'No description provided.') + '</p>' +
+                            '<div class="price-display"><span class="val">' + parseInt(doc.price).toLocaleString() + '</span><span class="cur">' + (doc.currency || 'RWF') + '</span></div>' +
                             timerHtml +
-                            (isPaid && !downloadExpired
+                            (canDownload
                                 ? '<button class="btn btn-paid" id="downloadBtn" onclick="downloadDocument()"><span class="material-icons">download</span> Download Document</button>'
-                                : '<button class="btn btn-primary" id="payBtn" onclick="startPayment()"><span class="material-icons">lock</span> '+(downloadExpired?'Purchase Again':'Pay to Download')+'</button>'
+                                : '<button class="btn ' + (expired ? 'btn-expired' : 'btn-primary') + '" id="payBtn" onclick="startPayment()"><span class="material-icons">' + (expired ? 'refresh' : 'lock') + '</span> ' + (expired ? 'Purchase Again' : 'Pay to Download') + '</button>'
                             ) +
                         '</div>' +
                     '</div>' +
                     '<div class="info-grid">' +
-                        '<div class="info-card"><div class="ic-icon views"><span class="material-icons">visibility</span></div><div><div class="ic-val">'+(doc.clicks||0).toLocaleString()+'</div><div class="ic-label">Total Views</div></div></div>' +
-                        '<div class="info-card"><div class="ic-icon payments"><span class="material-icons">payment</span></div><div><div class="ic-val">'+(isPaid?'Paid':'Pending')+'</div><div class="ic-label">Your Status</div></div></div>' +
+                        '<div class="info-card">' +
+                            '<div class="ic-icon views"><span class="material-icons">visibility</span></div>' +
+                            '<div><div class="ic-val">' + (doc.clicks || 0).toLocaleString() + '</div><div class="ic-label">Total Views</div></div>' +
+                        '</div>' +
+                        '<div class="info-card">' +
+                            '<div class="ic-icon payments"><span class="material-icons">payment</span></div>' +
+                            '<div><div class="ic-val">' + (isPaid ? 'Paid' : 'Pending') + '</div><div class="ic-label">Your Status</div></div>' +
+                        '</div>' +
                     '</div>';
 
-                // Update OG meta
+                // Update OG meta tags for social sharing
                 setMeta('og:title', doc.title + ' — DocStore');
-                setMeta('og:description', doc.description || 'Purchase securely via MTN or Airtel Money.');
+                setMeta('og:description', doc.description || 'Purchase and download this document securely via MTN or Airtel Money.');
                 setMeta('og:image', doc.image_url || '');
                 setMeta('og:url', window.location.href);
                 setMeta('twitter:title', doc.title + ' — DocStore');
@@ -247,79 +367,118 @@
             }
 
             window.startPayment = function() {
-                if (!doc || !fingerprint) { toast('Loading...', true); return; }
+                if (!doc || !fingerprint) {
+                    toast('Please wait, loading...', true);
+                    return;
+                }
+
                 var btn = $('payBtn');
-                if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Preparing...'; }
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Preparing...';
+                }
 
                 payToken = genToken();
 
-                apiCall('/api/init-payment', { document_id: docId, device_fingerprint: fingerprint, client_token: payToken })
-                    .then(function(r) {
-                        if (r.already_paid) { isPaid = true; render(); return; }
-                        if (r.error) { toast(r.error, true); if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download'; } return; }
+                apiCall('/api/init-payment', {
+                    document_id: docId,
+                    device_fingerprint: fingerprint,
+                    client_token: payToken
+                }).then(function(r) {
+                    if (r.already_paid) {
+                        isPaid = true;
+                        withinWindow = true;
+                        render();
+                        toast('You already own this document!');
+                        return;
+                    }
+                    if (r.error) {
+                        toast(r.error, true);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
+                        }
+                        return;
+                    }
 
-                        // Build form and submit in SAME tab
-                        var form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = AFRIPAY_URL;
-                        form.style.display = 'none';
+                    // Build form and submit in SAME tab
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = AFRIPAY_URL;
+                    form.style.display = 'none';
 
-                        var fields = {
-                            amount: parseInt(r.amount),
-                            currency: r.currency,
-                            comment: doc.title,
-                            client_token: payToken,
-                            return_url: window.location.origin + '/cart.html?doc=' + docId + '&token=' + payToken,
-                            app_id: AFRIPAY_APP_ID,
-                            app_secret: AFRIPAY_SECRET
-                        };
+                    var fields = {
+                        amount: parseInt(r.amount),
+                        currency: r.currency,
+                        comment: doc.title,
+                        client_token: payToken,
+                        return_url: window.location.origin + '/cart.html?doc=' + docId + '&token=' + payToken,
+                        app_id: AFRIPAY_APP_ID,
+                        app_secret: AFRIPAY_SECRET
+                    };
 
-                        Object.keys(fields).forEach(function(k) {
-                            var input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = k;
-                            input.value = fields[k];
-                            form.appendChild(input);
-                        });
-
-                        document.body.appendChild(form);
-                        form.submit();
-                    })
-                    .catch(function(err) {
-                        toast(err.message, true);
-                        if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download'; }
+                    Object.keys(fields).forEach(function(key) {
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = fields[key];
+                        form.appendChild(input);
                     });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }).catch(function(err) {
+                    toast(err.message || 'Failed to initiate payment', true);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
+                    }
+                });
             };
 
             window.downloadDocument = function() {
                 var btn = $('downloadBtn');
-                if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Generating...'; }
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Generating...';
+                }
 
-                apiCall('/api/download', { client_token: payToken, device_fingerprint: fingerprint, document_id: docId })
-                    .then(function(r) {
-                        if (r.url) {
-                            window.location.href = r.url;
-                        } else {
-                            toast(r.error || 'Download failed', true);
-                            if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons">download</span> Download Document'; }
+                apiCall('/api/download', {
+                    client_token: payToken,
+                    device_fingerprint: fingerprint,
+                    document_id: docId
+                }).then(function(r) {
+                    if (r.url) {
+                        window.location.href = r.url;
+                    } else {
+                        toast(r.error || 'Download failed', true);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<span class="material-icons">download</span> Download Document';
                         }
-                    })
-                    .catch(function(err) {
-                        toast(err.message, true);
-                        if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons">download</span> Download Document'; }
-                    });
+                    }
+                }).catch(function(err) {
+                    toast(err.message || 'Download failed', true);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="material-icons">download</span> Download Document';
+                    }
+                });
             };
 
-            // Init
-            (async function() {
+            // ─── INIT ────────────────────────────
+            (async function init() {
                 try {
-                    var fpP = getFingerprint();
+                    var fpPromise = getFingerprint();
                     await loadDocument();
-                    fingerprint = await fpP;
+                    fingerprint = await fpPromise;
                     await checkPayment();
-                    await fetch('/api/documents/' + docId + '/click', { method: 'POST' }).catch(function(){});
+                    // Track view silently
+                    fetch('/api/documents/' + docId + '/click', { method: 'POST' }).catch(function() {});
                     render();
-                } catch(e) {}
+                } catch(e) {
+                    // Error already handled in loadDocument
+                }
             })();
         })();
     </script>
