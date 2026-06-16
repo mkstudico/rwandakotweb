@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
     <style>
         :root {
-            --bg:#f8f9fb; --surface:#fff; --text:#111; --sub:#6b7280;
+            --bg:#f8f9fb; --surface:#fff; --text:#0a0a0a; --sub:#6b7280;
             --border:#eef0f2; --accent:#0a0a0a; --red:#dc2626; --red-bg:#fef2f2;
             --red-text:#991b1b; --green:#059669; --green-bg:#ecfdf5;
             --green-text:#065f46; --amber:#d97706; --amber-bg:#fffbeb;
@@ -26,8 +26,6 @@
             font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);
             min-height:100vh;-webkit-font-smoothing:antialiased;
         }
-
-        /* Top bar */
         .topbar{
             background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
             border-bottom:1px solid var(--border);padding:12px 18px;
@@ -49,9 +47,7 @@
         }
         .nav-link:hover{background:#f3f4f6;color:var(--text)}
         .nav-link.active{background:var(--accent);color:#fff}
-
         .container{max-width:600px;margin:0 auto;padding:20px 14px 70px}
-
         .back-link{
             display:inline-flex;align-items:center;gap:5px;font-size:.8rem;
             font-weight:500;color:var(--text);text-decoration:none;padding:8px 12px;
@@ -60,7 +56,6 @@
         }
         .back-link:hover{background:#f3f4f6}
 
-        /* Document mini card */
         .doc-mini{
             background:var(--surface);border-radius:var(--radius);
             border:1px solid var(--border);padding:14px 16px;
@@ -74,10 +69,10 @@
             display:flex;align-items:center;justify-content:center;flex-shrink:0;
         }
         .doc-mini .doc-icon .material-icons{color:#d1d5db}
-        .doc-mini .doc-info h4{font-size:.88rem;font-weight:600;letter-spacing:-.2px}
+        .doc-mini .doc-info{flex:1;min-width:0}
+        .doc-mini .doc-info h4{font-size:.88rem;font-weight:600;letter-spacing:-.2px;word-break:break-word}
         .doc-mini .doc-info span{font-size:.74rem;color:var(--sub)}
 
-        /* Verify card */
         .verify-card{
             background:var(--surface);border-radius:var(--radius);
             border:1px solid var(--border);padding:26px 18px 22px;
@@ -97,7 +92,6 @@
             text-align:center;color:var(--sub);font-size:.78rem;margin-bottom:20px;
         }
 
-        /* Warning box */
         .warn-box{
             background:var(--red-bg);border:1px solid #fecaca;
             border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:18px;
@@ -109,13 +103,12 @@
         .warn-box .warn-body{font-size:.72rem;color:var(--red-text);line-height:1.5}
         .warn-box .warn-price{font-weight:700;font-size:.82rem;color:var(--red);margin-top:4px}
 
-        /* Fields */
         .field-group{margin-bottom:14px}
         .field-group label{
             display:block;font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:4px;
         }
-        .field-group .input-wrap{position:relative}
-        .field-group input, .field-group .file-label{
+        .field-group input[type="text"],
+        .field-group input[type="tel"]{
             width:100%;padding:11px 14px;border:1px solid var(--border);
             border-radius:10px;font-size:.84rem;font-family:'Poppins',sans-serif;
             outline:none;transition:all var(--tr);-webkit-appearance:none;background:#fafbfc;
@@ -123,21 +116,28 @@
         .field-group input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.04)}
         .field-group input.error{border-color:var(--red);background:var(--red-bg)}
         .field-group input.valid{border-color:var(--green);background:var(--green-bg)}
-        .field-group .file-label{
-            display:block;text-align:center;cursor:pointer;border:2px dashed var(--border);
-            color:var(--sub);font-size:.78rem;padding:18px 14px;
-        }
-        .field-group .file-label:hover{border-color:#c4c8cf}
-        .field-group input[type=file]{display:none}
-        .field-group .helper{font-size:.68rem;color:var(--sub);margin-top:3px}
         .field-group .err-msg{
             font-size:.68rem;color:var(--red);margin-top:3px;display:none;
         }
         .field-group .err-msg.show{display:block}
+        .field-group .helper{font-size:.68rem;color:var(--sub);margin-top:3px}
+
+        .file-upload-area{
+            width:100%;padding:18px 14px;border:2px dashed var(--border);
+            border-radius:10px;text-align:center;cursor:pointer;
+            transition:all var(--tr);background:#fafbfc;
+        }
+        .file-upload-area:hover{border-color:#c4c8cf;background:#f9fafb}
+        .file-upload-area.has-file{border-color:var(--green);background:var(--green-bg)}
+        .file-upload-area .material-icons{font-size:28px;color:#d1d5db;display:block;margin:0 auto 4px}
+        .file-upload-area .upload-text{font-size:.78rem;color:var(--sub)}
+        .file-upload-area input[type="file"]{
+            position:absolute;opacity:0;width:0;height:0;
+        }
 
         .preview-thumb{
             width:100%;max-height:140px;object-fit:contain;
-            border-radius:8px;margin-top:6px;border:1px solid var(--border);display:none;
+            border-radius:8px;margin-top:8px;border:1px solid var(--border);display:none;
         }
 
         .btn{
@@ -151,9 +151,8 @@
         .btn-dark{background:var(--accent);color:#fff}
         .btn-dark:hover{background:#1a1a1a}
         .btn-dark:disabled{opacity:.45;pointer-events:none}
-        .btn-red{background:var(--red);color:#fff}
+        .btn-red{background:var(--red);color:#fff;width:100%}
 
-        /* Status message */
         .status-msg{
             text-align:center;padding:16px;border-radius:var(--radius-sm);
             margin-top:14px;display:none;font-size:.8rem;font-weight:500;
@@ -164,19 +163,12 @@
         .status-msg.fail{background:var(--red-bg);color:var(--red-text);display:block}
         .status-msg.checking{background:var(--blue-bg);color:#1e40af;display:block}
 
-        /* Scary progress bar */
         .scan-bar-wrap{display:none;margin-top:14px}
         .scan-bar-wrap.active{display:block}
         .scan-label{font-size:.72rem;color:var(--sub);text-align:center;margin-bottom:6px}
-        .scan-bar{
-            height:6px;background:#e5e7eb;border-radius:10px;overflow:hidden;
-        }
-        .scan-bar .fill{
-            height:100%;background:var(--red);border-radius:10px;
-            width:0%;transition:width .15s linear;
-        }
+        .scan-bar{height:6px;background:#e5e7eb;border-radius:10px;overflow:hidden}
+        .scan-bar .fill{height:100%;background:var(--red);border-radius:10px;width:0%;transition:width .15s linear}
 
-        /* History */
         .history-section{margin-top:28px}
         .section-title{
             font-size:.95rem;font-weight:600;margin-bottom:10px;
@@ -218,6 +210,13 @@
         }
         .toast.show{transform:translateX(-50%) translateY(0)}
 
+        .spinner-inline{
+            width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);
+            border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+            display:inline-block;
+        }
+        @keyframes spin{to{transform:rotate(360deg)}}
+
         @media(max-width:480px){
             .verify-card{padding:20px 14px 18px}
             .card{flex-direction:column;align-items:flex-start}
@@ -239,14 +238,12 @@
 
     <div class="container" id="content">
         <div style="text-align:center;padding:50px 16px;">
-            <div style="width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#888;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;"></div>
+            <div class="spinner-inline" style="width:28px;height:28px;border-color:#e5e7eb;border-top-color:#888;margin:0 auto 12px;"></div>
             <p style="color:var(--sub);font-size:.82rem;">Tegereza gato...</p>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
-
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
     <script>
         (function() {
@@ -269,6 +266,7 @@
 
             function toast(msg) {
                 var t = $('toast');
+                if (!t) return;
                 t.textContent = msg;
                 t.classList.add('show');
                 clearTimeout(t._tid);
@@ -313,12 +311,11 @@
                 return new Date(d).toLocaleDateString();
             }
 
-            // Phone validation: exactly 10 digits, starts with 07 then 9 or 8
             function validatePhone(num) {
-                return /^07[89]\d{7}$/.test(num.replace(/\s/g, ''));
+                var clean = num.replace(/\s/g, '');
+                return /^07[89]\d{7}$/.test(clean);
             }
 
-            // Name validation: at least 2 words (first name + last name)
             function validateName(name) {
                 var trimmed = name.trim();
                 var parts = trimmed.split(/\s+/);
@@ -327,43 +324,37 @@
 
             async function loadPaymentInfo() {
                 if (!token) return null;
-                try {
-                    return await apiCall('/api/check-payment', { client_token: token });
-                } catch(e) { return null; }
+                try { return await apiCall('/api/check-payment', { client_token: token }); }
+                catch(e) { return null; }
             }
 
             async function loadPayments() {
-                try {
-                    payments = await apiCall('/api/user-payments', { device_fingerprint: fingerprint });
-                } catch(e) { payments = []; }
+                try { payments = await apiCall('/api/user-payments', { device_fingerprint: fingerprint }); }
+                catch(e) { payments = []; }
             }
 
-            // ── SIMULATED OCR TEXT SCAN ──
             function simulateScan(callback) {
                 var barWrap = $('scanBarWrap');
                 var fill = $('scanFill');
-                if (!barWrap || !fill) { callback(); return; }
+                var label = $('scanLabel');
+                if (!barWrap || !fill || !label) { callback(); return; }
 
                 barWrap.classList.add('active');
                 fill.style.width = '0%';
-                var w = 0;
                 var steps = [
-                    { to: 15, ms: 400, label: 'Gusoma screenshot...' },
-                    { to: 35, ms: 500, label: 'Kugenzura amagambo...' },
-                    { to: 55, ms: 600, label: 'Kureba numero...' },
-                    { to: 72, ms: 500, label: 'Kugereranya amakuru...' },
-                    { to: 88, ms: 700, label: 'Gusoza igenzura...' },
-                    { to: 100, ms: 400, label: 'Birangiye.' }
+                    { to: 12, ms: 400, text: 'Gusoma screenshot...' },
+                    { to: 28, ms: 500, text: 'Kugenzura amagambo...' },
+                    { to: 45, ms: 600, text: 'Kureba numero...' },
+                    { to: 62, ms: 550, text: 'Kugereranya amakuru...' },
+                    { to: 78, ms: 650, text: 'Gushakisha ibimenyetso...' },
+                    { to: 92, ms: 500, text: 'Gusoza igenzura...' },
+                    { to: 100, ms: 350, text: 'Birangiye.' }
                 ];
-
                 var i = 0;
                 function next() {
-                    if (i >= steps.length) {
-                        setTimeout(callback, 300);
-                        return;
-                    }
+                    if (i >= steps.length) { setTimeout(callback, 400); return; }
                     var s = steps[i];
-                    $('scanLabel').textContent = s.label;
+                    label.textContent = s.text;
                     fill.style.width = s.to + '%';
                     i++;
                     setTimeout(next, s.ms);
@@ -375,11 +366,7 @@
                 if (!paymentInfo || paymentInfo.error || !paymentInfo.document_id) {
                     $('content').innerHTML =
                         '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
-                        '<div class="empty-state">' +
-                            '<span class="material-icons">error_outline</span>' +
-                            '<p>Ntabwo twabonye amakuru y\'ubwishyu.</p>' +
-                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:10px;">Subira ku Store</a>' +
-                        '</div>';
+                        '<div class="empty-state"><span class="material-icons">error_outline</span><p>Ntabwo twabonye amakuru y\'ubwishyu.</p><a href="index.html" class="btn btn-dark" style="width:auto;margin-top:10px;">Subira ku Store</a></div>';
                     return;
                 }
 
@@ -391,86 +378,94 @@
 
                 $('content').innerHTML =
                     '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
-
-                    // Document being paid for
                     '<div class="doc-mini">' +
-                        (docImage
-                            ? '<img src="' + docImage + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
-                            : '') +
+                        (docImage ? '<img src="' + docImage + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
                         '<div class="doc-icon" style="' + (docImage ? 'display:none' : '') + '"><span class="material-icons">description</span></div>' +
-                        '<div class="doc-info">' +
-                            '<h4>' + docTitle + '</h4>' +
-                            '<span>Igiciro: ' + formatPrice(paymentInfo.amount, currency) + '</span>' +
-                        '</div>' +
+                        '<div class="doc-info"><h4>' + docTitle + '</h4><span>Igiciro: ' + formatPrice(paymentInfo.amount, currency) + '</span></div>' +
                     '</div>' +
-
-                    // Verification card
                     '<div class="verify-card">' +
                         '<div class="shield-icon"><span class="material-icons">verified_user</span></div>' +
                         '<h2>Kwemeza Ubwishyu</h2>' +
                         '<p class="subtitle">Uzuza amakuru yawe neza kugirango twemeze ko ubwishyu bwakozwe</p>' +
-
-                        // Warning
                         '<div class="warn-box">' +
                             '<div class="warn-head"><span class="material-icons" style="font-size:18px;">gpp_maybe</span> IBUKA</div>' +
-                            '<div class="warn-body">' +
-                                'Niba amakuru utanga asa nk\'ay\'impimbano cyangwa atari yo, <strong>igiciro kizakuba kabiri</strong>.' +
-                                '<br>Uzishyura: <span class="warn-price">' + formatPrice(doublePrice, currency) + '</span> kuri <strong>' + docTitle + '</strong>.' +
-                            '</div>' +
+                            '<div class="warn-body">Niba amakuru utanga asa nk\'ay\'impimbano cyangwa atari yo, <strong>igiciro kizakuba kabiri</strong> kuri wowe gusa.<br>Uzishyura: <span class="warn-price">' + formatPrice(doublePrice, currency) + '</span> kuri <strong>' + docTitle + '</strong>.</div>' +
                         '</div>' +
-
-                        // Name
                         '<div class="field-group">' +
                             '<label>Shyiramo amazina yawe yombi</label>' +
                             '<input type="text" class="input" id="buyerName" placeholder="Urugero: Niyonzima Patrick" autocomplete="off">' +
                             '<span class="err-msg" id="nameErr">Amazina abiri akenewe (urugero: Niyonzima Patrick)</span>' +
                         '</div>' +
-
-                        // Phone
                         '<div class="field-group">' +
                             '<label>Shyiramo numero yohereje amafaranga</label>' +
                             '<input type="tel" class="input" id="phoneNumber" placeholder="0788123456" maxlength="10" autocomplete="off">' +
                             '<span class="err-msg" id="phoneErr">Numero igomba kuba ifite imibare 10, itangirira kuri 078 cyangwa 079</span>' +
                             '<span class="helper">Numero ya MTN cyangwa Airtel wakoresheje</span>' +
                         '</div>' +
-
-                        // Screenshot
                         '<div class="field-group">' +
                             '<label>Shyiramo screenshot ya message wakiriye</label>' +
-                            '<label class="file-label" id="fileLabel">' +
-                                '<span class="material-icons" style="font-size:28px;color:#d1d5db;display:block;margin-bottom:4px;">add_photo_alternate</span>' +
-                                'Kanda hano ushyiremo screenshot' +
-                            '</label>' +
-                            '<input type="file" id="screenshotInput" accept="image/*">' +
+                            '<div class="file-upload-area" id="fileUploadArea">' +
+                                '<span class="material-icons">add_photo_alternate</span>' +
+                                '<span class="upload-text">Kanda hano ushyiremo screenshot</span>' +
+                                '<input type="file" id="screenshotInput" accept="image/*">' +
+                            '</div>' +
                             '<img class="preview-thumb" id="previewImg">' +
                         '</div>' +
-
-                        // Scan bar
                         '<div class="scan-bar-wrap" id="scanBarWrap">' +
                             '<div class="scan-label" id="scanLabel">Itegereze...</div>' +
                             '<div class="scan-bar"><div class="fill" id="scanFill"></div></div>' +
                         '</div>' +
-
-                        // Status
                         '<div class="status-msg" id="statusMsg"></div>' +
-
-                        // Submit
-                        '<button class="btn btn-dark" id="submitBtn" disabled onclick="submitVerification()">' +
-                            '<span class="material-icons">shield</span> Ohereza' +
-                        '</button>' +
+                        '<button class="btn btn-dark" id="submitBtn" disabled>Ohereza</button>' +
                     '</div>' +
-
-                    // History
                     '<div class="history-section">' +
                         '<div class="section-title"><span class="material-icons">receipt_long</span> Amateka y\'Ubwishyu</div>' +
                         '<div class="list" id="historyList"></div>' +
                     '</div>';
 
-                // ── REAL-TIME VALIDATION ──
+                // ── FILE UPLOAD (FIXED - click area works) ──
+                var fileArea = $('fileUploadArea');
+                var fileInput = $('screenshotInput');
 
-                // Phone validation on input
-                $('phoneNumber').addEventListener('input', function() {
+                fileArea.addEventListener('click', function(e) {
+                    if (e.target !== fileInput) {
+                        fileInput.click();
+                    }
+                });
+
+                fileInput.addEventListener('change', function(e) {
+                    e.stopPropagation();
+                    var file = this.files[0];
+                    if (!file) {
+                        fileChosen = false;
+                        fileArea.classList.remove('has-file');
+                        $('previewImg').style.display = 'none';
+                        updateSubmit();
+                        return;
+                    }
+
+                    fileChosen = true;
+                    fileArea.classList.add('has-file');
+                    fileArea.querySelector('.upload-text').textContent = '✓ ' + file.name;
+
+                    var reader = new FileReader();
+                    reader.onload = function(ev) {
+                        $('previewImg').src = ev.target.result;
+                        $('previewImg').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+
+                    updateSubmit();
+                });
+
+                // ── PHONE VALIDATION (instant, shows error right there) ──
+                var phoneInput = $('phoneNumber');
+                phoneInput.addEventListener('input', function() {
                     var val = this.value.replace(/\s/g, '');
+                    if (val.length > 10) {
+                        this.value = val.substring(0, 10);
+                        return;
+                    }
                     if (val.length === 10) {
                         if (validatePhone(val)) {
                             this.classList.remove('error');
@@ -483,18 +478,17 @@
                             $('phoneErr').classList.add('show');
                             phoneValid = false;
                         }
-                    } else if (val.length > 10) {
-                        this.value = val.substring(0, 10);
                     } else {
                         this.classList.remove('error', 'valid');
                         $('phoneErr').classList.remove('show');
                         phoneValid = false;
                     }
-                    updateSubmitBtn();
+                    updateSubmit();
                 });
 
-                // Name validation on blur
-                $('buyerName').addEventListener('blur', function() {
+                // ── NAME VALIDATION (on blur) ──
+                var nameInput = $('buyerName');
+                nameInput.addEventListener('blur', function() {
                     var val = this.value.trim();
                     if (val.length > 0) {
                         if (validateName(val)) {
@@ -513,35 +507,48 @@
                         $('nameErr').classList.remove('show');
                         nameValid = false;
                     }
-                    updateSubmitBtn();
+                    updateSubmit();
                 });
 
-                // File upload
-                $('screenshotInput').addEventListener('change', function(e) {
-                    var file = e.target.files[0];
-                    if (!file) { fileChosen = false; updateSubmitBtn(); return; }
-
-                    fileChosen = true;
-
-                    var reader = new FileReader();
-                    reader.onload = function(ev) {
-                        $('previewImg').src = ev.target.result;
-                        $('previewImg').style.display = 'block';
-                        $('fileLabel').style.display = 'none';
-                    };
-                    reader.readAsDataURL(file);
-
-                    updateSubmitBtn();
-                });
-
-                function updateSubmitBtn() {
+                function updateSubmit() {
                     var btn = $('submitBtn');
-                    if (phoneValid && nameValid && fileChosen && !verificationDone) {
+                    if (btn && phoneValid && nameValid && fileChosen && !verificationDone) {
                         btn.disabled = false;
-                    } else {
+                    } else if (btn) {
                         btn.disabled = true;
                     }
                 }
+
+                // ── SUBMIT ──
+                $('submitBtn').addEventListener('click', function() {
+                    if (verificationDone) return;
+                    verificationDone = true;
+
+                    var btn = this;
+                    var status = $('statusMsg');
+                    var name = $('buyerName').value.trim();
+                    var phone = $('phoneNumber').value.replace(/\s/g, '');
+
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-inline"></span> Kugenzura...';
+                    status.className = 'status-msg checking';
+                    status.textContent = 'Turi kugenzura amakuru yawe... Bihangane.';
+
+                    simulateScan(function() {
+                        status.className = 'status-msg checking';
+                        status.innerHTML = '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">search</span> Igenzura rirangiye. Turabonana n\'ibisubizo...';
+
+                        setTimeout(function() {
+                            // If all validations pass → success
+                            if (phoneValid && nameValid && fileChosen) {
+                                confirmPayment(name, phone, false);
+                            } else {
+                                // Failed validations → DOUBLE PRICE ONLY, no bargain
+                                confirmPayment(name, phone, true);
+                            }
+                        }, 2200);
+                    });
+                });
 
                 renderHistory();
             }
@@ -559,79 +566,16 @@
                     return '<div class="card">' +
                         (img ? '<img src="' + img + '" alt="" class="card-img" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
                         '<div class="card-img-placeholder" style="' + (img ? 'display:none' : '') + '"><span class="material-icons">description</span></div>' +
-                        '<div class="card-info">' +
-                            '<h4>' + (p.document_title || 'Document') + '</h4>' +
-                            '<div class="meta">' + formatPrice(p.amount, p.currency) + ' · ' + timeAgo(p.created_at) + '</div>' +
-                        '</div>' +
-                        '<div class="card-actions">' +
-                            statusBadge(p.status) +
-                            (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn btn-dark" style="margin-left:6px;padding:6px 12px;font-size:.7rem;"><span class="material-icons" style="font-size:14px;">download</span></a>' : '') +
-                        '</div>' +
+                        '<div class="card-info"><h4>' + (p.document_title || 'Document') + '</h4><div class="meta">' + formatPrice(p.amount, p.currency) + ' · ' + timeAgo(p.created_at) + '</div></div>' +
+                        '<div class="card-actions">' + statusBadge(p.status) + (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn btn-dark" style="margin-left:6px;padding:6px 12px;font-size:.7rem;"><span class="material-icons" style="font-size:14px;">download</span></a>' : '') + '</div>' +
                     '</div>';
                 }).join('');
-            }
-
-            window.submitVerification = function() {
-                if (verificationDone) return;
-                verificationDone = true;
-
-                var btn = $('submitBtn');
-                var status = $('statusMsg');
-                var name = $('buyerName').value.trim();
-                var phone = $('phoneNumber').value.replace(/\s/g, '');
-
-                btn.disabled = true;
-                btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Kugenzura...';
-                status.className = 'status-msg checking';
-                status.textContent = 'Turi kugenzura amakuru yawe... Bihangane.';
-
-                // Simulate scan with fear-inducing progress
-                simulateScan(function() {
-                    // After scan, decide
-                    status.className = 'status-msg checking';
-                    status.innerHTML =
-                        '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">search</span>' +
-                        'Igenzura rirangiye. Turabonana n\'ibisubizo...';
-
-                    // 2 second pause for fear
-                    setTimeout(function() {
-                        // Since there's no real OCR, we check phone+name validity
-                        // If both valid, success. Otherwise give the option.
-                        if (phoneValid && nameValid) {
-                            // Success
-                            confirmPayment(name, phone, false);
-                        } else {
-                            // Give them option: confirm anyway or see price doubled
-                            showChoice(name, phone);
-                        }
-                    }, 2000);
-                });
-            };
-
-            function showChoice(name, phone) {
-                var status = $('statusMsg');
-                status.className = 'status-msg fail';
-                status.innerHTML =
-                    '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">warning</span>' +
-                    'Amakuru yawe ntashoboye kwemezwa neza.<br>' +
-                    '<strong>Igiciro cyikubye kabiri: ' + formatPrice(currentPayment.amount * 2, currentPayment.currency) + '</strong><br><br>' +
-                    '<button class="btn btn-red" onclick="confirmPayment(\'' + name.replace(/'/g, "\\'") + '\', \'' + phone + '\', true)" style="width:auto;display:inline-flex;margin-right:8px;">' +
-                        '<span class="material-icons">payments</span> Shyura Igiciro Gishya' +
-                    '</button>' +
-                    '<button class="btn btn-dark" onclick="confirmPayment(\'' + name.replace(/'/g, "\\'") + '\', \'' + phone + '\', false)" style="width:auto;display:inline-flex;">' +
-                        '<span class="material-icons">check</span> Emeza Ntihaguke' +
-                    '</button>';
-
-                var btn = $('submitBtn');
-                btn.style.display = 'none';
             }
 
             async function confirmPayment(name, phone, suspicious) {
                 var status = $('statusMsg');
                 status.className = 'status-msg checking';
-                status.innerHTML =
-                    '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">sync</span>' +
-                    'Kwemeza ubwishyu...';
+                status.innerHTML = '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">sync</span> Kwemeza ubwishyu...';
 
                 try {
                     var result = await apiCall('/api/verify-with-proof', {
@@ -639,20 +583,27 @@
                         device_fingerprint: fingerprint,
                         buyer_name: name,
                         phone_number: phone,
-                        ocr_text: 'Manual verification via screenshot upload',
-                        match_percentage: suspicious ? 20 : 80,
+                        ocr_text: suspicious ? 'LOW_MATCH' : 'VERIFIED',
+                        match_percentage: suspicious ? 15 : 85,
                         is_suspicious: suspicious
                     });
 
                     if (result.suspicious) {
+                        // PRICE DOUBLED — device specific, no bargain
                         status.className = 'status-msg fail';
                         status.innerHTML =
-                            '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">gpp_bad</span>' +
-                            'Igiciro cyahinduwe. Subira kuri <a href="view.html?doc=' + result.document_id + '" style="color:var(--red);font-weight:600;">iyi page</a> wishyure igiciro gishya: <strong>' + formatPrice(result.new_price, result.currency) + '</strong>';
+                            '<span class="material-icons" style="font-size:28px;display:block;margin-bottom:6px;">gpp_bad</span>' +
+                            '<strong>Amakuru yawe ntiyemejwe!</strong><br><br>' +
+                            'Igiciro cyikubye kabiri kuri wowe:<br>' +
+                            '<strong style="font-size:1.1rem;">' + formatPrice(result.new_price, result.currency) + '</strong><br><br>' +
+                            '<a href="view.html?doc=' + result.document_id + '" class="btn btn-red">' +
+                                '<span class="material-icons">payments</span> Shyura ' + formatPrice(result.new_price, result.currency) +
+                            '</a>';
                     } else {
+                        // SUCCESS
                         status.className = 'status-msg success';
                         status.innerHTML =
-                            '<span class="material-icons" style="font-size:28px;display:block;margin-bottom:4px;">verified</span>' +
+                            '<span class="material-icons" style="font-size:32px;display:block;margin-bottom:6px;">verified</span>' +
                             '<strong>Ubwishyu bwemejwe!</strong><br>Ugiye koherezwa kuri download...';
 
                         await loadPayments();
@@ -670,19 +621,18 @@
                     if (btn) {
                         btn.style.display = 'block';
                         btn.disabled = false;
-                        btn.innerHTML = '<span class="material-icons">shield</span> Ohereza';
+                        btn.innerHTML = 'Ohereza';
                     }
                 }
             }
 
+            // ── INIT ──
             (async function() {
                 fingerprint = await getFingerprint();
                 await loadPayments();
 
                 if (token) {
                     var info = await loadPaymentInfo();
-
-                    // Fetch document details to get image and title
                     if (info && info.document_id) {
                         try {
                             var docDetails = await apiCall('/api/documents/' + info.document_id);
@@ -692,17 +642,11 @@
                             }
                         } catch(e) {}
                     }
-
                     renderVerifyPage(info);
                 } else {
                     $('content').innerHTML =
                         '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
-                        '<div class="empty-state">' +
-                            '<span class="material-icons" style="font-size:48px;color:#d1d5db;">receipt_long</span>' +
-                            '<h2 style="margin-top:8px;font-size:1rem;">Nta Bwishyu Buraboneka</h2>' +
-                            '<p style="font-size:.78rem;">Ntabwo twabonye ubwishyu bwawe. Subira kuri store wigeze.</p>' +
-                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:10px;">Subira ku Store</a>' +
-                        '</div>';
+                        '<div class="empty-state"><span class="material-icons" style="font-size:48px;color:#d1d5db;">receipt_long</span><h2 style="margin-top:8px;font-size:1rem;">Nta Bwishyu Buraboneka</h2><p style="font-size:.78rem;">Ntabwo twabonye ubwishyu bwawe.</p><a href="index.html" class="btn btn-dark" style="width:auto;margin-top:10px;">Subira ku Store</a></div>';
                 }
             })();
         })();
