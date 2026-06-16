@@ -4,16 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title id="ogTitle">Document — KotWeb</title>
-    <meta property="og:title" id="ogMetaTitle" content="Document — KotWeb">
-    <meta property="og:description" id="ogMetaDesc" content="Purchase and download securely via MTN or Airtel Money with RwandaPay.">
-    <meta property="og:image" id="ogMetaImage" content="">
-    <meta property="og:url" content="">
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Document — KotWeb">
+    <meta name="description" content="Purchase and download this document securely via MTN or Airtel Money.">
+    
+    <!-- Open Graph / Facebook / Instagram / WhatsApp -->
     <meta property="og:type" content="product">
+    <meta property="og:url" id="ogUrl" content="">
+    <meta property="og:title" id="ogTitle2" content="Document — KotWeb">
+    <meta property="og:description" id="ogDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
+    <meta property="og:image" id="ogImage" content="">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:site_name" content="KotWeb">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" id="twUrl" content="">
     <meta name="twitter:title" id="twTitle" content="Document — KotWeb">
-    <meta name="twitter:description" id="twDesc" content="Purchase and download securely via MTN or Airtel Money with RwandaPay.">
+    <meta name="twitter:description" id="twDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
     <meta name="twitter:image" id="twImage" content="">
+    
+    <!-- WhatsApp specific -->
+    <meta property="og:image:alt" content="Document preview image">
+    
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -40,7 +57,6 @@
         @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
         .skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
         .sk-img{width:100%;height:240px}.sk-title{height:24px;width:55%;margin-bottom:8px;border-radius:4px}
@@ -86,7 +102,6 @@
         .state-wrap h2{font-size:1.1rem;font-weight:700;margin-bottom:6px}
         .state-wrap p{color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
 
-        /* Payment Modal */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all var(--transition-base)}
         .modal-overlay.active{opacity:1;visibility:visible}
         .modal{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;padding:1.5rem 1.25rem 2rem;animation:slideUp .3s ease;box-shadow:0 -4px 20px rgba(0,0,0,.12)}
@@ -95,11 +110,10 @@
         .modal .modal-icon-wrap i{font-size:26px;color:var(--primary)}
         .modal h3{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:2px}
         .modal .modal-sub{font-size:.78rem;color:var(--text-secondary);text-align:center;margin-bottom:1rem}
-        .modal .steps-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
-        .modal .step-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--bg-hover);border-radius:var(--radius-lg)}
-        .modal .step-num{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .modal .step-info h5{font-size:.76rem;font-weight:600;margin-bottom:1px}
-        .modal .step-info p{font-size:.68rem;color:var(--text-tertiary);line-height:1.4}
+        .modal .field-group{margin-bottom:12px;text-align:left}
+        .modal .field-group label{display:block;font-size:.72rem;font-weight:600;color:var(--text-primary);margin-bottom:3px}
+        .modal .field-group input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-full);font-size:.82rem;font-family:var(--font-family);outline:none;background:var(--bg-input);color:var(--text-primary);transition:all var(--transition-fast);-webkit-appearance:none}
+        .modal .field-group input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1);background:var(--bg-surface)}
         .modal .phone-input-group{display:flex;align-items:center;background:var(--bg-input);border-radius:var(--radius-full);overflow:hidden;border:1.5px solid var(--border);margin-bottom:.75rem;transition:all var(--transition-fast)}
         .modal .phone-input-group:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1)}
         .modal .phone-input-group .prefix{background:var(--bg-hover);padding:10px 14px;font-size:.76rem;font-weight:600;color:var(--text-secondary);border-right:1px solid var(--border);white-space:nowrap}
@@ -107,20 +121,12 @@
         .modal .btn-close-modal{width:100%;padding:9px;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-secondary);margin-top:6px;font-family:var(--font-family)}
         .modal .btn-close-modal:hover{background:var(--bg-hover)}
 
-        /* Processing overlay */
         .processing-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all var(--transition-base)}
         .processing-overlay.active{opacity:1;visibility:visible}
         .processing-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-align:center;max-width:340px;width:90%;animation:modalIn .25s ease}
         .processing-card .big-spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
         .processing-card h4{font-size:.9rem;font-weight:700;margin-bottom:4px}
         .processing-card p{font-size:.74rem;color:var(--text-secondary)}
-
-        .pc-warn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all var(--transition-base)}
-        .pc-warn-overlay.active{opacity:1;visibility:visible}
-        .pc-warn-card{background:var(--bg-surface);border-radius:var(--radius-xl);max-width:380px;width:100%;padding:2rem 1.5rem;text-align:center;animation:modalIn .25s ease;box-shadow:0 12px 40px rgba(0,0,0,.2)}
-        .pc-warn-card i{font-size:48px;color:var(--warning);display:block;margin-bottom:10px}
-        .pc-warn-card h3{font-size:1rem;font-weight:700;margin-bottom:6px}
-        .pc-warn-card p{font-size:.78rem;color:var(--text-secondary);margin-bottom:1rem;line-height:1.5}
 
         .toast-container{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none}
         .toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:slideUp .3s ease-out;pointer-events:auto;white-space:nowrap;text-align:center}
@@ -152,16 +158,23 @@
         <div class="modal">
             <div class="modal-icon-wrap"><i class="bx bx-credit-card"></i></div>
             <h3>Pay with RwandaPay</h3>
-            <p class="modal-sub">Enter your phone number to receive a payment prompt</p>
-            <div class="steps-list">
-                <div class="step-item"><div class="step-num">1</div><div class="step-info"><h5>Enter Phone Number</h5><p>Type your MTN or Airtel number</p></div></div>
-                <div class="step-item"><div class="step-num">2</div><div class="step-info"><h5>Approve on Phone</h5><p>Enter your PIN when prompted</p></div></div>
-                <div class="step-item"><div class="step-num">3</div><div class="step-info"><h5>Auto-Verification</h5><p>Payment confirmed automatically</p></div></div>
+            <p class="modal-sub">Enter your details to receive a payment prompt on your phone</p>
+            
+            <!-- Name input -->
+            <div class="field-group">
+                <label>Your Full Name</label>
+                <input type="text" id="modalNameInput" placeholder="e.g. Niyonzima Patrick" autocomplete="off">
+            </div>
+            
+            <!-- Phone input -->
+            <div class="field-group">
+                <label>Phone Number</label>
             </div>
             <div class="phone-input-group">
                 <span class="prefix">🇷🇼</span>
                 <input type="tel" id="modalPhoneInput" placeholder="0788123456" maxlength="10" autocomplete="off">
             </div>
+
             <button class="btn btn-primary" id="proceedToPayBtn"><i class="bx bx-check-shield"></i> Pay Now</button>
             <button class="btn-close-modal" onclick="closePaymentModal()">Cancel</button>
         </div>
@@ -173,16 +186,6 @@
             <div class="big-spinner"></div>
             <h4>Processing Payment</h4>
             <p>Please wait while we confirm your payment...</p>
-        </div>
-    </div>
-
-    <!-- PC Warning -->
-    <div class="pc-warn-overlay" id="pcWarnOverlay">
-        <div class="pc-warn-card">
-            <i class="bx bx-desktop"></i>
-            <h3>Desktop Not Supported</h3>
-            <p>Mobile Money payments only work on a mobile phone.</p>
-            <button class="btn btn-outline" onclick="document.getElementById('pcWarnOverlay').classList.remove('active')"><i class="bx bx-x"></i> Close</button>
         </div>
     </div>
 
@@ -215,10 +218,10 @@
                 setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(function(){ t.remove(); },250); },2800);
             }
 
-            function isMobile() { return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && window.innerWidth < 768); }
             function genToken() { var c='abcdefghijklmnopqrstuvwxyz0123456789',r=''; for(var i=0;i<28;i++)r+=c[Math.floor(Math.random()*c.length)]; return 'tk_'+r+'_'+Date.now().toString(36); }
             function vu(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id); }
             function formatPrice(n,c) { return parseInt(n).toLocaleString()+' '+(c||'RWF'); }
+            function validatePhone(p) { return /^0?7[89]\d{7}$/.test((p||'').replace(/\s/g,'')); }
 
             async function apiCall(path, body) {
                 var ctrl = new AbortController();
@@ -237,6 +240,64 @@
             async function getFingerprint() {
                 try{var fp=await FingerprintJS.load();return(await fp.get()).visitorId;}
                 catch(e){var c=[navigator.userAgent,screen.width+'x'+screen.height,navigator.language,new Date().getTimezoneOffset(),navigator.hardwareConcurrency||''];return'fb_'+btoa(c.join('|')).replace(/[=+/]/g,'').slice(0,48);}
+            }
+
+            // ── UPDATE ALL META TAGS FOR SOCIAL SHARING ──
+            function updateAllMeta() {
+                if (!doc) return;
+                var title = doc.title + ' — KotWeb';
+                var desc = doc.description || 'Purchase and download this document securely via MTN or Airtel Money.';
+                var img = doc.image_url || '';
+                var pageUrl = window.location.href.split('?')[0] + '?doc=' + docId;
+
+                document.title = title;
+
+                // Set all meta tags
+                var tags = {
+                    'title': title,
+                    'description': desc,
+                    'og:title': title,
+                    'og:description': desc,
+                    'og:image': img,
+                    'og:url': pageUrl,
+                    'twitter:title': title,
+                    'twitter:description': desc,
+                    'twitter:image': img,
+                    'twitter:url': pageUrl
+                };
+
+                Object.keys(tags).forEach(function(key) {
+                    var val = tags[key];
+                    if (!val) return;
+                    // Try property first, then name
+                    var el = document.querySelector('meta[property="' + key + '"]') ||
+                             document.querySelector('meta[name="' + key + '"]');
+                    if (el) el.setAttribute('content', val);
+                });
+
+                // Also update the og:url meta
+                var ogUrl = document.querySelector('meta[property="og:url"]');
+                if (ogUrl) ogUrl.setAttribute('content', pageUrl);
+
+                // Update elements with IDs
+                var idMap = {
+                    'ogTitle': title,
+                    'ogTitle2': title,
+                    'ogDesc': desc,
+                    'ogImage': img,
+                    'ogUrl': pageUrl,
+                    'twTitle': title,
+                    'twDesc': desc,
+                    'twImage': img,
+                    'twUrl': pageUrl
+                };
+                Object.keys(idMap).forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) {
+                        if (el.tagName === 'META') el.setAttribute('content', idMap[id]);
+                        else el.textContent = idMap[id];
+                    }
+                });
             }
 
             var params = new URLSearchParams(window.location.search);
@@ -307,13 +368,15 @@
                 var dlBtn=$('downloadBtn'),payBtn=$('payBtn');
                 if(dlBtn)dlBtn.addEventListener('click',downloadDocument);
                 if(payBtn)payBtn.addEventListener('click',handlePayClick);
+
+                updateAllMeta();
             }
 
             // ── PAYMENT ──
             function handlePayClick() {
-                if(!isMobile()){$('pcWarnOverlay').classList.add('active');return;}
                 $('paymentStepsModal').classList.add('active');
-                var phoneInput=$('modalPhoneInput');if(phoneInput)phoneInput.focus();
+                var nameInput=$('modalNameInput');if(nameInput)nameInput.focus();
+                var phoneInput=$('modalPhoneInput');
 
                 var proceedBtn=$('proceedToPayBtn');
                 var newBtn=proceedBtn.cloneNode(true);
@@ -325,8 +388,11 @@
             $('paymentStepsModal').addEventListener('click',function(e){if(e.target===this)closePaymentModal();});
 
             async function executePayment() {
+                var name=($('modalNameInput').value||'').trim();
                 var phone=($('modalPhoneInput').value||'').replace(/\s/g,'');
-                if(!/^0?7[89]\d{7}$/.test(phone)){toast('Enter valid phone (078...)',true);return;}
+
+                if(!name||name.split(/\s+/).length<1){toast('Please enter your full name',true);return;}
+                if(!validatePhone(phone)){toast('Enter valid phone (078...)',true);return;}
                 if(!doc||!fingerprint){toast('Loading...',true);return;}
 
                 $('paymentStepsModal').classList.remove('active');
@@ -337,7 +403,7 @@
 
                 try{
                     var r=await apiCall('/api/rwandapay-init',{
-                        document_id:docId,device_fingerprint:fingerprint,phone:phone,client_token:payToken
+                        document_id:docId,device_fingerprint:fingerprint,phone:phone,client_token:payToken,customer_name:name
                     });
 
                     if(r.already_paid){isPaid=true;withinWindow=true;isDoubled=false;completedToken=payToken;render();toast('Already paid!');return;}
@@ -346,9 +412,7 @@
                     if(r.payment_url){
                         rpReference=r.reference||payToken;
                         $('processingOverlay').classList.add('active');
-                        // Poll for payment confirmation
                         startPolling(r.reference||payToken);
-                        // Redirect to RwandaPay
                         window.location.href=r.payment_url;
                     }
                 }catch(err){toast(err.message,true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download';}}
@@ -379,8 +443,6 @@
                     }catch(e){}
                     if(attempts>=60){clearInterval(pollTimer);$('processingOverlay').classList.remove('active');toast('Verification timeout. Refresh.',true);}
                 },4000);
-                // Also check immediately
-                setTimeout(function(){},500);
             }
 
             // ── DOWNLOAD ──
@@ -406,7 +468,6 @@
                 else findCompletedPayment().then(function(t){if(t)completedToken=t;attemptDownload(completedToken);});
             }
 
-            // ── CHECK IF RETURNING FROM RWANDAPAY ──
             function checkReturnFromRP() {
                 var statusParam=params.get('status');
                 if(statusParam==='successful'&&rpReference){
@@ -425,6 +486,7 @@
                     var fpP=getFingerprint();
                     await loadDocument();
                     fingerprint=await fpP;
+                    updateAllMeta();
                     await checkPayment();
                     fetch('/api/documents/'+docId+'/click',{method:'POST'}).catch(function(){});
                     render();
