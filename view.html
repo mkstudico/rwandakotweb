@@ -56,6 +56,7 @@
         @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
         .skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
@@ -112,7 +113,6 @@
             padding:7px 12px;border-radius:var(--radius-full);
             font-size:.72rem;font-weight:600;
         }
-        .badge-row i{font-size:15px}
 
         .btn{
             display:inline-flex;align-items:center;justify-content:center;
@@ -145,9 +145,7 @@
             display:flex;align-items:center;justify-content:center;flex-shrink:0;
         }
         .info-card .ic-icon.views{background:#e3f2fd;color:#0d47a1}
-        .info-card .ic-icon.views i{font-size:1rem}
         .info-card .ic-icon.payments{background:var(--warning-bg);color:var(--warning)}
-        .info-card .ic-icon.payments i{font-size:1rem}
         .info-card .ic-val{font-size:1rem;font-weight:700}
         .info-card .ic-label{font-size:.65rem;color:var(--text-tertiary);font-weight:500}
 
@@ -155,6 +153,73 @@
         .state-wrap i{font-size:52px;color:#d1d5db;display:block;margin-bottom:10px}
         .state-wrap h2{font-size:1.1rem;font-weight:700;margin-bottom:6px}
         .state-wrap p{color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
+
+        /* ── MODAL ── */
+        .modal-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;
+            display:flex;align-items:flex-end;justify-content:center;
+            opacity:0;visibility:hidden;transition:all var(--transition-base);
+        }
+        .modal-overlay.active{opacity:1;visibility:visible}
+        .modal{
+            background:var(--bg-surface);
+            border-radius:1.2rem 1.2rem 0 0;
+            width:100%;max-width:460px;max-height:88vh;overflow-y:auto;
+            padding:1.5rem 1.25rem 2rem;
+            animation:slideUp .3s ease;
+            box-shadow:0 -4px 20px rgba(0,0,0,.12);
+        }
+        @media(min-width:500px){
+            .modal-overlay{align-items:center}
+            .modal{border-radius:var(--radius-xl);animation:modalIn .25s ease}
+        }
+        .modal .modal-icon-wrap{
+            width:52px;height:52px;border-radius:50%;background:var(--primary-light);
+            display:flex;align-items:center;justify-content:center;
+            margin:0 auto 10px;
+        }
+        .modal .modal-icon-wrap i{font-size:26px;color:var(--primary)}
+        .modal h3{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:2px}
+        .modal .modal-sub{font-size:.78rem;color:var(--text-secondary);text-align:center;margin-bottom:1.25rem}
+        .modal .steps-list{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem}
+        .modal .step-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg-hover);border-radius:var(--radius-lg)}
+        .modal .step-num{
+            width:28px;height:28px;border-radius:50%;background:var(--primary);
+            color:#fff;font-weight:700;font-size:.72rem;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        }
+        .modal .step-info h5{font-size:.78rem;font-weight:600;margin-bottom:1px}
+        .modal .step-info p{font-size:.7rem;color:var(--text-tertiary);line-height:1.4}
+        .modal .btn{width:100%;margin-top:4px}
+        .modal .btn-close-modal{
+            width:100%;padding:9px;border-radius:var(--radius-full);font-size:.75rem;
+            font-weight:500;cursor:pointer;border:1px solid var(--border);
+            background:transparent;color:var(--text-secondary);margin-top:8px;
+            font-family:var(--font-family);
+        }
+        .modal .btn-close-modal:hover{background:var(--bg-hover)}
+
+        /* PC warning modal */
+        .pc-warn-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;
+            display:flex;align-items:center;justify-content:center;padding:1rem;
+            opacity:0;visibility:hidden;transition:all var(--transition-base);
+        }
+        .pc-warn-overlay.active{opacity:1;visibility:visible}
+        .pc-warn-card{
+            background:var(--bg-surface);border-radius:var(--radius-xl);
+            max-width:380px;width:100%;padding:2rem 1.5rem;text-align:center;
+            animation:modalIn .25s ease;
+            box-shadow:0 12px 40px rgba(0,0,0,.2);
+        }
+        .pc-warn-card i{font-size:48px;color:var(--warning);display:block;margin-bottom:10px}
+        .pc-warn-card h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+        .pc-warn-card p{font-size:.78rem;color:var(--text-secondary);margin-bottom:1rem;line-height:1.5}
+        .pc-warn-card .highlight-box{
+            background:var(--warning-bg);border-radius:var(--radius-lg);
+            padding:10px 14px;font-size:.74rem;color:var(--warning);font-weight:600;
+            margin-bottom:1rem;
+        }
 
         .toast-container{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none}
         .toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:slideUp .3s ease-out;pointer-events:auto;white-space:nowrap;text-align:center}
@@ -182,6 +247,63 @@
                 <div class="skeleton sk-price"></div>
                 <div class="skeleton sk-btn"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Payment Steps Modal -->
+    <div class="modal-overlay" id="paymentStepsModal">
+        <div class="modal">
+            <div class="modal-icon-wrap"><i class="bx bx-credit-card"></i></div>
+            <h3>How Payment Works</h3>
+            <p class="modal-sub">Follow these steps to complete your purchase</p>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                        <h5>Redirect to Payment Page</h5>
+                        <p>You will be taken to AfriPay's secure checkout page</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                        <h5>Enter Your MTN Number</h5>
+                        <p>Type your MTN Mobile Money phone number (078... or 079...)</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                        <h5>Receive MTN Payment Prompt</h5>
+                        <p>A payment confirmation box will appear on your phone</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-info">
+                        <h5>Approve & Pay</h5>
+                        <p>Enter your MTN PIN to approve the payment. Done!</p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="proceedToPayBtn"><i class="bx bx-check-shield"></i> Proceed to Payment</button>
+            <button class="btn-close-modal" onclick="closePaymentSteps()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- PC Warning Modal -->
+    <div class="pc-warn-overlay" id="pcWarnOverlay">
+        <div class="pc-warn-card">
+            <i class="bx bx-desktop"></i>
+            <h3>Desktop Not Supported</h3>
+            <p>Mobile Money payments only work on a mobile phone. You can browse documents on desktop but cannot pay.</p>
+            <div class="highlight-box">
+                <i class="bx bx-smartphone" style="margin-right:6px;"></i>
+                Open this page on your phone to pay
+            </div>
+            <button class="btn btn-outline" onclick="document.getElementById('pcWarnOverlay').classList.remove('active')">
+                <i class="bx bx-x"></i> Close
+            </button>
         </div>
     </div>
 
@@ -215,6 +337,12 @@
                 t.textContent = msg;
                 $('toastContainer').appendChild(t);
                 setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(function(){ t.remove(); },250); },2800);
+            }
+
+            // Detect if user is on a mobile device
+            function isMobile() {
+                return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) ||
+                       (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
             }
 
             function genToken() {
@@ -322,7 +450,7 @@
                 var dlBtn = $('downloadBtn');
                 var payBtn = $('payBtn');
                 if (dlBtn) dlBtn.addEventListener('click', downloadDocument);
-                if (payBtn) payBtn.addEventListener('click', startPayment);
+                if (payBtn) payBtn.addEventListener('click', handlePayClick);
 
                 setMeta('og:title', doc.title+' — KotWeb');
                 setMeta('og:description', doc.description||'Purchase and download this document securely via MTN or Airtel Money.');
@@ -334,24 +462,102 @@
                 document.title = doc.title+' — KotWeb';
             }
 
-            function startPayment() {
-                if (!doc||!fingerprint) { toast('Please wait...', true); return; }
-                var btn = $('payBtn'); if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Preparing...'; }
+            // ── PAYMENT FLOW ──
+            function handlePayClick() {
+                if (!isMobile()) {
+                    // Show PC warning
+                    $('pcWarnOverlay').classList.add('active');
+                    return;
+                }
+                // Show payment steps modal
+                showPaymentSteps();
+            }
+
+            function showPaymentSteps() {
+                $('paymentStepsModal').classList.add('active');
+
+                // Attach proceed button listener
+                var proceedBtn = $('proceedToPayBtn');
+                var newBtn = proceedBtn.cloneNode(true);
+                proceedBtn.parentNode.replaceChild(newBtn, proceedBtn);
+                newBtn.addEventListener('click', function() {
+                    $('paymentStepsModal').classList.remove('active');
+                    executePayment();
+                });
+            }
+
+            function closePaymentSteps() {
+                $('paymentStepsModal').classList.remove('active');
+            }
+
+            // Close modals on overlay click
+            $('paymentStepsModal').addEventListener('click', function(e) {
+                if (e.target === this) closePaymentSteps();
+            });
+            $('pcWarnOverlay').addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+
+            function executePayment() {
+                if (!doc || !fingerprint) { toast('Please wait...', true); return; }
+                var btn = $('payBtn');
+                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Preparing...'; }
+
                 payToken = genToken();
                 var amountToPay = isDoubled && doubledPrice ? doubledPrice : doc.price;
-                apiCall('/api/init-payment', { document_id:docId, device_fingerprint:fingerprint, client_token:payToken }).then(function(r) {
-                    if (r.already_paid) { isPaid=true; withinWindow=true; isDoubled=false; completedToken=payToken; render(); toast('You already own this!'); return; }
-                    if (r.error) { toast(r.error, true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'; } return; }
-                    var form = document.createElement('form'); form.method='POST'; form.action=AFRIPAY_URL; form.style.display='none';
-                    var fields = { amount:parseInt(amountToPay), currency:r.currency||doc.currency, comment:doc.title, client_token:payToken, return_url:window.location.origin+'/cart.html?doc='+docId+'&token='+payToken, app_id:AFRIPAY_APP_ID, app_secret:AFRIPAY_SECRET };
-                    Object.keys(fields).forEach(function(k) { var i=document.createElement('input'); i.type='hidden'; i.name=k; i.value=fields[k]; form.appendChild(i); });
-                    document.body.appendChild(form); form.submit();
-                }).catch(function(err) { toast(err.message||'Failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'; } });
+
+                apiCall('/api/init-payment', {
+                    document_id: docId,
+                    device_fingerprint: fingerprint,
+                    client_token: payToken
+                }).then(function(r) {
+                    if (r.already_paid) {
+                        isPaid = true; withinWindow = true; isDoubled = false;
+                        completedToken = payToken; render();
+                        toast('You already own this document!');
+                        return;
+                    }
+                    if (r.error) {
+                        toast(r.error, true);
+                        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bx bx-lock"></i> Pay to Download'; }
+                        return;
+                    }
+
+                    // Submit to AfriPay
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = AFRIPAY_URL;
+                    form.style.display = 'none';
+
+                    var fields = {
+                        amount: parseInt(amountToPay),
+                        currency: r.currency || doc.currency,
+                        comment: doc.title,
+                        client_token: payToken,
+                        return_url: window.location.origin + '/cart.html?doc=' + docId + '&token=' + payToken,
+                        app_id: AFRIPAY_APP_ID,
+                        app_secret: AFRIPAY_SECRET
+                    };
+
+                    Object.keys(fields).forEach(function(k) {
+                        var i = document.createElement('input');
+                        i.type = 'hidden'; i.name = k; i.value = fields[k];
+                        form.appendChild(i);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }).catch(function(err) {
+                    toast(err.message || 'Failed', true);
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bx bx-lock"></i> Pay to Download'; }
+                });
             }
 
             function downloadDocument() {
-                var btn = $('downloadBtn'); if (btn) { btn.disabled=true; btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Downloading...'; }
+                var btn = $('downloadBtn');
+                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Downloading...'; }
                 var tokenToUse = completedToken || payToken;
+
                 function attemptDownload(token) {
                     if (!token) { toast('Cannot find payment. Refresh.', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } return; }
                     apiCall('/api/download', { client_token:token, device_fingerprint:fingerprint, document_id:docId }).then(function(r) {
@@ -365,11 +571,14 @@
                         }).catch(function() { window.open(r.url,'_blank'); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } });
                     }).catch(function(err) { toast(err.message||'Download failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } });
                 }
+
                 if (tokenToUse) attemptDownload(tokenToUse);
                 else findCompletedPayment().then(function(t) { if (t) completedToken=t; attemptDownload(completedToken); });
             }
 
-            (async function() { try { var fpP=getFingerprint(); await loadDocument(); fingerprint=await fpP; await checkPayment(); fetch('/api/documents/'+docId+'/click',{method:'POST'}).catch(function(){}); render(); } catch(e) {} })();
+            (async function() {
+                try { var fpP=getFingerprint(); await loadDocument(); fingerprint=await fpP; await checkPayment(); fetch('/api/documents/'+docId+'/click',{method:'POST'}).catch(function(){}); render(); } catch(e) {}
+            })();
         })();
     </script>
 </body>
