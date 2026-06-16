@@ -2,172 +2,177 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title id="ogTitle">Document — DocStore</title>
-    <meta property="og:title" id="ogMetaTitle" content="Document — DocStore">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title id="ogTitle">Document — KotWeb</title>
+    <meta property="og:title" id="ogMetaTitle" content="Document — KotWeb">
     <meta property="og:description" id="ogMetaDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
     <meta property="og:image" id="ogMetaImage" content="">
     <meta property="og:url" content="">
     <meta property="og:type" content="product">
-    <meta property="og:site_name" content="DocStore">
+    <meta property="og:site_name" content="KotWeb">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" id="twTitle" content="Document — DocStore">
+    <meta name="twitter:title" id="twTitle" content="Document — KotWeb">
     <meta name="twitter:description" id="twDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
     <meta name="twitter:image" id="twImage" content="">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
     <style>
         :root {
-            --bg:#f8f9fb; --surface:#fff; --text:#111; --sub:#6b7280;
-            --border:#eef0f2; --accent:#0a0a0a; --accent-hover:#1a1a1a;
-            --green:#059669; --green-bg:#ecfdf5; --green-text:#065f46;
-            --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
-            --amber:#d97706; --amber-bg:#fffbeb; --amber-text:#92400e;
-            --radius:18px; --radius-sm:12px;
-            --tr:0.2s cubic-bezier(0.4,0,0.2,1);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --bg-main: #f4f2ee;
+            --bg-surface: #ffffff;
+            --bg-hover: #f9fafb;
+            --bg-input: #eef3f8;
+            --border: #e5e7eb;
+            --text-primary: #191919;
+            --text-secondary: #595856;
+            --text-tertiary: #868482;
+            --primary: #6c47ff;
+            --primary-hover: #5835e8;
+            --primary-light: #f0ebff;
+            --success: #057642;
+            --success-bg: #e9f7ef;
+            --danger: #d11124;
+            --danger-bg: #fdecea;
+            --warning: #b85c00;
+            --warning-bg: #fff8f0;
+            --card-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+            --card-hover-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-full: 9999px;
         }
-
-        *{margin:0;padding:0;box-sizing:border-box}
-
-        body{
-            font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);
-            min-height:100vh;-webkit-font-smoothing:antialiased;
-        }
-
-        .skeleton{
-            background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);
-            background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;
-        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{-webkit-font-smoothing:antialiased;font-size:16px;scroll-behavior:smooth}
+        body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);line-height:1.5;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        button{cursor:pointer;font-family:inherit;border:none;background:transparent}
         @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-        .sk-img{width:100%;height:260px;border-radius:0}
-        .sk-title{height:28px;width:60%;margin-bottom:10px}
-        .sk-text{height:16px;width:90%;margin-bottom:6px}
-        .sk-text.short{width:50%}
-        .sk-price{height:36px;width:35%;margin-bottom:14px}
-        .sk-btn{height:50px;width:100%;border-radius:30px}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-        .container{max-width:700px;margin:0 auto;padding:20px 16px 80px}
+        .skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+        .sk-img{width:100%;height:240px}
+        .sk-title{height:24px;width:55%;margin-bottom:8px;border-radius:4px}
+        .sk-text{height:14px;width:90%;margin-bottom:5px;border-radius:4px}
+        .sk-text.short{width:40%}
+        .sk-price{height:32px;width:30%;margin-bottom:12px;border-radius:4px}
+        .sk-btn{height:48px;width:100%;border-radius:var(--radius-full)}
+
+        .container{max-width:640px;margin:0 auto;padding:1rem .85rem 5rem}
 
         .back-link{
-            display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
-            font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
-            margin-bottom:18px;border-radius:30px;transition:background var(--tr);
-            -webkit-tap-highlight-color:transparent;
+            display:inline-flex;align-items:center;gap:5px;font-size:.8rem;
+            font-weight:500;color:var(--text-secondary);padding:8px 14px;
+            margin-bottom:1rem;border-radius:var(--radius-full);
+            transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;
+            background:var(--bg-surface);border:1px solid var(--border);
         }
-        .back-link:hover{background:#f3f4f6}
+        .back-link:hover{background:var(--bg-hover);color:var(--text-primary)}
+        .back-link i{font-size:16px}
 
         .hero{
-            background:var(--surface);border-radius:var(--radius);
-            border:1px solid var(--border);overflow:hidden;
-            box-shadow:0 1px 3px rgba(0,0,0,.03);
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%);
+            overflow:hidden;
+            box-shadow:var(--card-shadow);
         }
         .hero-img-wrap{
-            position:relative;background:#f3f4f6;min-height:200px;
+            position:relative;background:var(--bg-input);min-height:200px;
             display:flex;align-items:center;justify-content:center;
         }
-        .hero-img-wrap img{width:100%;max-height:320px;object-fit:cover;display:block}
-        .hero-img-wrap .img-fallback{font-size:64px;color:#d1d5db}
-        .hero-body{padding:24px 20px}
-        .hero-body .doc-title{
-            font-size:1.35rem;font-weight:700;margin-bottom:6px;
-            letter-spacing:-.4px;line-height:1.3;
+        .hero-img-wrap img{width:100%;max-height:340px;object-fit:cover;display:block}
+        .hero-img-wrap .img-fallback{font-size:72px;color:#d1d5db}
+        .hero-body{padding:1.5rem 1.25rem}
+        .hero-body .doc-title{font-size:1.3rem;font-weight:800;margin-bottom:6px;letter-spacing:-.4px;line-height:1.3}
+        .hero-body .doc-desc{font-size:.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem}
+        .hero-body .price-display{display:flex;align-items:baseline;gap:5px;margin-bottom:1rem}
+        .hero-body .price-display .val{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;color:var(--primary)}
+        .hero-body .price-display .cur{font-size:.72rem;color:var(--text-tertiary);font-weight:500}
+
+        .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}
+        .timer-badge{
+            display:inline-flex;align-items:center;gap:5px;
+            background:var(--warning-bg);color:var(--warning);
+            padding:7px 12px;border-radius:var(--radius-full);
+            font-size:.72rem;font-weight:600;
         }
-        .hero-body .doc-desc{
-            font-size:.85rem;color:var(--sub);line-height:1.6;margin-bottom:16px;
+        .timer-badge.expired{background:var(--danger-bg);color:var(--danger)}
+        .suspicious-badge{
+            display:inline-flex;align-items:center;gap:5px;
+            background:var(--danger-bg);color:var(--danger);
+            padding:7px 12px;border-radius:var(--radius-full);
+            font-size:.72rem;font-weight:600;
         }
-        .hero-body .price-display{
-            display:flex;align-items:baseline;gap:6px;margin-bottom:18px;
-        }
-        .hero-body .price-display .val{
-            font-size:1.6rem;font-weight:700;letter-spacing:-.5px;
-        }
-        .hero-body .price-display .cur{
-            font-size:.78rem;color:#9ca3af;font-weight:400;
-        }
+        .badge-row i{font-size:15px}
 
         .btn{
             display:inline-flex;align-items:center;justify-content:center;
-            gap:8px;padding:14px 28px;border-radius:30px;font-weight:600;
-            font-size:.88rem;cursor:pointer;border:none;
-            font-family:'Poppins',sans-serif;transition:all var(--tr);
+            gap:7px;padding:13px 24px;border-radius:var(--radius-full);font-weight:600;
+            font-size:.84rem;cursor:pointer;border:none;
+            font-family:var(--font-family);transition:all var(--transition-fast);
             -webkit-tap-highlight-color:transparent;width:100%;letter-spacing:-.2px;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
         }
-        .btn .material-icons{font-size:20px}
-        .btn-primary{background:var(--accent);color:#fff}
-        .btn-primary:hover{background:var(--accent-hover)}
-        .btn-primary:active{transform:scale(.97)}
+        .btn i{font-size:18px}
+        .btn:active{transform:scale(.97)}
+        .btn-primary{background:var(--primary);color:#fff}
+        .btn-primary:hover{background:var(--primary-hover);box-shadow:0 4px 16px rgba(108,71,255,.3)}
         .btn-primary:disabled{opacity:.5;pointer-events:none;transform:none}
-        .btn-paid{background:var(--green-bg);color:var(--green-text)}
-        .btn-paid:hover{background:#d1fae5}
-        .btn-paid:active{transform:scale(.97)}
-        .btn-expired{background:var(--red-bg);color:var(--red-text)}
-        .btn-doubled{background:var(--red);color:#fff}
-        .btn-doubled:hover{background:#b91c1c}
+        .btn-success{background:var(--success);color:#fff}
+        .btn-success:hover{background:#046b38}
+        .btn-danger{background:var(--danger);color:#fff}
+        .btn-danger:hover{background:#b91c1c}
+        .btn-outline{background:var(--bg-surface);color:var(--text-primary);border:1.5px solid var(--border);box-shadow:none}
+        .btn-outline:hover{background:var(--bg-hover)}
 
-        .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+        .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem}
         .info-card{
-            background:var(--surface);border-radius:var(--radius-sm);
-            border:1px solid var(--border);padding:16px;
-            display:flex;align-items:center;gap:10px;
+            background:var(--bg-surface);border:1px solid var(--border);
+            clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
+            padding:1rem .9rem;display:flex;align-items:center;gap:10px;
         }
         .info-card .ic-icon{
-            width:40px;height:40px;border-radius:10px;
+            width:38px;height:38px;border-radius:8px 2px 8px 2px;
             display:flex;align-items:center;justify-content:center;flex-shrink:0;
         }
-        .info-card .ic-icon.views{background:#eff6ff;color:#2563eb}
-        .info-card .ic-icon.payments{background:#fef3c7;color:#d97706}
-        .info-card .ic-val{font-size:1.1rem;font-weight:700}
-        .info-card .ic-label{font-size:.7rem;color:var(--sub)}
+        .info-card .ic-icon.views{background:#e3f2fd;color:#0d47a1}
+        .info-card .ic-icon.views i{font-size:1rem}
+        .info-card .ic-icon.payments{background:var(--warning-bg);color:var(--warning)}
+        .info-card .ic-icon.payments i{font-size:1rem}
+        .info-card .ic-val{font-size:1rem;font-weight:700}
+        .info-card .ic-label{font-size:.65rem;color:var(--text-tertiary);font-weight:500}
 
-        .timer-badge{
-            display:inline-flex;align-items:center;gap:6px;
-            background:#fef3c7;color:#92400e;padding:8px 14px;
-            border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
-        }
-        .timer-badge.expired{background:var(--red-bg);color:var(--red-text)}
+        .state-wrap{text-align:center;padding:3rem 1.5rem}
+        .state-wrap i{font-size:52px;color:#d1d5db;display:block;margin-bottom:10px}
+        .state-wrap h2{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+        .state-wrap p{color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
 
-        .suspicious-badge{
-            display:inline-flex;align-items:center;gap:6px;
-            background:var(--red-bg);color:var(--red-text);padding:8px 14px;
-            border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
-        }
-        .suspicious-badge .material-icons{font-size:18px}
-
-        .state-wrap{text-align:center;padding:60px 20px}
-        .state-wrap .material-icons{font-size:56px;color:#d1d5db;margin-bottom:12px}
-        .state-wrap h2{font-size:1.2rem;font-weight:600;margin-bottom:6px}
-        .state-wrap p{color:var(--sub);font-size:.85rem;margin-bottom:16px}
-
-        .toast{
-            position:fixed;bottom:24px;left:50%;
-            transform:translateX(-50%) translateY(120px);
-            background:#1a1a2e;color:#fff;padding:12px 24px;
-            border-radius:50px;font-size:.8rem;font-weight:500;
-            font-family:'Poppins',sans-serif;z-index:300;
-            transition:transform .3s ease;pointer-events:none;
-            white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.2);
-        }
-        .toast.show{transform:translateX(-50%) translateY(0)}
-        .toast.err{background:var(--red)}
+        .toast-container{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none}
+        .toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:slideUp .3s ease-out;pointer-events:auto;white-space:nowrap;text-align:center}
+        .toast.err{background:var(--danger)}
 
         @media(max-width:500px){
-            .hero-body{padding:18px 14px}
-            .hero-body .doc-title{font-size:1.15rem}
+            .hero-body{padding:1.1rem .9rem}
+            .hero-body .doc-title{font-size:1.1rem}
+            .hero-body .price-display .val{font-size:1.25rem}
             .info-grid{grid-template-columns:1fr}
-            .hero-img-wrap{min-height:180px}
+            .hero-img-wrap{min-height:160px}
         }
     </style>
 </head>
 <body>
 
     <div class="container" id="pageContent">
-        <div class="back-link" style="pointer-events:none;">
-            <span class="material-icons">arrow_back</span> Back
-        </div>
+        <a href="index.html" class="back-link" style="pointer-events:none;"><i class="bx bx-arrow-back"></i> Back</a>
         <div class="hero">
             <div class="hero-img-wrap"><div class="skeleton sk-img"></div></div>
             <div class="hero-body">
@@ -180,7 +185,7 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         (function() {
@@ -204,6 +209,13 @@
             var completedToken = null;
 
             function $(id) { return document.getElementById(id); }
+            function toast(msg, isError) {
+                var t = document.createElement('div');
+                t.className = 'toast' + (isError ? ' err' : '');
+                t.textContent = msg;
+                $('toastContainer').appendChild(t);
+                setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(function(){ t.remove(); },250); },2800);
+            }
 
             function genToken() {
                 var c = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -212,17 +224,8 @@
                 return 'tk_' + r + '_' + Date.now().toString(36);
             }
 
-            function toast(msg, isError) {
-                var t = $('toast');
-                t.textContent = msg;
-                t.className = 'toast show' + (isError ? ' err' : '');
-                clearTimeout(t._tid);
-                t._tid = setTimeout(function() { t.classList.remove('show'); }, 3000);
-            }
-
             function setMeta(prop, content) {
-                var el = document.querySelector('meta[property="' + prop + '"]') ||
-                         document.querySelector('meta[name="' + prop + '"]');
+                var el = document.querySelector('meta[property="' + prop + '"]') || document.querySelector('meta[name="' + prop + '"]');
                 if (el && content) el.setAttribute('content', content);
             }
 
@@ -230,127 +233,54 @@
                 var ctrl = new AbortController();
                 var timeout = setTimeout(function() { ctrl.abort(); }, 15000);
                 try {
-                    var opts = {
-                        method: body ? 'POST' : 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        signal: ctrl.signal
-                    };
+                    var opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal };
                     if (body) opts.body = JSON.stringify(body);
                     var res = await fetch(path, opts);
                     clearTimeout(timeout);
                     var txt = await res.text();
-                    if (!res.ok) {
-                        var msg = 'Request failed';
-                        try { msg = JSON.parse(txt).error || msg; } catch(e) {}
-                        throw new Error(msg);
-                    }
+                    if (!res.ok) { var msg = 'Request failed'; try { msg = JSON.parse(txt).error || msg; } catch(e) {} throw new Error(msg); }
                     try { return JSON.parse(txt); } catch(e) { throw new Error('Invalid response'); }
-                } catch(err) {
-                    clearTimeout(timeout);
-                    if (err.name === 'AbortError') throw new Error('Request timed out');
-                    throw err;
-                }
+                } catch(err) { clearTimeout(timeout); if (err.name === 'AbortError') throw new Error('Request timed out'); throw err; }
             }
 
             async function getFingerprint() {
-                try {
-                    var fp = await FingerprintJS.load();
-                    return (await fp.get()).visitorId;
-                } catch(e) {
-                    var comps = [navigator.userAgent, screen.width + 'x' + screen.height, navigator.language, new Date().getTimezoneOffset(), navigator.hardwareConcurrency || ''];
-                    return 'fb_' + btoa(comps.join('|')).replace(/[=+/]/g, '').slice(0, 48);
-                }
+                try { var fp = await FingerprintJS.load(); return (await fp.get()).visitorId; }
+                catch(e) { var c = [navigator.userAgent, screen.width+'x'+screen.height, navigator.language, new Date().getTimezoneOffset(), navigator.hardwareConcurrency||'']; return 'fb_'+btoa(c.join('|')).replace(/[=+/]/g,'').slice(0,48); }
             }
 
-            function formatPrice(n, c) {
-                return parseInt(n).toLocaleString() + ' ' + (c || 'RWF');
-            }
-
-            function vu(id) {
-                return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-            }
+            function formatPrice(n, c) { return parseInt(n).toLocaleString() + ' ' + (c || 'RWF'); }
+            function vu(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id); }
 
             var params = new URLSearchParams(window.location.search);
             var docId = params.get('doc');
 
             if (!docId || !vu(docId)) {
-                $('pageContent').innerHTML =
-                    '<div class="state-wrap">' +
-                        '<span class="material-icons">error_outline</span>' +
-                        '<h2>Invalid Document</h2>' +
-                        '<p>No valid document was specified.</p>' +
-                        '<a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 28px;">Browse Documents</a>' +
-                    '</div>';
+                $('pageContent').innerHTML = '<div class="state-wrap"><i class="bx bx-error-circle"></i><h2>Invalid Document</h2><p>No valid document was specified.</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Browse Documents</a></div>';
                 return;
             }
 
             async function loadDocument() {
-                try {
-                    doc = await apiCall('/api/documents/' + docId);
-                } catch(err) {
-                    $('pageContent').innerHTML =
-                        '<div class="state-wrap">' +
-                            '<span class="material-icons">folder_off</span>' +
-                            '<h2>Document Not Found</h2>' +
-                            '<p>' + err.message + '</p>' +
-                            '<a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 28px;">Back to Store</a>' +
-                        '</div>';
-                    throw err;
-                }
+                try { doc = await apiCall('/api/documents/' + docId); }
+                catch(err) { $('pageContent').innerHTML = '<div class="state-wrap"><i class="bx bx-folder-open"></i><h2>Document Not Found</h2><p>'+err.message+'</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Back to Store</a></div>'; throw err; }
             }
 
             async function findCompletedPayment() {
-                try {
-                    var payments = await apiCall('/api/user-payments', { device_fingerprint: fingerprint });
-                    if (payments && payments.length) {
-                        for (var i = 0; i < payments.length; i++) {
-                            if (payments[i].document_id === docId && payments[i].status === 'completed') {
-                                return payments[i].client_token;
-                            }
-                        }
-                    }
-                } catch(e) {}
-                return null;
+                try { var p = await apiCall('/api/user-payments', { device_fingerprint: fingerprint }); if (p) for (var i=0;i<p.length;i++) if (p[i].document_id===docId&&p[i].status==='completed') return p[i].client_token; } catch(e) {} return null;
             }
 
             async function checkPayment() {
                 try {
-                    var r = await apiCall('/api/check-payment', {
-                        device_fingerprint: fingerprint,
-                        document_id: docId
-                    });
-
-                    isPaid = r.already_paid === true;
-                    withinWindow = r.within_window === true;
-
-                    if (r.payment) {
-                        if (r.payment.created_at) paidAt = new Date(r.payment.created_at);
-
-                        if (r.payment.status === 'pending_verification') {
-                            isDoubled = true;
-                            doubledPrice = r.payment.amount;
-                        }
-                    }
-
-                    if (isPaid) {
-                        completedToken = await findCompletedPayment();
-                    }
-                } catch(e) {
-                    isPaid = false;
-                    withinWindow = false;
-                    isDoubled = false;
-                }
+                    var r = await apiCall('/api/check-payment', { device_fingerprint: fingerprint, document_id: docId });
+                    isPaid = r.already_paid === true; withinWindow = r.within_window === true;
+                    if (r.payment) { if (r.payment.created_at) paidAt = new Date(r.payment.created_at); if (r.payment.status==='pending_verification') { isDoubled = true; doubledPrice = r.payment.amount; } }
+                    if (isPaid) completedToken = await findCompletedPayment();
+                } catch(e) { isPaid=false; withinWindow=false; isDoubled=false; }
             }
 
-            function getTimeRemaining() {
-                if (!paidAt) return -1;
-                var diff = DOWNLOAD_WINDOW_MINUTES - ((Date.now() - paidAt.getTime()) / 60000);
-                return Math.max(0, Math.floor(diff));
-            }
+            function getTimeRemaining() { if (!paidAt) return -1; return Math.max(0, Math.floor(DOWNLOAD_WINDOW_MINUTES - ((Date.now() - paidAt.getTime()) / 60000))); }
 
             function render() {
                 if (!doc) return;
-
                 var hasImg = doc.image_url && doc.image_url.trim().length > 0;
                 var timeLeft = getTimeRemaining();
                 var expired = isPaid && !withinWindow;
@@ -359,235 +289,87 @@
                 var statusHtml = '';
                 var priceToShow = isDoubled && doubledPrice ? doubledPrice : doc.price;
 
-                if (canDownload) {
-                    timerHtml = '<div class="timer-badge"><span class="material-icons">timer</span> Download available for ' + timeLeft + ' more minutes</div>';
-                } else if (expired) {
-                    timerHtml = '<div class="timer-badge expired"><span class="material-icons">timer_off</span> Download window expired — purchase again</div>';
-                } else if (isDoubled) {
-                    statusHtml = '<div class="suspicious-badge"><span class="material-icons">gpp_bad</span> Your info was flagged suspicious. Price doubled to ' + formatPrice(priceToShow, doc.currency) + '.</div>';
-                }
+                if (canDownload) timerHtml = '<div class="timer-badge"><i class="bx bx-time-five"></i> Download available for '+timeLeft+' more minutes</div>';
+                else if (expired) timerHtml = '<div class="timer-badge expired"><i class="bx bx-timer-off"></i> Download window expired — purchase again</div>';
+                else if (isDoubled) statusHtml = '<div class="suspicious-badge"><i class="bx bx-shield-x"></i> Info flagged suspicious. Price doubled to '+formatPrice(priceToShow, doc.currency)+'.</div>';
 
                 $('pageContent').innerHTML =
-                    '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to store</a>' +
+                    '<a href="index.html" class="back-link"><i class="bx bx-arrow-back"></i> Back to store</a>' +
                     '<div class="hero">' +
                         '<div class="hero-img-wrap">' +
-                            (hasImg ? '<img src="' + doc.image_url + '" alt="' + doc.title + '" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
-                            '<span class="img-fallback" style="' + (hasImg ? 'display:none' : 'display:flex') + ';align-items:center;justify-content:center;width:100%;height:200px;">' +
-                                '<span class="material-icons" style="font-size:64px;color:#d1d5db;">description</span>' +
-                            '</span>' +
+                            (hasImg ? '<img src="'+doc.image_url+'" alt="'+doc.title+'" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
+                            '<span class="img-fallback" style="'+(hasImg?'display:none':'display:flex')+';align-items:center;justify-content:center;width:100%;height:200px;"><i class="bx bx-file" style="font-size:64px;color:#d1d5db;"></i></span>' +
                         '</div>' +
                         '<div class="hero-body">' +
-                            '<h1 class="doc-title">' + doc.title + '</h1>' +
-                            '<p class="doc-desc">' + (doc.description || 'No description provided.') + '</p>' +
-                            '<div class="price-display"><span class="val">' + parseInt(priceToShow).toLocaleString() + '</span><span class="cur">' + (doc.currency || 'RWF') + '</span></div>' +
-                            timerHtml +
-                            statusHtml +
+                            '<h1 class="doc-title">'+doc.title+'</h1>' +
+                            '<p class="doc-desc">'+(doc.description||'No description provided.')+'</p>' +
+                            '<div class="price-display"><span class="val">'+parseInt(priceToShow).toLocaleString()+'</span><span class="cur">'+(doc.currency||'RWF')+'</span></div>' +
+                            '<div class="badge-row">'+timerHtml+statusHtml+'</div>' +
                             (canDownload
-                                ? '<button class="btn btn-paid" id="downloadBtn"><span class="material-icons">download</span> Download Document</button>'
+                                ? '<button class="btn btn-success" id="downloadBtn"><i class="bx bx-download"></i> Download Document</button>'
                                 : (isDoubled
-                                    ? '<button class="btn btn-doubled" id="payBtn"><span class="material-icons">payments</span> Pay ' + formatPrice(priceToShow, doc.currency) + '</button>'
-                                    : '<button class="btn ' + (expired ? 'btn-expired' : 'btn-primary') + '" id="payBtn"><span class="material-icons">' + (expired ? 'refresh' : 'lock') + '</span> ' + (expired ? 'Purchase Again' : 'Pay to Download') + '</button>'
+                                    ? '<button class="btn btn-danger" id="payBtn"><i class="bx bx-credit-card"></i> Pay '+formatPrice(priceToShow, doc.currency)+'</button>'
+                                    : '<button class="btn '+(expired?'btn-outline':'btn-primary')+'" id="payBtn"><i class="bx bx-'+(expired?'refresh':'lock')+'"></i> '+(expired?'Purchase Again':'Pay to Download')+'</button>'
                                 )
                             ) +
                         '</div>' +
                     '</div>' +
                     '<div class="info-grid">' +
-                        '<div class="info-card">' +
-                            '<div class="ic-icon views"><span class="material-icons">visibility</span></div>' +
-                            '<div><div class="ic-val">' + (doc.clicks || 0).toLocaleString() + '</div><div class="ic-label">Total Views</div></div>' +
-                        '</div>' +
-                        '<div class="info-card">' +
-                            '<div class="ic-icon payments"><span class="material-icons">payment</span></div>' +
-                            '<div><div class="ic-val">' + (canDownload ? 'Paid' : (isDoubled ? 'Flagged' : 'Pending')) + '</div><div class="ic-label">Your Status</div></div>' +
-                        '</div>' +
+                        '<div class="info-card"><div class="ic-icon views"><i class="bx bx-show"></i></div><div><div class="ic-val">'+(doc.clicks||0).toLocaleString()+'</div><div class="ic-label">Total Views</div></div></div>' +
+                        '<div class="info-card"><div class="ic-icon payments"><i class="bx bx-credit-card"></i></div><div><div class="ic-val">'+(canDownload?'Paid':(isDoubled?'Flagged':'Pending'))+'</div><div class="ic-label">Your Status</div></div></div>' +
                     '</div>';
 
                 var dlBtn = $('downloadBtn');
                 var payBtn = $('payBtn');
-
                 if (dlBtn) dlBtn.addEventListener('click', downloadDocument);
                 if (payBtn) payBtn.addEventListener('click', startPayment);
 
-                setMeta('og:title', doc.title + ' — DocStore');
-                setMeta('og:description', doc.description || 'Purchase and download this document securely via MTN or Airtel Money.');
-                setMeta('og:image', doc.image_url || '');
+                setMeta('og:title', doc.title+' — KotWeb');
+                setMeta('og:description', doc.description||'Purchase and download this document securely via MTN or Airtel Money.');
+                setMeta('og:image', doc.image_url||'');
                 setMeta('og:url', window.location.href);
-                setMeta('twitter:title', doc.title + ' — DocStore');
-                setMeta('twitter:description', doc.description || '');
-                setMeta('twitter:image', doc.image_url || '');
-                document.title = doc.title + ' — DocStore';
+                setMeta('twitter:title', doc.title+' — KotWeb');
+                setMeta('twitter:description', doc.description||'');
+                setMeta('twitter:image', doc.image_url||'');
+                document.title = doc.title+' — KotWeb';
             }
 
             function startPayment() {
-                if (!doc || !fingerprint) {
-                    toast('Please wait, loading...', true);
-                    return;
-                }
-
-                var btn = $('payBtn');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Preparing...';
-                }
-
+                if (!doc||!fingerprint) { toast('Please wait...', true); return; }
+                var btn = $('payBtn'); if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Preparing...'; }
                 payToken = genToken();
                 var amountToPay = isDoubled && doubledPrice ? doubledPrice : doc.price;
-
-                apiCall('/api/init-payment', {
-                    document_id: docId,
-                    device_fingerprint: fingerprint,
-                    client_token: payToken
-                }).then(function(r) {
-                    if (r.already_paid) {
-                        isPaid = true;
-                        withinWindow = true;
-                        isDoubled = false;
-                        completedToken = payToken;
-                        render();
-                        toast('You already own this document!');
-                        return;
-                    }
-                    if (r.error) {
-                        toast(r.error, true);
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
-                        }
-                        return;
-                    }
-
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = AFRIPAY_URL;
-                    form.style.display = 'none';
-
-                    var fields = {
-                        amount: parseInt(amountToPay),
-                        currency: r.currency || doc.currency,
-                        comment: doc.title,
-                        client_token: payToken,
-                        return_url: window.location.origin + '/cart.html?doc=' + docId + '&token=' + payToken,
-                        app_id: AFRIPAY_APP_ID,
-                        app_secret: AFRIPAY_SECRET
-                    };
-
-                    Object.keys(fields).forEach(function(key) {
-                        var input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = fields[key];
-                        form.appendChild(input);
-                    });
-
-                    document.body.appendChild(form);
-                    form.submit();
-                }).catch(function(err) {
-                    toast(err.message || 'Failed', true);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
-                    }
-                });
+                apiCall('/api/init-payment', { document_id:docId, device_fingerprint:fingerprint, client_token:payToken }).then(function(r) {
+                    if (r.already_paid) { isPaid=true; withinWindow=true; isDoubled=false; completedToken=payToken; render(); toast('You already own this!'); return; }
+                    if (r.error) { toast(r.error, true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'; } return; }
+                    var form = document.createElement('form'); form.method='POST'; form.action=AFRIPAY_URL; form.style.display='none';
+                    var fields = { amount:parseInt(amountToPay), currency:r.currency||doc.currency, comment:doc.title, client_token:payToken, return_url:window.location.origin+'/cart.html?doc='+docId+'&token='+payToken, app_id:AFRIPAY_APP_ID, app_secret:AFRIPAY_SECRET };
+                    Object.keys(fields).forEach(function(k) { var i=document.createElement('input'); i.type='hidden'; i.name=k; i.value=fields[k]; form.appendChild(i); });
+                    document.body.appendChild(form); form.submit();
+                }).catch(function(err) { toast(err.message||'Failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'; } });
             }
 
             function downloadDocument() {
-                var btn = $('downloadBtn');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Downloading...';
-                }
-
+                var btn = $('downloadBtn'); if (btn) { btn.disabled=true; btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Downloading...'; }
                 var tokenToUse = completedToken || payToken;
-
                 function attemptDownload(token) {
-                    if (!token) {
-                        toast('Cannot find payment. Please refresh.', true);
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = '<span class="material-icons">download</span> Download Document';
-                        }
-                        return;
-                    }
-
-                    apiCall('/api/download', {
-                        client_token: token,
-                        device_fingerprint: fingerprint,
-                        document_id: docId
-                    }).then(function(r) {
-                        if (!r.url) {
-                            toast(r.error || 'Download failed', true);
-                            if (btn) {
-                                btn.disabled = false;
-                                btn.innerHTML = '<span class="material-icons">download</span> Download Document';
-                            }
-                            return;
-                        }
-
-                        if (btn) btn.innerHTML = '<span class="material-icons">cloud_download</span> Fetching file...';
-
-                        fetch(r.url)
-                            .then(function(response) {
-                                if (!response.ok) throw new Error('Failed to fetch file');
-                                return response.blob();
-                            })
-                            .then(function(blob) {
-                                var filename = r.filename || 'document';
-                                var blobUrl = window.URL.createObjectURL(blob);
-                                var a = document.createElement('a');
-                                a.style.display = 'none';
-                                a.href = blobUrl;
-                                a.download = filename;
-                                document.body.appendChild(a);
-                                a.click();
-
-                                setTimeout(function() {
-                                    document.body.removeChild(a);
-                                    window.URL.revokeObjectURL(blobUrl);
-                                }, 200);
-
-                                if (btn) {
-                                    btn.disabled = false;
-                                    btn.innerHTML = '<span class="material-icons">download</span> Download Again';
-                                }
-                                toast('Download started!');
-                            })
-                            .catch(function() {
-                                window.open(r.url, '_blank');
-                                if (btn) {
-                                    btn.disabled = false;
-                                    btn.innerHTML = '<span class="material-icons">download</span> Download Document';
-                                }
-                            });
-
-                    }).catch(function(err) {
-                        toast(err.message || 'Download failed', true);
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = '<span class="material-icons">download</span> Download Document';
-                        }
-                    });
+                    if (!token) { toast('Cannot find payment. Refresh.', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } return; }
+                    apiCall('/api/download', { client_token:token, device_fingerprint:fingerprint, document_id:docId }).then(function(r) {
+                        if (!r.url) { toast(r.error||'Download failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } return; }
+                        if (btn) btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';
+                        fetch(r.url).then(function(res) { if (!res.ok) throw new Error('Failed'); return res.blob(); }).then(function(blob) {
+                            var fn = r.filename||'document'; var u = window.URL.createObjectURL(blob); var a = document.createElement('a');
+                            a.style.display='none'; a.href=u; a.download=fn; document.body.appendChild(a); a.click();
+                            setTimeout(function(){ document.body.removeChild(a); window.URL.revokeObjectURL(u); },200);
+                            if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Again'; } toast('Download started!');
+                        }).catch(function() { window.open(r.url,'_blank'); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } });
+                    }).catch(function(err) { toast(err.message||'Download failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } });
                 }
-
-                if (tokenToUse) {
-                    attemptDownload(tokenToUse);
-                } else {
-                    findCompletedPayment().then(function(foundToken) {
-                        if (foundToken) completedToken = foundToken;
-                        attemptDownload(completedToken);
-                    });
-                }
+                if (tokenToUse) attemptDownload(tokenToUse);
+                else findCompletedPayment().then(function(t) { if (t) completedToken=t; attemptDownload(completedToken); });
             }
 
-            (async function init() {
-                try {
-                    var fpPromise = getFingerprint();
-                    await loadDocument();
-                    fingerprint = await fpPromise;
-                    await checkPayment();
-                    fetch('/api/documents/' + docId + '/click', { method: 'POST' }).catch(function() {});
-                    render();
-                } catch(e) {}
-            })();
+            (async function() { try { var fpP=getFingerprint(); await loadDocument(); fingerprint=await fpP; await checkPayment(); fetch('/api/documents/'+docId+'/click',{method:'POST'}).catch(function(){}); render(); } catch(e) {} })();
         })();
     </script>
 </body>
