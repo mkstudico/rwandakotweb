@@ -101,7 +101,6 @@ export default async function handler(req, res) {
                 const rpData = await rpRes.json();
                 if (rpData.completed && rpData.success && rpData.status === 'successful') {
                     await supabase.from('payments').update({ status: 'completed', payment_method: 'rwandapay' }).eq('client_token', ref).eq('status', 'pending');
-                    // Also try updating by transaction_ref
                     await supabase.from('payments').update({ status: 'completed', payment_method: 'rwandapay' }).eq('transaction_ref', ref).eq('status', 'pending');
                     return res.status(200).json({ verified: true, status: 'completed', document_id });
                 }
@@ -123,7 +122,6 @@ export default async function handler(req, res) {
                 const ref = data.reference;
                 const { data: payment } = await supabase.from('payments').select('id, status').eq('client_token', ref).single();
                 if (!payment) {
-                    // Try by transaction_ref
                     const { data: p2 } = await supabase.from('payments').select('id, status').eq('transaction_ref', ref).single();
                     if (p2 && p2.status === 'pending') {
                         await supabase.from('payments').update({ status: 'completed', transaction_ref: data.transaction_id || ref, payment_method: 'rwandapay' }).eq('id', p2.id);
@@ -156,20 +154,34 @@ export default async function handler(req, res) {
             }
             return res.status(400).json({ error: 'Missing params' });
         }
-        // Download
+        // Download - FIXED: finds any completed payment for this device+document
         if (path === '/api/download' && method === 'POST') {
             const { client_token, device_fingerprint, document_id } = req.body;
-            if (!vt(client_token) || !vf(device_fingerprint) || !vu(document_id)) return res.status(400).json({ error: 'Invalid params' });
-            const { data: payment } = await supabase.from('payments').select('*').eq('device_fingerprint', device_fingerprint).eq('document_id', document_id).eq('status', 'completed').order('created_at', { ascending: false }).limit(1).single();
-            if (!payment) return res.status(403).json({ error: 'Not confirmed' });
+            if (!vf(device_fingerprint) || !vu(document_id)) {
+                return res.status(400).json({ error: 'Invalid parameters' });
+            }
+            const { data: payment, error: payErr } = await supabase
+                .from('payments')
+                .select('*')
+                .eq('device_fingerprint', device_fingerprint)
+                .eq('document_id', document_id)
+                .eq('status', 'completed')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+            if (payErr || !payment) {
+                return res.status(403).json({ error: 'Payment not confirmed. Please complete payment first.' });
+            }
             const diffMin = (Date.now() - new Date(payment.created_at).getTime()) / 60000;
-            if (diffMin > DOWNLOAD_WINDOW_MINUTES) return res.status(410).json({ error: 'Expired', expired: true });
-            const { data: doc } = await supabase.from('documents').select('file_path').eq('id', document_id).single();
-            if (!doc) return res.status(404).json({ error: 'Not found' });
-            const { data: signed } = await supabase.storage.from('documents').createSignedUrl(doc.file_path, 600);
-            if (!signed) return res.status(500).json({ error: 'Link failed' });
+            if (diffMin > DOWNLOAD_WINDOW_MINUTES) {
+                return res.status(410).json({ error: 'Download window expired', expired: true });
+            }
+            const { data: doc, error: docErr } = await supabase.from('documents').select('file_path').eq('id', document_id).single();
+            if (docErr || !doc) return res.status(404).json({ error: 'Document not found' });
+            const { data: signedData, error: signedErr } = await supabase.storage.from('documents').createSignedUrl(doc.file_path, 600);
+            if (signedErr || !signedData) return res.status(500).json({ error: 'Failed to generate link' });
             await supabase.from('payments').update({ downloaded: true, downloaded_at: new Date().toISOString() }).eq('id', payment.id);
-            return res.status(200).json({ url: signed.signedUrl, filename: doc.file_path.split('/').pop() });
+            return res.status(200).json({ url: signedData.signedUrl, filename: doc.file_path.split('/').pop(), expires_in_minutes: Math.max(0, Math.floor(DOWNLOAD_WINDOW_MINUTES - diffMin)) });
         }
         // User payments
         if (path === '/api/user-payments' && method === 'POST') {
