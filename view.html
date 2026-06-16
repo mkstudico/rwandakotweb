@@ -258,29 +258,9 @@
 
             function downloadDocument(){
                 var btn=$('downloadBtn');if(btn){btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Downloading...';}
-                var tokenToUse=completedToken||payToken||rpReference;
-
-                function attemptDownload(token){
-                    if(!token){
-                        apiCall('/api/download',{client_token:'find_by_device',device_fingerprint:fingerprint,document_id:docId}).then(function(r){if(r.url)triggerDownload(r);else failDownload(r.error);}).catch(function(err){failDownload(err.message);});
-                        return;
-                    }
-                    apiCall('/api/download',{client_token:token,device_fingerprint:fingerprint,document_id:docId}).then(function(r){if(r.url)triggerDownload(r);else failDownload(r.error);}).catch(function(err){failDownload(err.message);});
-                }
-
-                function triggerDownload(r){
-                    if(btn)btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';
-                    fetch(r.url).then(function(res){if(!res.ok)throw new Error('Failed');return res.blob();}).then(function(blob){
-                        var fn=r.filename||'document',u=window.URL.createObjectURL(blob),a=document.createElement('a');a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();
-                        setTimeout(function(){document.body.removeChild(a);window.URL.revokeObjectURL(u);},200);
-                        if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download Again';}toast('Download started!');
-                    }).catch(function(){window.open(r.url,'_blank');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
-                }
-
-                function failDownload(msg){toast(msg||'Download failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}}
-
-                if(tokenToUse)attemptDownload(tokenToUse);
-                else findCompletedPayment().then(function(t){if(t)completedToken=t;attemptDownload(completedToken);});
+                apiCall('/api/download',{client_token:'download',device_fingerprint:fingerprint,document_id:docId}).then(function(r){
+                    if(r.url){if(btn)btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';fetch(r.url).then(function(res){if(!res.ok)throw new Error('Failed');return res.blob();}).then(function(blob){var fn=r.filename||'document',u=window.URL.createObjectURL(blob),a=document.createElement('a');a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);window.URL.revokeObjectURL(u);},200);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download Again';}toast('Download started!');}).catch(function(){window.open(r.url,'_blank');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});}else{toast(r.error||'Download failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}}
+                }).catch(function(err){toast(err.message||'Download failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
             }
 
             function checkReturnFromRP(){
