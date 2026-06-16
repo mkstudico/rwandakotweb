@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title id="ogTitle">Document — KotWeb</title>
     <meta property="og:title" id="ogMetaTitle" content="Document — KotWeb">
-    <meta property="og:description" id="ogMetaDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
+    <meta property="og:description" id="ogMetaDesc" content="Purchase and download securely via MTN or Airtel Money with RwandaPay.">
     <meta property="og:image" id="ogMetaImage" content="">
     <meta property="og:url" content="">
     <meta property="og:type" content="product">
     <meta property="og:site_name" content="KotWeb">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" id="twTitle" content="Document — KotWeb">
-    <meta name="twitter:description" id="twDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
+    <meta name="twitter:description" id="twDesc" content="Purchase and download securely via MTN or Airtel Money with RwandaPay.">
     <meta name="twitter:image" id="twImage" content="">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -21,75 +21,38 @@
     <style>
         :root {
             --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --bg-main: #f4f2ee;
-            --bg-surface: #ffffff;
-            --bg-hover: #f9fafb;
-            --bg-input: #eef3f8;
-            --border: #e5e7eb;
-            --text-primary: #191919;
-            --text-secondary: #595856;
-            --text-tertiary: #868482;
-            --primary: #6c47ff;
-            --primary-hover: #5835e8;
-            --primary-light: #f0ebff;
-            --success: #057642;
-            --success-bg: #e9f7ef;
-            --danger: #d11124;
-            --danger-bg: #fdecea;
-            --warning: #b85c00;
-            --warning-bg: #fff8f0;
-            --card-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-            --card-hover-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --bg-main: #f4f2ee; --bg-surface: #ffffff; --bg-hover: #f9fafb; --bg-input: #eef3f8;
+            --border: #e5e7eb; --text-primary: #191919; --text-secondary: #595856; --text-tertiary: #868482;
+            --primary: #6c47ff; --primary-hover: #5835e8; --primary-light: #f0ebff;
+            --success: #057642; --success-bg: #e9f7ef; --danger: #d11124; --danger-bg: #fdecea;
+            --warning: #b85c00; --warning-bg: #fff8f0;
             --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-full: 9999px;
+            --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-full: 9999px;
         }
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{-webkit-font-smoothing:antialiased;font-size:16px;scroll-behavior:smooth}
         body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);line-height:1.5;min-height:100vh}
         a{color:inherit;text-decoration:none}
         button{cursor:pointer;font-family:inherit;border:none;background:transparent}
+        input{font-family:inherit;font-size:inherit}
         @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
         .skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
-        .sk-img{width:100%;height:240px}
-        .sk-title{height:24px;width:55%;margin-bottom:8px;border-radius:4px}
-        .sk-text{height:14px;width:90%;margin-bottom:5px;border-radius:4px}
-        .sk-text.short{width:40%}
-        .sk-price{height:32px;width:30%;margin-bottom:12px;border-radius:4px}
-        .sk-btn{height:48px;width:100%;border-radius:var(--radius-full)}
+        .sk-img{width:100%;height:240px}.sk-title{height:24px;width:55%;margin-bottom:8px;border-radius:4px}
+        .sk-text{height:14px;width:90%;margin-bottom:5px;border-radius:4px}.sk-text.short{width:40%}
+        .sk-price{height:32px;width:30%;margin-bottom:12px;border-radius:4px}.sk-btn{height:48px;width:100%;border-radius:var(--radius-full)}
 
         .container{max-width:640px;margin:0 auto;padding:1rem .85rem 5rem}
+        .back-link{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:500;color:var(--text-secondary);padding:8px 14px;margin-bottom:1rem;border-radius:var(--radius-full);transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;background:var(--bg-surface);border:1px solid var(--border)}
+        .back-link:hover{background:var(--bg-hover);color:var(--text-primary)}.back-link i{font-size:16px}
 
-        .back-link{
-            display:inline-flex;align-items:center;gap:5px;font-size:.8rem;
-            font-weight:500;color:var(--text-secondary);padding:8px 14px;
-            margin-bottom:1rem;border-radius:var(--radius-full);
-            transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;
-            background:var(--bg-surface);border:1px solid var(--border);
-        }
-        .back-link:hover{background:var(--bg-hover);color:var(--text-primary)}
-        .back-link i{font-size:16px}
-
-        .hero{
-            background:var(--bg-surface);
-            border:1px solid var(--border);
-            clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%);
-            overflow:hidden;
-            box-shadow:var(--card-shadow);
-        }
-        .hero-img-wrap{
-            position:relative;background:var(--bg-input);min-height:200px;
-            display:flex;align-items:center;justify-content:center;
-        }
+        .hero{background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+        .hero-img-wrap{position:relative;background:var(--bg-input);min-height:200px;display:flex;align-items:center;justify-content:center}
         .hero-img-wrap img{width:100%;max-height:340px;object-fit:cover;display:block}
         .hero-img-wrap .img-fallback{font-size:72px;color:#d1d5db}
         .hero-body{padding:1.5rem 1.25rem}
@@ -100,137 +63,73 @@
         .hero-body .price-display .cur{font-size:.72rem;color:var(--text-tertiary);font-weight:500}
 
         .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}
-        .timer-badge{
-            display:inline-flex;align-items:center;gap:5px;
-            background:var(--warning-bg);color:var(--warning);
-            padding:7px 12px;border-radius:var(--radius-full);
-            font-size:.72rem;font-weight:600;
-        }
+        .timer-badge{display:inline-flex;align-items:center;gap:5px;background:var(--warning-bg);color:var(--warning);padding:7px 12px;border-radius:var(--radius-full);font-size:.72rem;font-weight:600}
         .timer-badge.expired{background:var(--danger-bg);color:var(--danger)}
-        .suspicious-badge{
-            display:inline-flex;align-items:center;gap:5px;
-            background:var(--danger-bg);color:var(--danger);
-            padding:7px 12px;border-radius:var(--radius-full);
-            font-size:.72rem;font-weight:600;
-        }
+        .suspicious-badge{display:inline-flex;align-items:center;gap:5px;background:var(--danger-bg);color:var(--danger);padding:7px 12px;border-radius:var(--radius-full);font-size:.72rem;font-weight:600}
 
-        .btn{
-            display:inline-flex;align-items:center;justify-content:center;
-            gap:7px;padding:13px 24px;border-radius:var(--radius-full);font-weight:600;
-            font-size:.84rem;cursor:pointer;border:none;
-            font-family:var(--font-family);transition:all var(--transition-fast);
-            -webkit-tap-highlight-color:transparent;width:100%;letter-spacing:-.2px;
-            box-shadow:0 2px 8px rgba(0,0,0,.06);
-        }
-        .btn i{font-size:18px}
-        .btn:active{transform:scale(.97)}
-        .btn-primary{background:var(--primary);color:#fff}
-        .btn-primary:hover{background:var(--primary-hover);box-shadow:0 4px 16px rgba(108,71,255,.3)}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:13px 24px;border-radius:var(--radius-full);font-weight:600;font-size:.84rem;cursor:pointer;border:none;font-family:var(--font-family);transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;width:100%;letter-spacing:-.2px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+        .btn i{font-size:18px}.btn:active{transform:scale(.97)}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover);box-shadow:0 4px 16px rgba(108,71,255,.3)}
         .btn-primary:disabled{opacity:.5;pointer-events:none;transform:none}
-        .btn-success{background:var(--success);color:#fff}
-        .btn-success:hover{background:#046b38}
-        .btn-danger{background:var(--danger);color:#fff}
-        .btn-danger:hover{background:#b91c1c}
+        .btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#046b38}
+        .btn-danger{background:var(--danger);color:#fff;width:auto;display:inline-flex}.btn-danger:hover{background:#b91c1c}
         .btn-outline{background:var(--bg-surface);color:var(--text-primary);border:1.5px solid var(--border);box-shadow:none}
-        .btn-outline:hover{background:var(--bg-hover)}
 
         .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem}
-        .info-card{
-            background:var(--bg-surface);border:1px solid var(--border);
-            clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
-            padding:1rem .9rem;display:flex;align-items:center;gap:10px;
-        }
-        .info-card .ic-icon{
-            width:38px;height:38px;border-radius:8px 2px 8px 2px;
-            display:flex;align-items:center;justify-content:center;flex-shrink:0;
-        }
-        .info-card .ic-icon.views{background:#e3f2fd;color:#0d47a1}
-        .info-card .ic-icon.payments{background:var(--warning-bg);color:var(--warning)}
-        .info-card .ic-val{font-size:1rem;font-weight:700}
-        .info-card .ic-label{font-size:.65rem;color:var(--text-tertiary);font-weight:500}
+        .info-card{background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);padding:1rem .9rem;display:flex;align-items:center;gap:10px}
+        .info-card .ic-icon{width:38px;height:38px;border-radius:8px 2px 8px 2px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .info-card .ic-icon.views{background:#e3f2fd;color:#0d47a1}.info-card .ic-icon.payments{background:var(--warning-bg);color:var(--warning)}
+        .info-card .ic-val{font-size:1rem;font-weight:700}.info-card .ic-label{font-size:.65rem;color:var(--text-tertiary);font-weight:500}
 
         .state-wrap{text-align:center;padding:3rem 1.5rem}
         .state-wrap i{font-size:52px;color:#d1d5db;display:block;margin-bottom:10px}
         .state-wrap h2{font-size:1.1rem;font-weight:700;margin-bottom:6px}
         .state-wrap p{color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
 
-        /* ── MODAL ── */
-        .modal-overlay{
-            position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;
-            display:flex;align-items:flex-end;justify-content:center;
-            opacity:0;visibility:hidden;transition:all var(--transition-base);
-        }
+        /* Payment Modal */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all var(--transition-base)}
         .modal-overlay.active{opacity:1;visibility:visible}
-        .modal{
-            background:var(--bg-surface);
-            border-radius:1.2rem 1.2rem 0 0;
-            width:100%;max-width:460px;max-height:88vh;overflow-y:auto;
-            padding:1.5rem 1.25rem 2rem;
-            animation:slideUp .3s ease;
-            box-shadow:0 -4px 20px rgba(0,0,0,.12);
-        }
-        @media(min-width:500px){
-            .modal-overlay{align-items:center}
-            .modal{border-radius:var(--radius-xl);animation:modalIn .25s ease}
-        }
-        .modal .modal-icon-wrap{
-            width:52px;height:52px;border-radius:50%;background:var(--primary-light);
-            display:flex;align-items:center;justify-content:center;
-            margin:0 auto 10px;
-        }
+        .modal{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;padding:1.5rem 1.25rem 2rem;animation:slideUp .3s ease;box-shadow:0 -4px 20px rgba(0,0,0,.12)}
+        @media(min-width:500px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius-xl);animation:modalIn .25s ease}}
+        .modal .modal-icon-wrap{width:52px;height:52px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
         .modal .modal-icon-wrap i{font-size:26px;color:var(--primary)}
         .modal h3{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:2px}
-        .modal .modal-sub{font-size:.78rem;color:var(--text-secondary);text-align:center;margin-bottom:1.25rem}
-        .modal .steps-list{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem}
-        .modal .step-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg-hover);border-radius:var(--radius-lg)}
-        .modal .step-num{
-            width:28px;height:28px;border-radius:50%;background:var(--primary);
-            color:#fff;font-weight:700;font-size:.72rem;
-            display:flex;align-items:center;justify-content:center;flex-shrink:0;
-        }
-        .modal .step-info h5{font-size:.78rem;font-weight:600;margin-bottom:1px}
-        .modal .step-info p{font-size:.7rem;color:var(--text-tertiary);line-height:1.4}
-        .modal .btn{width:100%;margin-top:4px}
-        .modal .btn-close-modal{
-            width:100%;padding:9px;border-radius:var(--radius-full);font-size:.75rem;
-            font-weight:500;cursor:pointer;border:1px solid var(--border);
-            background:transparent;color:var(--text-secondary);margin-top:8px;
-            font-family:var(--font-family);
-        }
+        .modal .modal-sub{font-size:.78rem;color:var(--text-secondary);text-align:center;margin-bottom:1rem}
+        .modal .steps-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+        .modal .step-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--bg-hover);border-radius:var(--radius-lg)}
+        .modal .step-num{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .modal .step-info h5{font-size:.76rem;font-weight:600;margin-bottom:1px}
+        .modal .step-info p{font-size:.68rem;color:var(--text-tertiary);line-height:1.4}
+        .modal .phone-input-group{display:flex;align-items:center;background:var(--bg-input);border-radius:var(--radius-full);overflow:hidden;border:1.5px solid var(--border);margin-bottom:.75rem;transition:all var(--transition-fast)}
+        .modal .phone-input-group:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1)}
+        .modal .phone-input-group .prefix{background:var(--bg-hover);padding:10px 14px;font-size:.76rem;font-weight:600;color:var(--text-secondary);border-right:1px solid var(--border);white-space:nowrap}
+        .modal .phone-input-group input{flex:1;border:none;background:transparent;padding:10px 12px;font-size:.82rem;font-family:var(--font-family);outline:none;color:var(--text-primary);-webkit-appearance:none}
+        .modal .btn-close-modal{width:100%;padding:9px;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-secondary);margin-top:6px;font-family:var(--font-family)}
         .modal .btn-close-modal:hover{background:var(--bg-hover)}
 
-        /* PC warning modal */
-        .pc-warn-overlay{
-            position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;
-            display:flex;align-items:center;justify-content:center;padding:1rem;
-            opacity:0;visibility:hidden;transition:all var(--transition-base);
-        }
+        /* Processing overlay */
+        .processing-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all var(--transition-base)}
+        .processing-overlay.active{opacity:1;visibility:visible}
+        .processing-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-align:center;max-width:340px;width:90%;animation:modalIn .25s ease}
+        .processing-card .big-spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+        .processing-card h4{font-size:.9rem;font-weight:700;margin-bottom:4px}
+        .processing-card p{font-size:.74rem;color:var(--text-secondary)}
+
+        .pc-warn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all var(--transition-base)}
         .pc-warn-overlay.active{opacity:1;visibility:visible}
-        .pc-warn-card{
-            background:var(--bg-surface);border-radius:var(--radius-xl);
-            max-width:380px;width:100%;padding:2rem 1.5rem;text-align:center;
-            animation:modalIn .25s ease;
-            box-shadow:0 12px 40px rgba(0,0,0,.2);
-        }
+        .pc-warn-card{background:var(--bg-surface);border-radius:var(--radius-xl);max-width:380px;width:100%;padding:2rem 1.5rem;text-align:center;animation:modalIn .25s ease;box-shadow:0 12px 40px rgba(0,0,0,.2)}
         .pc-warn-card i{font-size:48px;color:var(--warning);display:block;margin-bottom:10px}
         .pc-warn-card h3{font-size:1rem;font-weight:700;margin-bottom:6px}
         .pc-warn-card p{font-size:.78rem;color:var(--text-secondary);margin-bottom:1rem;line-height:1.5}
-        .pc-warn-card .highlight-box{
-            background:var(--warning-bg);border-radius:var(--radius-lg);
-            padding:10px 14px;font-size:.74rem;color:var(--warning);font-weight:600;
-            margin-bottom:1rem;
-        }
 
         .toast-container{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none}
         .toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:slideUp .3s ease-out;pointer-events:auto;white-space:nowrap;text-align:center}
         .toast.err{background:var(--danger)}
 
         @media(max-width:500px){
-            .hero-body{padding:1.1rem .9rem}
-            .hero-body .doc-title{font-size:1.1rem}
+            .hero-body{padding:1.1rem .9rem}.hero-body .doc-title{font-size:1.1rem}
             .hero-body .price-display .val{font-size:1.25rem}
-            .info-grid{grid-template-columns:1fr}
-            .hero-img-wrap{min-height:160px}
+            .info-grid{grid-template-columns:1fr}.hero-img-wrap{min-height:160px}
         }
     </style>
 </head>
@@ -241,69 +140,49 @@
         <div class="hero">
             <div class="hero-img-wrap"><div class="skeleton sk-img"></div></div>
             <div class="hero-body">
-                <div class="skeleton sk-title"></div>
-                <div class="skeleton sk-text"></div>
-                <div class="skeleton sk-text short"></div>
-                <div class="skeleton sk-price"></div>
+                <div class="skeleton sk-title"></div><div class="skeleton sk-text"></div>
+                <div class="skeleton sk-text short"></div><div class="skeleton sk-price"></div>
                 <div class="skeleton sk-btn"></div>
             </div>
         </div>
     </div>
 
-    <!-- Payment Steps Modal -->
+    <!-- Payment Modal -->
     <div class="modal-overlay" id="paymentStepsModal">
         <div class="modal">
             <div class="modal-icon-wrap"><i class="bx bx-credit-card"></i></div>
-            <h3>How Payment Works</h3>
-            <p class="modal-sub">Follow these steps to complete your purchase</p>
+            <h3>Pay with RwandaPay</h3>
+            <p class="modal-sub">Enter your phone number to receive a payment prompt</p>
             <div class="steps-list">
-                <div class="step-item">
-                    <div class="step-num">1</div>
-                    <div class="step-info">
-                        <h5>Redirect to Payment Page</h5>
-                        <p>You will be taken to AfriPay's secure checkout page</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-num">2</div>
-                    <div class="step-info">
-                        <h5>Enter Your MTN Number</h5>
-                        <p>Type your MTN Mobile Money phone number (078... or 079...)</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-num">3</div>
-                    <div class="step-info">
-                        <h5>Receive MTN Payment Prompt</h5>
-                        <p>A payment confirmation box will appear on your phone</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-num">4</div>
-                    <div class="step-info">
-                        <h5>Approve & Pay</h5>
-                        <p>Enter your MTN PIN to approve the payment. Done!</p>
-                    </div>
-                </div>
+                <div class="step-item"><div class="step-num">1</div><div class="step-info"><h5>Enter Phone Number</h5><p>Type your MTN or Airtel number</p></div></div>
+                <div class="step-item"><div class="step-num">2</div><div class="step-info"><h5>Approve on Phone</h5><p>Enter your PIN when prompted</p></div></div>
+                <div class="step-item"><div class="step-num">3</div><div class="step-info"><h5>Auto-Verification</h5><p>Payment confirmed automatically</p></div></div>
             </div>
-            <button class="btn btn-primary" id="proceedToPayBtn"><i class="bx bx-check-shield"></i> Proceed to Payment</button>
-            <button class="btn-close-modal" onclick="closePaymentSteps()">Cancel</button>
+            <div class="phone-input-group">
+                <span class="prefix">🇷🇼</span>
+                <input type="tel" id="modalPhoneInput" placeholder="0788123456" maxlength="10" autocomplete="off">
+            </div>
+            <button class="btn btn-primary" id="proceedToPayBtn"><i class="bx bx-check-shield"></i> Pay Now</button>
+            <button class="btn-close-modal" onclick="closePaymentModal()">Cancel</button>
         </div>
     </div>
 
-    <!-- PC Warning Modal -->
+    <!-- Processing overlay -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-card">
+            <div class="big-spinner"></div>
+            <h4>Processing Payment</h4>
+            <p>Please wait while we confirm your payment...</p>
+        </div>
+    </div>
+
+    <!-- PC Warning -->
     <div class="pc-warn-overlay" id="pcWarnOverlay">
         <div class="pc-warn-card">
             <i class="bx bx-desktop"></i>
             <h3>Desktop Not Supported</h3>
-            <p>Mobile Money payments only work on a mobile phone. You can browse documents on desktop but cannot pay.</p>
-            <div class="highlight-box">
-                <i class="bx bx-smartphone" style="margin-right:6px;"></i>
-                Open this page on your phone to pay
-            </div>
-            <button class="btn btn-outline" onclick="document.getElementById('pcWarnOverlay').classList.remove('active')">
-                <i class="bx bx-x"></i> Close
-            </button>
+            <p>Mobile Money payments only work on a mobile phone.</p>
+            <button class="btn btn-outline" onclick="document.getElementById('pcWarnOverlay').classList.remove('active')"><i class="bx bx-x"></i> Close</button>
         </div>
     </div>
 
@@ -315,9 +194,6 @@
 
             var SUPABASE_URL = 'https://wuswjdmshzzxnlsugukm.supabase.co';
             var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
-            var AFRIPAY_APP_ID = '20a9a129bb48f058ed39e1c999aa44e8';
-            var AFRIPAY_SECRET = 'JDJ5JDEwJHZmYXJ2';
-            var AFRIPAY_URL = 'https://www.afripay.africa/checkout/index.php';
             var DOWNLOAD_WINDOW_MINUTES = 30;
 
             var doc = null;
@@ -329,58 +205,43 @@
             var payToken = null;
             var paidAt = null;
             var completedToken = null;
+            var rpReference = null;
+            var pollTimer = null;
 
             function $(id) { return document.getElementById(id); }
             function toast(msg, isError) {
-                var t = document.createElement('div');
-                t.className = 'toast' + (isError ? ' err' : '');
-                t.textContent = msg;
-                $('toastContainer').appendChild(t);
+                var t = document.createElement('div'); t.className = 'toast' + (isError ? ' err' : '');
+                t.textContent = msg; $('toastContainer').appendChild(t);
                 setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(function(){ t.remove(); },250); },2800);
             }
 
-            // Detect if user is on a mobile device
-            function isMobile() {
-                return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) ||
-                       (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
-            }
-
-            function genToken() {
-                var c = 'abcdefghijklmnopqrstuvwxyz0123456789';
-                var r = '';
-                for (var i = 0; i < 28; i++) r += c[Math.floor(Math.random() * c.length)];
-                return 'tk_' + r + '_' + Date.now().toString(36);
-            }
-
-            function setMeta(prop, content) {
-                var el = document.querySelector('meta[property="' + prop + '"]') || document.querySelector('meta[name="' + prop + '"]');
-                if (el && content) el.setAttribute('content', content);
-            }
+            function isMobile() { return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && window.innerWidth < 768); }
+            function genToken() { var c='abcdefghijklmnopqrstuvwxyz0123456789',r=''; for(var i=0;i<28;i++)r+=c[Math.floor(Math.random()*c.length)]; return 'tk_'+r+'_'+Date.now().toString(36); }
+            function vu(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id); }
+            function formatPrice(n,c) { return parseInt(n).toLocaleString()+' '+(c||'RWF'); }
 
             async function apiCall(path, body) {
                 var ctrl = new AbortController();
-                var timeout = setTimeout(function() { ctrl.abort(); }, 15000);
+                var timeout = setTimeout(function(){ ctrl.abort(); }, 20000);
                 try {
-                    var opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal };
-                    if (body) opts.body = JSON.stringify(body);
+                    var opts = { method: body?'POST':'GET', headers:{'Content-Type':'application/json'}, signal:ctrl.signal };
+                    if(body) opts.body = JSON.stringify(body);
                     var res = await fetch(path, opts);
                     clearTimeout(timeout);
                     var txt = await res.text();
-                    if (!res.ok) { var msg = 'Request failed'; try { msg = JSON.parse(txt).error || msg; } catch(e) {} throw new Error(msg); }
-                    try { return JSON.parse(txt); } catch(e) { throw new Error('Invalid response'); }
-                } catch(err) { clearTimeout(timeout); if (err.name === 'AbortError') throw new Error('Request timed out'); throw err; }
+                    if(!res.ok) { var msg='Request failed'; try{msg=JSON.parse(txt).error||msg;}catch(e){} throw new Error(msg); }
+                    try{return JSON.parse(txt);}catch(e){throw new Error('Invalid response');}
+                } catch(err) { clearTimeout(timeout); if(err.name==='AbortError') throw new Error('Timed out'); throw err; }
             }
 
             async function getFingerprint() {
-                try { var fp = await FingerprintJS.load(); return (await fp.get()).visitorId; }
-                catch(e) { var c = [navigator.userAgent, screen.width+'x'+screen.height, navigator.language, new Date().getTimezoneOffset(), navigator.hardwareConcurrency||'']; return 'fb_'+btoa(c.join('|')).replace(/[=+/]/g,'').slice(0,48); }
+                try{var fp=await FingerprintJS.load();return(await fp.get()).visitorId;}
+                catch(e){var c=[navigator.userAgent,screen.width+'x'+screen.height,navigator.language,new Date().getTimezoneOffset(),navigator.hardwareConcurrency||''];return'fb_'+btoa(c.join('|')).replace(/[=+/]/g,'').slice(0,48);}
             }
-
-            function formatPrice(n, c) { return parseInt(n).toLocaleString() + ' ' + (c || 'RWF'); }
-            function vu(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id); }
 
             var params = new URLSearchParams(window.location.search);
             var docId = params.get('doc');
+            rpReference = params.get('rp_ref') || null;
 
             if (!docId || !vu(docId)) {
                 $('pageContent').innerHTML = '<div class="state-wrap"><i class="bx bx-error-circle"></i><h2>Invalid Document</h2><p>No valid document was specified.</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Browse Documents</a></div>';
@@ -388,196 +249,187 @@
             }
 
             async function loadDocument() {
-                try { doc = await apiCall('/api/documents/' + docId); }
-                catch(err) { $('pageContent').innerHTML = '<div class="state-wrap"><i class="bx bx-folder-open"></i><h2>Document Not Found</h2><p>'+err.message+'</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Back to Store</a></div>'; throw err; }
+                try{doc=await apiCall('/api/documents/'+docId);}
+                catch(err){$('pageContent').innerHTML='<div class="state-wrap"><i class="bx bx-folder-open"></i><h2>Not Found</h2><p>'+err.message+'</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Back to Store</a></div>';throw err;}
             }
 
             async function findCompletedPayment() {
-                try { var p = await apiCall('/api/user-payments', { device_fingerprint: fingerprint }); if (p) for (var i=0;i<p.length;i++) if (p[i].document_id===docId&&p[i].status==='completed') return p[i].client_token; } catch(e) {} return null;
+                try{var p=await apiCall('/api/user-payments',{device_fingerprint:fingerprint});if(p)for(var i=0;i<p.length;i++)if(p[i].document_id===docId&&p[i].status==='completed')return p[i].client_token;}catch(e){}return null;
             }
 
             async function checkPayment() {
-                try {
-                    var r = await apiCall('/api/check-payment', { device_fingerprint: fingerprint, document_id: docId });
-                    isPaid = r.already_paid === true; withinWindow = r.within_window === true;
-                    if (r.payment) { if (r.payment.created_at) paidAt = new Date(r.payment.created_at); if (r.payment.status==='pending_verification') { isDoubled = true; doubledPrice = r.payment.amount; } }
-                    if (isPaid) completedToken = await findCompletedPayment();
-                } catch(e) { isPaid=false; withinWindow=false; isDoubled=false; }
+                try{
+                    var r=await apiCall('/api/check-payment',{device_fingerprint:fingerprint,document_id:docId});
+                    isPaid=r.already_paid===true;withinWindow=r.within_window===true;
+                    if(r.payment){if(r.payment.created_at)paidAt=new Date(r.payment.created_at);if(r.payment.status==='pending_verification'){isDoubled=true;doubledPrice=r.payment.amount;}}
+                    if(isPaid)completedToken=await findCompletedPayment();
+                }catch(e){isPaid=false;withinWindow=false;isDoubled=false;}
             }
 
-            function getTimeRemaining() { if (!paidAt) return -1; return Math.max(0, Math.floor(DOWNLOAD_WINDOW_MINUTES - ((Date.now() - paidAt.getTime()) / 60000))); }
+            function getTimeRemaining(){if(!paidAt)return-1;return Math.max(0,Math.floor(DOWNLOAD_WINDOW_MINUTES-((Date.now()-paidAt.getTime())/60000)));}
 
             function render() {
-                if (!doc) return;
-                var hasImg = doc.image_url && doc.image_url.trim().length > 0;
-                var timeLeft = getTimeRemaining();
-                var expired = isPaid && !withinWindow;
-                var canDownload = isPaid && withinWindow;
-                var timerHtml = '';
-                var statusHtml = '';
-                var priceToShow = isDoubled && doubledPrice ? doubledPrice : doc.price;
+                if(!doc)return;
+                var hasImg=doc.image_url&&doc.image_url.trim().length>0;
+                var timeLeft=getTimeRemaining();
+                var expired=isPaid&&!withinWindow;
+                var canDownload=isPaid&&withinWindow;
+                var timerHtml='',statusHtml='';
+                var priceToShow=isDoubled&&doubledPrice?doubledPrice:doc.price;
 
-                if (canDownload) timerHtml = '<div class="timer-badge"><i class="bx bx-time-five"></i> Download available for '+timeLeft+' more minutes</div>';
-                else if (expired) timerHtml = '<div class="timer-badge expired"><i class="bx bx-timer-off"></i> Download window expired — purchase again</div>';
-                else if (isDoubled) statusHtml = '<div class="suspicious-badge"><i class="bx bx-shield-x"></i> Info flagged suspicious. Price doubled to '+formatPrice(priceToShow, doc.currency)+'.</div>';
+                if(canDownload)timerHtml='<div class="timer-badge"><i class="bx bx-time-five"></i> Download: '+timeLeft+' min left</div>';
+                else if(expired)timerHtml='<div class="timer-badge expired"><i class="bx bx-timer-off"></i> Expired — purchase again</div>';
+                else if(isDoubled)statusHtml='<div class="suspicious-badge"><i class="bx bx-shield-x"></i> Flagged. Price: '+formatPrice(priceToShow,doc.currency)+'</div>';
 
                 $('pageContent').innerHTML =
-                    '<a href="index.html" class="back-link"><i class="bx bx-arrow-back"></i> Back to store</a>' +
-                    '<div class="hero">' +
-                        '<div class="hero-img-wrap">' +
-                            (hasImg ? '<img src="'+doc.image_url+'" alt="'+doc.title+'" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
-                            '<span class="img-fallback" style="'+(hasImg?'display:none':'display:flex')+';align-items:center;justify-content:center;width:100%;height:200px;"><i class="bx bx-file" style="font-size:64px;color:#d1d5db;"></i></span>' +
-                        '</div>' +
-                        '<div class="hero-body">' +
-                            '<h1 class="doc-title">'+doc.title+'</h1>' +
-                            '<p class="doc-desc">'+(doc.description||'No description provided.')+'</p>' +
-                            '<div class="price-display"><span class="val">'+parseInt(priceToShow).toLocaleString()+'</span><span class="cur">'+(doc.currency||'RWF')+'</span></div>' +
-                            '<div class="badge-row">'+timerHtml+statusHtml+'</div>' +
-                            (canDownload
-                                ? '<button class="btn btn-success" id="downloadBtn"><i class="bx bx-download"></i> Download Document</button>'
-                                : (isDoubled
-                                    ? '<button class="btn btn-danger" id="payBtn"><i class="bx bx-credit-card"></i> Pay '+formatPrice(priceToShow, doc.currency)+'</button>'
-                                    : '<button class="btn '+(expired?'btn-outline':'btn-primary')+'" id="payBtn"><i class="bx bx-'+(expired?'refresh':'lock')+'"></i> '+(expired?'Purchase Again':'Pay to Download')+'</button>'
-                                )
-                            ) +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="info-grid">' +
-                        '<div class="info-card"><div class="ic-icon views"><i class="bx bx-show"></i></div><div><div class="ic-val">'+(doc.clicks||0).toLocaleString()+'</div><div class="ic-label">Total Views</div></div></div>' +
-                        '<div class="info-card"><div class="ic-icon payments"><i class="bx bx-credit-card"></i></div><div><div class="ic-val">'+(canDownload?'Paid':(isDoubled?'Flagged':'Pending'))+'</div><div class="ic-label">Your Status</div></div></div>' +
+                    '<a href="index.html" class="back-link"><i class="bx bx-arrow-back"></i> Back to store</a>'+
+                    '<div class="hero"><div class="hero-img-wrap">'+
+                        (hasImg?'<img src="'+doc.image_url+'" alt="'+doc.title+'" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'')+
+                        '<span class="img-fallback" style="'+(hasImg?'display:none':'display:flex')+';align-items:center;justify-content:center;width:100%;height:200px;"><i class="bx bx-file" style="font-size:64px;color:#d1d5db;"></i></span>'+
+                    '</div><div class="hero-body">'+
+                        '<h1 class="doc-title">'+doc.title+'</h1>'+
+                        '<p class="doc-desc">'+(doc.description||'No description.')+'</p>'+
+                        '<div class="price-display"><span class="val">'+parseInt(priceToShow).toLocaleString()+'</span><span class="cur">'+(doc.currency||'RWF')+'</span></div>'+
+                        '<div class="badge-row">'+timerHtml+statusHtml+'</div>'+
+                        (canDownload
+                            ?'<button class="btn btn-success" id="downloadBtn"><i class="bx bx-download"></i> Download Document</button>'
+                            :(isDoubled
+                                ?'<button class="btn btn-danger" id="payBtn"><i class="bx bx-credit-card"></i> Pay '+formatPrice(priceToShow,doc.currency)+'</button>'
+                                :'<button class="btn '+(expired?'btn-outline':'btn-primary')+'" id="payBtn"><i class="bx bx-'+(expired?'refresh':'lock')+'"></i> '+(expired?'Purchase Again':'Pay to Download')+'</button>'
+                            )
+                        )+
+                    '</div></div>'+
+                    '<div class="info-grid">'+
+                        '<div class="info-card"><div class="ic-icon views"><i class="bx bx-show"></i></div><div><div class="ic-val">'+(doc.clicks||0).toLocaleString()+'</div><div class="ic-label">Views</div></div></div>'+
+                        '<div class="info-card"><div class="ic-icon payments"><i class="bx bx-credit-card"></i></div><div><div class="ic-val">'+(canDownload?'Paid':(isDoubled?'Flagged':'Pending'))+'</div><div class="ic-label">Status</div></div></div>'+
                     '</div>';
 
-                var dlBtn = $('downloadBtn');
-                var payBtn = $('payBtn');
-                if (dlBtn) dlBtn.addEventListener('click', downloadDocument);
-                if (payBtn) payBtn.addEventListener('click', handlePayClick);
-
-                setMeta('og:title', doc.title+' — KotWeb');
-                setMeta('og:description', doc.description||'Purchase and download this document securely via MTN or Airtel Money.');
-                setMeta('og:image', doc.image_url||'');
-                setMeta('og:url', window.location.href);
-                setMeta('twitter:title', doc.title+' — KotWeb');
-                setMeta('twitter:description', doc.description||'');
-                setMeta('twitter:image', doc.image_url||'');
-                document.title = doc.title+' — KotWeb';
+                var dlBtn=$('downloadBtn'),payBtn=$('payBtn');
+                if(dlBtn)dlBtn.addEventListener('click',downloadDocument);
+                if(payBtn)payBtn.addEventListener('click',handlePayClick);
             }
 
-            // ── PAYMENT FLOW ──
+            // ── PAYMENT ──
             function handlePayClick() {
-                if (!isMobile()) {
-                    // Show PC warning
-                    $('pcWarnOverlay').classList.add('active');
-                    return;
-                }
-                // Show payment steps modal
-                showPaymentSteps();
-            }
-
-            function showPaymentSteps() {
+                if(!isMobile()){$('pcWarnOverlay').classList.add('active');return;}
                 $('paymentStepsModal').classList.add('active');
+                var phoneInput=$('modalPhoneInput');if(phoneInput)phoneInput.focus();
 
-                // Attach proceed button listener
-                var proceedBtn = $('proceedToPayBtn');
-                var newBtn = proceedBtn.cloneNode(true);
-                proceedBtn.parentNode.replaceChild(newBtn, proceedBtn);
-                newBtn.addEventListener('click', function() {
-                    $('paymentStepsModal').classList.remove('active');
-                    executePayment();
-                });
+                var proceedBtn=$('proceedToPayBtn');
+                var newBtn=proceedBtn.cloneNode(true);
+                proceedBtn.parentNode.replaceChild(newBtn,proceedBtn);
+                newBtn.addEventListener('click',executePayment);
             }
 
-            function closePaymentSteps() {
+            function closePaymentModal(){$('paymentStepsModal').classList.remove('active');}
+            $('paymentStepsModal').addEventListener('click',function(e){if(e.target===this)closePaymentModal();});
+
+            async function executePayment() {
+                var phone=($('modalPhoneInput').value||'').replace(/\s/g,'');
+                if(!/^0?7[89]\d{7}$/.test(phone)){toast('Enter valid phone (078...)',true);return;}
+                if(!doc||!fingerprint){toast('Loading...',true);return;}
+
                 $('paymentStepsModal').classList.remove('active');
-            }
+                var btn=$('payBtn');if(btn){btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Processing...';}
 
-            // Close modals on overlay click
-            $('paymentStepsModal').addEventListener('click', function(e) {
-                if (e.target === this) closePaymentSteps();
-            });
-            $('pcWarnOverlay').addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('active');
-            });
+                payToken=genToken();
+                var amountToPay=isDoubled&&doubledPrice?doubledPrice:doc.price;
 
-            function executePayment() {
-                if (!doc || !fingerprint) { toast('Please wait...', true); return; }
-                var btn = $('payBtn');
-                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Preparing...'; }
-
-                payToken = genToken();
-                var amountToPay = isDoubled && doubledPrice ? doubledPrice : doc.price;
-
-                apiCall('/api/init-payment', {
-                    document_id: docId,
-                    device_fingerprint: fingerprint,
-                    client_token: payToken
-                }).then(function(r) {
-                    if (r.already_paid) {
-                        isPaid = true; withinWindow = true; isDoubled = false;
-                        completedToken = payToken; render();
-                        toast('You already own this document!');
-                        return;
-                    }
-                    if (r.error) {
-                        toast(r.error, true);
-                        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bx bx-lock"></i> Pay to Download'; }
-                        return;
-                    }
-
-                    // Submit to AfriPay
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = AFRIPAY_URL;
-                    form.style.display = 'none';
-
-                    var fields = {
-                        amount: parseInt(amountToPay),
-                        currency: r.currency || doc.currency,
-                        comment: doc.title,
-                        client_token: payToken,
-                        return_url: window.location.origin + '/cart.html?doc=' + docId + '&token=' + payToken,
-                        app_id: AFRIPAY_APP_ID,
-                        app_secret: AFRIPAY_SECRET
-                    };
-
-                    Object.keys(fields).forEach(function(k) {
-                        var i = document.createElement('input');
-                        i.type = 'hidden'; i.name = k; i.value = fields[k];
-                        form.appendChild(i);
+                try{
+                    var r=await apiCall('/api/rwandapay-init',{
+                        document_id:docId,device_fingerprint:fingerprint,phone:phone,client_token:payToken
                     });
 
-                    document.body.appendChild(form);
-                    form.submit();
-                }).catch(function(err) {
-                    toast(err.message || 'Failed', true);
-                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bx bx-lock"></i> Pay to Download'; }
-                });
+                    if(r.already_paid){isPaid=true;withinWindow=true;isDoubled=false;completedToken=payToken;render();toast('Already paid!');return;}
+                    if(r.error){toast(r.error,true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download';}return;}
+
+                    if(r.payment_url){
+                        rpReference=r.reference||payToken;
+                        $('processingOverlay').classList.add('active');
+                        // Poll for payment confirmation
+                        startPolling(r.reference||payToken);
+                        // Redirect to RwandaPay
+                        window.location.href=r.payment_url;
+                    }
+                }catch(err){toast(err.message,true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download';}}
             }
 
-            function downloadDocument() {
-                var btn = $('downloadBtn');
-                if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Downloading...'; }
-                var tokenToUse = completedToken || payToken;
+            function startPolling(ref) {
+                clearInterval(pollTimer);
+                var attempts=0;
+                pollTimer=setInterval(async function(){
+                    attempts++;
+                    try{
+                        var r=await apiCall('/api/rwandapay-verify',{reference:ref,client_token:payToken,document_id:docId});
+                        if(r.verified&&r.status==='completed'){
+                            clearInterval(pollTimer);
+                            $('processingOverlay').classList.remove('active');
+                            isPaid=true;withinWindow=true;isDoubled=false;
+                            completedToken=payToken;
+                            render();toast('Payment confirmed!');
+                            return;
+                        }
+                        if(r.status==='failed'){
+                            clearInterval(pollTimer);
+                            $('processingOverlay').classList.remove('active');
+                            toast('Payment failed. Try again.',true);
+                            var btn=$('payBtn');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download';}
+                            return;
+                        }
+                    }catch(e){}
+                    if(attempts>=60){clearInterval(pollTimer);$('processingOverlay').classList.remove('active');toast('Verification timeout. Refresh.',true);}
+                },4000);
+                // Also check immediately
+                setTimeout(function(){},500);
+            }
 
-                function attemptDownload(token) {
-                    if (!token) { toast('Cannot find payment. Refresh.', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } return; }
-                    apiCall('/api/download', { client_token:token, device_fingerprint:fingerprint, document_id:docId }).then(function(r) {
-                        if (!r.url) { toast(r.error||'Download failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } return; }
-                        if (btn) btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';
-                        fetch(r.url).then(function(res) { if (!res.ok) throw new Error('Failed'); return res.blob(); }).then(function(blob) {
-                            var fn = r.filename||'document'; var u = window.URL.createObjectURL(blob); var a = document.createElement('a');
-                            a.style.display='none'; a.href=u; a.download=fn; document.body.appendChild(a); a.click();
-                            setTimeout(function(){ document.body.removeChild(a); window.URL.revokeObjectURL(u); },200);
-                            if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Again'; } toast('Download started!');
-                        }).catch(function() { window.open(r.url,'_blank'); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } });
-                    }).catch(function(err) { toast(err.message||'Download failed', true); if (btn) { btn.disabled=false; btn.innerHTML='<i class="bx bx-download"></i> Download Document'; } });
+            // ── DOWNLOAD ──
+            function downloadDocument() {
+                var btn=$('downloadBtn');if(btn){btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Downloading...';}
+                var tokenToUse=completedToken||payToken;
+
+                function attemptDownload(token){
+                    if(!token){toast('Cannot find payment. Refresh.',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}return;}
+                    apiCall('/api/download',{client_token:token,device_fingerprint:fingerprint,document_id:docId}).then(function(r){
+                        if(!r.url){toast(r.error||'Failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}return;}
+                        if(btn)btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';
+                        fetch(r.url).then(function(res){if(!res.ok)throw new Error('Failed');return res.blob();}).then(function(blob){
+                            var fn=r.filename||'document',u=window.URL.createObjectURL(blob),a=document.createElement('a');
+                            a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();
+                            setTimeout(function(){document.body.removeChild(a);window.URL.revokeObjectURL(u);},200);
+                            if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download Again';}toast('Download started!');
+                        }).catch(function(){window.open(r.url,'_blank');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
+                    }).catch(function(err){toast(err.message||'Failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
                 }
 
-                if (tokenToUse) attemptDownload(tokenToUse);
-                else findCompletedPayment().then(function(t) { if (t) completedToken=t; attemptDownload(completedToken); });
+                if(tokenToUse)attemptDownload(tokenToUse);
+                else findCompletedPayment().then(function(t){if(t)completedToken=t;attemptDownload(completedToken);});
             }
 
-            (async function() {
-                try { var fpP=getFingerprint(); await loadDocument(); fingerprint=await fpP; await checkPayment(); fetch('/api/documents/'+docId+'/click',{method:'POST'}).catch(function(){}); render(); } catch(e) {}
+            // ── CHECK IF RETURNING FROM RWANDAPAY ──
+            function checkReturnFromRP() {
+                var statusParam=params.get('status');
+                if(statusParam==='successful'&&rpReference){
+                    payToken=rpReference;
+                    $('processingOverlay').classList.add('active');
+                    startPolling(rpReference);
+                }
+                if(statusParam==='failed'){
+                    toast('Payment was not successful. Please try again.',true);
+                }
+            }
+
+            // ── INIT ──
+            (async function(){
+                try{
+                    var fpP=getFingerprint();
+                    await loadDocument();
+                    fingerprint=await fpP;
+                    await checkPayment();
+                    fetch('/api/documents/'+docId+'/click',{method:'POST'}).catch(function(){});
+                    render();
+                    checkReturnFromRP();
+                }catch(e){}
             })();
         })();
     </script>
