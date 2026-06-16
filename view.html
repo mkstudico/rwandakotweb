@@ -177,7 +177,6 @@
 
             var params=new URLSearchParams(window.location.search);
             var docId=params.get('doc');
-            // Catch ALL possible return parameter names from RwandaPay
             rpReference = params.get('rp_ref') || params.get('reference') || params.get('tx_ref') || params.get('session_id') || null;
 
             if(!docId||!vu(docId)){$('pageContent').innerHTML='<div class="state-wrap"><i class="bx bx-error-circle"></i><h2>Invalid Document</h2><p>No valid document was specified.</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Browse Documents</a></div>';return;}
@@ -245,7 +244,6 @@
 
             function startPolling(ref){
                 clearInterval(pollTimer);var attempts=0;
-                // Store reference globally so download can use it
                 rpReference=ref;payToken=ref;
                 pollTimer=setInterval(async function(){
                     attempts++;
@@ -261,30 +259,33 @@
             function downloadDocument(){
                 var btn=$('downloadBtn');if(btn){btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Downloading...';}
                 var tokenToUse=completedToken||payToken||rpReference;
+
                 function attemptDownload(token){
-                    if(!token){toast('Cannot find payment. Refresh.',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}return;}
-                    apiCall('/api/download',{client_token:token,device_fingerprint:fingerprint,document_id:docId}).then(function(r){
-                        if(!r.url){toast(r.error||'Failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}return;}
-                        if(btn)btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';
-                        fetch(r.url).then(function(res){if(!res.ok)throw new Error('Failed');return res.blob();}).then(function(blob){
-                            var fn=r.filename||'document',u=window.URL.createObjectURL(blob),a=document.createElement('a');a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();
-                            setTimeout(function(){document.body.removeChild(a);window.URL.revokeObjectURL(u);},200);
-                            if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download Again';}toast('Download started!');
-                        }).catch(function(){window.open(r.url,'_blank');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
-                    }).catch(function(err){toast(err.message||'Failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
+                    if(!token){
+                        apiCall('/api/download',{client_token:'find_by_device',device_fingerprint:fingerprint,document_id:docId}).then(function(r){if(r.url)triggerDownload(r);else failDownload(r.error);}).catch(function(err){failDownload(err.message);});
+                        return;
+                    }
+                    apiCall('/api/download',{client_token:token,device_fingerprint:fingerprint,document_id:docId}).then(function(r){if(r.url)triggerDownload(r);else failDownload(r.error);}).catch(function(err){failDownload(err.message);});
                 }
+
+                function triggerDownload(r){
+                    if(btn)btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';
+                    fetch(r.url).then(function(res){if(!res.ok)throw new Error('Failed');return res.blob();}).then(function(blob){
+                        var fn=r.filename||'document',u=window.URL.createObjectURL(blob),a=document.createElement('a');a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();
+                        setTimeout(function(){document.body.removeChild(a);window.URL.revokeObjectURL(u);},200);
+                        if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download Again';}toast('Download started!');
+                    }).catch(function(){window.open(r.url,'_blank');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}});
+                }
+
+                function failDownload(msg){toast(msg||'Download failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download';}}
+
                 if(tokenToUse)attemptDownload(tokenToUse);
                 else findCompletedPayment().then(function(t){if(t)completedToken=t;attemptDownload(completedToken);});
             }
 
             function checkReturnFromRP(){
                 var statusParam=params.get('status');
-                // If returning from RwandaPay with any success indicator
-                if((statusParam==='successful'||statusParam==='success')&&rpReference){
-                    payToken=rpReference;
-                    $('processingOverlay').classList.add('active');
-                    startPolling(rpReference);
-                }
+                if((statusParam==='successful'||statusParam==='success')&&rpReference){payToken=rpReference;$('processingOverlay').classList.add('active');startPolling(rpReference);}
                 if(statusParam==='failed'){toast('Payment was not successful. Please try again.',true);}
             }
 
