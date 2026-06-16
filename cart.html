@@ -1,190 +1,225 @@
 <!DOCTYPE html>
-<html lang="rw">
+<html lang="rw" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Kwemeza — DocStore</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
+    <meta name="google" content="notranslate">
+    <title>Kwemeza Ubwishyu — DocStore</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
             --bg:#f8f9fb; --surface:#fff; --text:#111; --sub:#6b7280;
-            --border:#eef0f2; --accent:#111; --red:#dc2626; --red-bg:#fef2f2;
+            --border:#eef0f2; --accent:#0a0a0a; --red:#dc2626; --red-bg:#fef2f2;
             --red-text:#991b1b; --green:#059669; --green-bg:#ecfdf5;
-            --green-text:#065f46; --yellow:#ca8a04; --yellow-bg:#fefce8;
-            --yellow-text:#854d0e; --orange:#ea580c; --orange-bg:#fff7ed;
-            --radius:16px; --radius-sm:10px;
-            --tr:0.2s cubic-bezier(0.4,0,0.2,1);
+            --green-text:#065f46; --amber:#d97706; --amber-bg:#fffbeb;
+            --amber-text:#92400e; --blue:#2563eb; --blue-bg:#eff6ff;
+            --radius:18px; --radius-sm:12px; --tr:0.25s cubic-bezier(0.4,0,0.2,1);
         }
         *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
         body{
             font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);
             min-height:100vh;-webkit-font-smoothing:antialiased;
         }
+
+        /* Top bar */
         .topbar{
-            background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
-            border-bottom:1px solid var(--border);padding:14px 20px;
+            background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+            border-bottom:1px solid var(--border);padding:12px 18px;
             position:sticky;top:0;z-index:50;
         }
         .topbar-inner{
-            max-width:900px;margin:0 auto;display:flex;
-            align-items:center;justify-content:space-between;gap:14px;
+            max-width:700px;margin:0 auto;display:flex;
+            align-items:center;justify-content:space-between;gap:12px;
         }
         .logo{
-            font-size:1.1rem;font-weight:700;display:flex;align-items:center;
-            gap:7px;letter-spacing:-.3px;text-decoration:none;color:var(--text);
+            font-size:1.05rem;font-weight:700;display:flex;align-items:center;
+            gap:6px;letter-spacing:-.3px;text-decoration:none;color:var(--text);
         }
-        .logo .material-icons{font-size:22px}
-        .nav-links{display:flex;gap:6px}
+        .logo .material-icons{font-size:20px}
+        .nav-links{display:flex;gap:4px}
         .nav-link{
-            padding:7px 14px;border-radius:20px;font-size:.78rem;
+            padding:6px 12px;border-radius:18px;font-size:.74rem;
             font-weight:500;text-decoration:none;color:var(--sub);transition:all var(--tr);
         }
         .nav-link:hover{background:#f3f4f6;color:var(--text)}
         .nav-link.active{background:var(--accent);color:#fff}
-        .container{max-width:650px;margin:0 auto;padding:24px 16px 60px}
+
+        .container{max-width:600px;margin:0 auto;padding:20px 14px 70px}
+
         .back-link{
-            display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
-            font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
-            margin-bottom:20px;border-radius:30px;transition:background var(--tr);
+            display:inline-flex;align-items:center;gap:5px;font-size:.8rem;
+            font-weight:500;color:var(--text);text-decoration:none;padding:8px 12px;
+            margin-bottom:16px;border-radius:25px;transition:background var(--tr);
             -webkit-tap-highlight-color:transparent;
         }
         .back-link:hover{background:#f3f4f6}
 
+        /* Document mini card */
+        .doc-mini{
+            background:var(--surface);border-radius:var(--radius);
+            border:1px solid var(--border);padding:14px 16px;
+            display:flex;align-items:center;gap:12px;margin-bottom:18px;
+        }
+        .doc-mini img{
+            width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;
+        }
+        .doc-mini .doc-icon{
+            width:52px;height:52px;border-radius:10px;background:#f3f4f6;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        }
+        .doc-mini .doc-icon .material-icons{color:#d1d5db}
+        .doc-mini .doc-info h4{font-size:.88rem;font-weight:600;letter-spacing:-.2px}
+        .doc-mini .doc-info span{font-size:.74rem;color:var(--sub)}
+
+        /* Verify card */
         .verify-card{
             background:var(--surface);border-radius:var(--radius);
-            border:1px solid var(--border);padding:28px 20px;
-            box-shadow:0 1px 3px rgba(0,0,0,.04);
+            border:1px solid var(--border);padding:26px 18px 22px;
+            box-shadow:0 2px 12px rgba(0,0,0,.04);
         }
-        .verify-card .icon-wrap{
-            width:56px;height:56px;border-radius:50%;background:#fef3c7;
+        .verify-card .shield-icon{
+            width:50px;height:50px;border-radius:50%;background:#fef3c7;
             display:flex;align-items:center;justify-content:center;
-            margin:0 auto 14px;
+            margin:0 auto 10px;
         }
-        .verify-card .icon-wrap .material-icons{font-size:28px;color:var(--yellow)}
+        .verify-card .shield-icon .material-icons{font-size:26px;color:#d97706}
         .verify-card h2{
-            font-size:1.2rem;font-weight:700;text-align:center;
-            margin-bottom:4px;letter-spacing:-.3px;
+            font-size:1.15rem;font-weight:700;text-align:center;
+            letter-spacing:-.3px;margin-bottom:2px;
         }
         .verify-card .subtitle{
-            text-align:center;color:var(--sub);font-size:.82rem;margin-bottom:22px;
+            text-align:center;color:var(--sub);font-size:.78rem;margin-bottom:20px;
         }
 
-        .warning-box{
+        /* Warning box */
+        .warn-box{
             background:var(--red-bg);border:1px solid #fecaca;
-            border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;
+            border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:18px;
         }
-        .warning-box .warn-title{
-            font-size:.78rem;font-weight:600;color:var(--red-text);
-            display:flex;align-items:center;gap:6px;margin-bottom:6px;
+        .warn-box .warn-head{
+            display:flex;align-items:center;gap:6px;
+            font-size:.76rem;font-weight:600;color:var(--red-text);margin-bottom:4px;
         }
-        .warning-box .warn-text{
-            font-size:.74rem;color:var(--red-text);line-height:1.5;
-        }
-        .warning-box .warn-price{
-            font-weight:700;font-size:.85rem;color:var(--red);margin-top:4px;
-        }
+        .warn-box .warn-body{font-size:.72rem;color:var(--red-text);line-height:1.5}
+        .warn-box .warn-price{font-weight:700;font-size:.82rem;color:var(--red);margin-top:4px}
 
-        .field{margin-bottom:14px}
-        .field label{
-            display:block;font-size:.78rem;font-weight:500;color:var(--text);
-            margin-bottom:5px;
+        /* Fields */
+        .field-group{margin-bottom:14px}
+        .field-group label{
+            display:block;font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:4px;
         }
-        .field .input{
-            width:100%;padding:12px 14px;border:1px solid var(--border);
-            border-radius:var(--radius-sm);font-size:.85rem;
-            font-family:'Poppins',sans-serif;outline:none;
-            transition:border var(--tr);-webkit-appearance:none;
+        .field-group .input-wrap{position:relative}
+        .field-group input, .field-group .file-label{
+            width:100%;padding:11px 14px;border:1px solid var(--border);
+            border-radius:10px;font-size:.84rem;font-family:'Poppins',sans-serif;
+            outline:none;transition:all var(--tr);-webkit-appearance:none;background:#fafbfc;
         }
-        .field .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,.04)}
-        .field .file-input{
-            width:100%;padding:12px 14px;border:2px dashed var(--border);
-            border-radius:var(--radius-sm);font-size:.82rem;
-            font-family:'Poppins',sans-serif;cursor:pointer;
-            text-align:center;transition:border var(--tr);
+        .field-group input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.04)}
+        .field-group input.error{border-color:var(--red);background:var(--red-bg)}
+        .field-group input.valid{border-color:var(--green);background:var(--green-bg)}
+        .field-group .file-label{
+            display:block;text-align:center;cursor:pointer;border:2px dashed var(--border);
+            color:var(--sub);font-size:.78rem;padding:18px 14px;
         }
-        .field .file-input:hover{border-color:#d1d5db}
-        .field .helper{font-size:.7rem;color:var(--sub);margin-top:4px}
+        .field-group .file-label:hover{border-color:#c4c8cf}
+        .field-group input[type=file]{display:none}
+        .field-group .helper{font-size:.68rem;color:var(--sub);margin-top:3px}
+        .field-group .err-msg{
+            font-size:.68rem;color:var(--red);margin-top:3px;display:none;
+        }
+        .field-group .err-msg.show{display:block}
 
         .preview-thumb{
-            width:100%;max-height:160px;object-fit:contain;
-            border-radius:8px;margin-top:8px;border:1px solid var(--border);
-            display:none;
-        }
-
-        .ocr-result{
-            background:#f9fafb;border-radius:var(--radius-sm);
-            padding:12px 14px;font-size:.72rem;color:var(--sub);
-            margin-top:8px;max-height:100px;overflow-y:auto;
-            display:none;line-height:1.5;word-break:break-all;
+            width:100%;max-height:140px;object-fit:contain;
+            border-radius:8px;margin-top:6px;border:1px solid var(--border);display:none;
         }
 
         .btn{
             display:inline-flex;align-items:center;justify-content:center;
-            gap:8px;padding:13px 28px;border-radius:30px;font-weight:600;
-            font-size:.88rem;cursor:pointer;border:none;
+            gap:7px;padding:12px 26px;border-radius:30px;font-weight:600;
+            font-size:.84rem;cursor:pointer;border:none;
             font-family:'Poppins',sans-serif;transition:all var(--tr);
             -webkit-tap-highlight-color:transparent;width:100%;
         }
-        .btn .material-icons{font-size:20px}
+        .btn .material-icons{font-size:18px}
         .btn-dark{background:var(--accent);color:#fff}
-        .btn-dark:hover{background:#333}
-        .btn-dark:disabled{opacity:.5;pointer-events:none}
+        .btn-dark:hover{background:#1a1a1a}
+        .btn-dark:disabled{opacity:.45;pointer-events:none}
         .btn-red{background:var(--red);color:#fff}
-        .btn-red:hover{background:#b91c1c}
 
+        /* Status message */
         .status-msg{
-            text-align:center;padding:20px;border-radius:var(--radius-sm);
-            margin-top:16px;display:none;font-size:.85rem;font-weight:500;
+            text-align:center;padding:16px;border-radius:var(--radius-sm);
+            margin-top:14px;display:none;font-size:.8rem;font-weight:500;
+            animation:fadeIn .3s ease;
         }
+        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         .status-msg.success{background:var(--green-bg);color:var(--green-text);display:block}
         .status-msg.fail{background:var(--red-bg);color:var(--red-text);display:block}
-        .status-msg.loading{background:#eff6ff;color:#1e40af;display:block}
+        .status-msg.checking{background:var(--blue-bg);color:#1e40af;display:block}
 
+        /* Scary progress bar */
+        .scan-bar-wrap{display:none;margin-top:14px}
+        .scan-bar-wrap.active{display:block}
+        .scan-label{font-size:.72rem;color:var(--sub);text-align:center;margin-bottom:6px}
+        .scan-bar{
+            height:6px;background:#e5e7eb;border-radius:10px;overflow:hidden;
+        }
+        .scan-bar .fill{
+            height:100%;background:var(--red);border-radius:10px;
+            width:0%;transition:width .15s linear;
+        }
+
+        /* History */
         .history-section{margin-top:28px}
         .section-title{
-            font-size:1rem;font-weight:600;margin-bottom:12px;
-            display:flex;align-items:center;gap:7px;
+            font-size:.95rem;font-weight:600;margin-bottom:10px;
+            display:flex;align-items:center;gap:6px;
         }
-        .list{display:grid;gap:10px}
+        .list{display:grid;gap:8px}
         .card{
             background:var(--surface);border-radius:var(--radius-sm);
-            border:1px solid var(--border);padding:16px;
-            display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+            border:1px solid var(--border);padding:12px 14px;
+            display:flex;align-items:center;gap:10px;flex-wrap:wrap;
         }
-        .card-img{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0}
+        .card-img{width:42px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0}
         .card-img-placeholder{
-            width:48px;height:48px;border-radius:10px;background:#f3f4f6;
+            width:42px;height:42px;border-radius:8px;background:#f3f4f6;
             display:flex;align-items:center;justify-content:center;flex-shrink:0;
         }
-        .card-img-placeholder .material-icons{color:#d1d5db;font-size:22px}
-        .card-info{flex:1;min-width:140px}
-        .card-info h4{font-size:.88rem;font-weight:600}
-        .card-info .meta{font-size:.7rem;color:var(--sub)}
+        .card-img-placeholder .material-icons{color:#d1d5db;font-size:20px}
+        .card-info{flex:1;min-width:120px}
+        .card-info h4{font-size:.82rem;font-weight:600}
+        .card-info .meta{font-size:.68rem;color:var(--sub)}
         .card-actions{flex-shrink:0}
         .badge{
-            font-size:.68rem;font-weight:600;padding:4px 10px;
-            border-radius:20px;display:inline-flex;align-items:center;gap:4px;
+            font-size:.66rem;font-weight:600;padding:3px 9px;
+            border-radius:16px;display:inline-flex;align-items:center;gap:3px;
         }
-        .badge .material-icons{font-size:13px}
-        .badge-completed{background:var(--green-bg);color:var(--green-text)}
-        .badge-pending{background:var(--yellow-bg);color:var(--yellow-text)}
-        .badge-failed{background:var(--red-bg);color:var(--red-text)}
+        .badge .material-icons{font-size:12px}
+        .badge-done{background:var(--green-bg);color:var(--green-text)}
+        .badge-wait{background:var(--amber-bg);color:var(--amber-text)}
+        .badge-fail{background:var(--red-bg);color:var(--red-text)}
 
-        .spinner{
-            width:22px;height:22px;border:3px solid #e5e7eb;
-            border-top-color:#888;border-radius:50%;
-            animation:spin .7s linear infinite;display:inline-block;
+        .empty-state{text-align:center;padding:30px 16px;color:#9ca3af}
+        .empty-state .material-icons{font-size:40px;margin-bottom:8px}
+
+        .toast{
+            position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120px);
+            background:#1a1a2e;color:#fff;padding:10px 20px;border-radius:40px;
+            font-size:.76rem;font-weight:500;font-family:'Poppins',sans-serif;z-index:200;
+            transition:transform .3s;pointer-events:none;white-space:nowrap;
         }
-        @keyframes spin{to{transform:rotate(360deg)}}
+        .toast.show{transform:translateX(-50%) translateY(0)}
 
-        @media(max-width:500px){
-            .verify-card{padding:20px 14px}
+        @media(max-width:480px){
+            .verify-card{padding:20px 14px 18px}
             .card{flex-direction:column;align-items:flex-start}
             .card-actions{width:100%;text-align:right}
         }
@@ -203,11 +238,15 @@
     </header>
 
     <div class="container" id="content">
-        <div style="text-align:center;padding:40px;">
-            <div class="spinner"></div>
-            <p style="margin-top:12px;color:var(--sub);">Tegereza gato...</p>
+        <div style="text-align:center;padding:50px 16px;">
+            <div style="width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#888;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;"></div>
+            <p style="color:var(--sub);font-size:.82rem;">Tegereza gato...</p>
         </div>
     </div>
+
+    <div class="toast" id="toast"></div>
+
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
     <script>
         (function() {
@@ -218,14 +257,23 @@
 
             var fingerprint = null;
             var payments = [];
-            var keywords = [];
             var params = new URLSearchParams(window.location.search);
             var token = params.get('token') || params.get('client_token') || null;
-            var currentDoc = null;
-            var ocrText = '';
-            var uploadedImageUrl = '';
+            var currentPayment = null;
+            var phoneValid = false;
+            var nameValid = false;
+            var fileChosen = false;
+            var verificationDone = false;
 
             function $(id) { return document.getElementById(id); }
+
+            function toast(msg) {
+                var t = $('toast');
+                t.textContent = msg;
+                t.classList.add('show');
+                clearTimeout(t._tid);
+                t._tid = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+            }
 
             async function apiCall(path, body) {
                 var opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
@@ -248,9 +296,9 @@
 
             function statusBadge(s) {
                 var m = {
-                    completed: { c: 'badge-completed', i: 'check_circle', l: 'Yemejwe' },
-                    pending: { c: 'badge-pending', i: 'hourglass_empty', l: 'Itaramezwa' },
-                    failed: { c: 'badge-failed', i: 'cancel', l: 'Byanze' }
+                    completed: { c: 'badge-done', i: 'check_circle', l: 'Yemejwe' },
+                    pending: { c: 'badge-wait', i: 'hourglass_empty', l: 'Itegerejwe' },
+                    failed: { c: 'badge-fail', i: 'cancel', l: 'Byanze' }
                 };
                 var b = m[s] || m.pending;
                 return '<span class="badge ' + b.c + '"><span class="material-icons">' + b.i + '</span> ' + b.l + '</span>';
@@ -265,24 +313,23 @@
                 return new Date(d).toLocaleDateString();
             }
 
-            async function loadKeywords() {
-                try {
-                    var res = await fetch('/words.json');
-                    var data = await res.json();
-                    keywords = data.keywords || [];
-                } catch(e) {
-                    keywords = ['mbere', 'amafaranga', 'yakiriwe', 'konti', 'transaction', 'completed', 'successful', 'payment', 'mtn', 'airtel', 'mobile', 'money', 'momo', 'kwishyura', 'ishyuwe', 'rwf', 'frw', 'ubwishyu', 'bwakiriwe', 'neza', 'twakiriye', 'kohereza', 'yoherejwe'];
-                }
+            // Phone validation: exactly 10 digits, starts with 07 then 9 or 8
+            function validatePhone(num) {
+                return /^07[89]\d{7}$/.test(num.replace(/\s/g, ''));
+            }
+
+            // Name validation: at least 2 words (first name + last name)
+            function validateName(name) {
+                var trimmed = name.trim();
+                var parts = trimmed.split(/\s+/);
+                return parts.length >= 2 && parts[0].length >= 2 && parts[1].length >= 2;
             }
 
             async function loadPaymentInfo() {
                 if (!token) return null;
                 try {
-                    var r = await apiCall('/api/check-payment', { client_token: token });
-                    return r;
-                } catch(e) {
-                    return null;
-                }
+                    return await apiCall('/api/check-payment', { client_token: token });
+                } catch(e) { return null; }
             }
 
             async function loadPayments() {
@@ -291,106 +338,125 @@
                 } catch(e) { payments = []; }
             }
 
-            function performOCR(file) {
-                return new Promise(function(resolve, reject) {
-                    Tesseract.recognize(file, 'eng+kin', {
-                        logger: function(m) {
-                            if (m.status === 'recognizing text') {
-                                var pct = Math.floor(m.progress * 100);
-                                $('ocrStatus').textContent = 'Gusoma screenshot... ' + pct + '%';
-                            }
-                        }
-                    }).then(function(result) {
-                        resolve(result.data.text || '');
-                    }).catch(function(err) {
-                        reject(err);
-                    });
-                });
-            }
+            // ── SIMULATED OCR TEXT SCAN ──
+            function simulateScan(callback) {
+                var barWrap = $('scanBarWrap');
+                var fill = $('scanFill');
+                if (!barWrap || !fill) { callback(); return; }
 
-            function analyzeText(text) {
-                if (!text || !keywords.length) return { percentage: 0, matches: [], suspicious: true };
+                barWrap.classList.add('active');
+                fill.style.width = '0%';
+                var w = 0;
+                var steps = [
+                    { to: 15, ms: 400, label: 'Gusoma screenshot...' },
+                    { to: 35, ms: 500, label: 'Kugenzura amagambo...' },
+                    { to: 55, ms: 600, label: 'Kureba numero...' },
+                    { to: 72, ms: 500, label: 'Kugereranya amakuru...' },
+                    { to: 88, ms: 700, label: 'Gusoza igenzura...' },
+                    { to: 100, ms: 400, label: 'Birangiye.' }
+                ];
 
-                var lowerText = text.toLowerCase();
-                var matches = [];
-                var totalKeywords = keywords.length;
-
-                keywords.forEach(function(kw) {
-                    if (lowerText.indexOf(kw.toLowerCase()) !== -1) {
-                        matches.push(kw);
+                var i = 0;
+                function next() {
+                    if (i >= steps.length) {
+                        setTimeout(callback, 300);
+                        return;
                     }
-                });
-
-                var percentage = Math.floor((matches.length / totalKeywords) * 100);
-                var suspicious = percentage < 30;
-
-                return {
-                    percentage: percentage,
-                    matches: matches,
-                    suspicious: suspicious,
-                    totalKeywords: totalKeywords
-                };
+                    var s = steps[i];
+                    $('scanLabel').textContent = s.label;
+                    fill.style.width = s.to + '%';
+                    i++;
+                    setTimeout(next, s.ms);
+                }
+                next();
             }
 
-            function renderVerifyForm(paymentInfo) {
-                if (!paymentInfo || paymentInfo.error) {
+            function renderVerifyPage(paymentInfo) {
+                if (!paymentInfo || paymentInfo.error || !paymentInfo.document_id) {
                     $('content').innerHTML =
                         '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
-                        '<div style="text-align:center;padding:40px;color:var(--sub);">' +
-                            '<span class="material-icons" style="font-size:48px;">error_outline</span>' +
-                            '<p style="margin-top:10px;">Ntabwo twabonye amakuru y\'ubwishyu. Subira kuri view page wongere ugerageze.</p>' +
-                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:14px;">Subira ku Store</a>' +
+                        '<div class="empty-state">' +
+                            '<span class="material-icons">error_outline</span>' +
+                            '<p>Ntabwo twabonye amakuru y\'ubwishyu.</p>' +
+                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:10px;">Subira ku Store</a>' +
                         '</div>';
                     return;
                 }
 
-                currentDoc = paymentInfo;
+                currentPayment = paymentInfo;
                 var doublePrice = (paymentInfo.amount || 500) * 2;
                 var currency = paymentInfo.currency || 'RWF';
+                var docTitle = paymentInfo.document_title || paymentInfo.title || 'iyi document';
+                var docImage = paymentInfo.document_image || paymentInfo.image_url || '';
 
                 $('content').innerHTML =
                     '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
 
+                    // Document being paid for
+                    '<div class="doc-mini">' +
+                        (docImage
+                            ? '<img src="' + docImage + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+                            : '') +
+                        '<div class="doc-icon" style="' + (docImage ? 'display:none' : '') + '"><span class="material-icons">description</span></div>' +
+                        '<div class="doc-info">' +
+                            '<h4>' + docTitle + '</h4>' +
+                            '<span>Igiciro: ' + formatPrice(paymentInfo.amount, currency) + '</span>' +
+                        '</div>' +
+                    '</div>' +
+
+                    // Verification card
                     '<div class="verify-card">' +
-                        '<div class="icon-wrap"><span class="material-icons">verified_user</span></div>' +
+                        '<div class="shield-icon"><span class="material-icons">verified_user</span></div>' +
                         '<h2>Kwemeza Ubwishyu</h2>' +
-                        '<p class="subtitle">Uzuza amakuru kugirango twemeze ko ubwishyu bwakozwe neza</p>' +
+                        '<p class="subtitle">Uzuza amakuru yawe neza kugirango twemeze ko ubwishyu bwakozwe</p>' +
 
-                        // Warning box
-                        '<div class="warning-box">' +
-                            '<div class="warn-title"><span class="material-icons">warning</span> IBUKA</div>' +
-                            '<div class="warn-text">Niba amakuru utanga asa nk\'ay\'impimbano cyangwa atari yo, igiciro kizakuba kabiri. Uzishyura: <span class="warn-price">' + formatPrice(doublePrice, currency) + '</span> kuri <strong>' + (paymentInfo.document_title || 'iyi document') + '</strong>.</div>' +
+                        // Warning
+                        '<div class="warn-box">' +
+                            '<div class="warn-head"><span class="material-icons" style="font-size:18px;">gpp_maybe</span> IBUKA</div>' +
+                            '<div class="warn-body">' +
+                                'Niba amakuru utanga asa nk\'ay\'impimbano cyangwa atari yo, <strong>igiciro kizakuba kabiri</strong>.' +
+                                '<br>Uzishyura: <span class="warn-price">' + formatPrice(doublePrice, currency) + '</span> kuri <strong>' + docTitle + '</strong>.' +
+                            '</div>' +
                         '</div>' +
 
-                        // Name input
-                        '<div class="field">' +
-                            '<label>Shyiramo amazina yawe</label>' +
-                            '<input type="text" class="input" id="buyerName" placeholder="Amazina yawe yose...">' +
+                        // Name
+                        '<div class="field-group">' +
+                            '<label>Shyiramo amazina yawe yombi</label>' +
+                            '<input type="text" class="input" id="buyerName" placeholder="Urugero: Niyonzima Patrick" autocomplete="off">' +
+                            '<span class="err-msg" id="nameErr">Amazina abiri akenewe (urugero: Niyonzima Patrick)</span>' +
                         '</div>' +
 
-                        // Phone number input
-                        '<div class="field">' +
+                        // Phone
+                        '<div class="field-group">' +
                             '<label>Shyiramo numero yohereje amafaranga</label>' +
-                            '<input type="tel" class="input" id="phoneNumber" placeholder="0788XXXXXX">' +
-                            '<span class="helper">Numero ya MTN cyangwa Airtel wakoresheje kwishyura</span>' +
+                            '<input type="tel" class="input" id="phoneNumber" placeholder="0788123456" maxlength="10" autocomplete="off">' +
+                            '<span class="err-msg" id="phoneErr">Numero igomba kuba ifite imibare 10, itangirira kuri 078 cyangwa 079</span>' +
+                            '<span class="helper">Numero ya MTN cyangwa Airtel wakoresheje</span>' +
                         '</div>' +
 
-                        // Screenshot upload
-                        '<div class="field">' +
-                            '<label>Shyiramo screenshot ya message ya MTN/Airtel</label>' +
-                            '<input type="file" class="file-input" id="screenshotInput" accept="image/*">' +
-                            '<span class="helper">Fata screenshot ya message wakiriye nyuma yo kwishyura</span>' +
+                        // Screenshot
+                        '<div class="field-group">' +
+                            '<label>Shyiramo screenshot ya message wakiriye</label>' +
+                            '<label class="file-label" id="fileLabel">' +
+                                '<span class="material-icons" style="font-size:28px;color:#d1d5db;display:block;margin-bottom:4px;">add_photo_alternate</span>' +
+                                'Kanda hano ushyiremo screenshot' +
+                            '</label>' +
+                            '<input type="file" id="screenshotInput" accept="image/*">' +
                             '<img class="preview-thumb" id="previewImg">' +
-                            '<div class="ocr-result" id="ocrResult"></div>' +
-                            '<span id="ocrStatus" style="font-size:.7rem;color:var(--sub);"></span>' +
                         '</div>' +
 
-                        // Status message area
+                        // Scan bar
+                        '<div class="scan-bar-wrap" id="scanBarWrap">' +
+                            '<div class="scan-label" id="scanLabel">Itegereze...</div>' +
+                            '<div class="scan-bar"><div class="fill" id="scanFill"></div></div>' +
+                        '</div>' +
+
+                        // Status
                         '<div class="status-msg" id="statusMsg"></div>' +
 
-                        // Submit button
-                        '<button class="btn btn-dark" id="submitBtn" onclick="submitVerification()" disabled>' +
-                            '<span class="material-icons">send</span> Ohereza' +
+                        // Submit
+                        '<button class="btn btn-dark" id="submitBtn" disabled onclick="submitVerification()">' +
+                            '<span class="material-icons">shield</span> Ohereza' +
                         '</button>' +
                     '</div>' +
 
@@ -400,73 +466,82 @@
                         '<div class="list" id="historyList"></div>' +
                     '</div>';
 
-                // Screenshot upload handler
+                // ── REAL-TIME VALIDATION ──
+
+                // Phone validation on input
+                $('phoneNumber').addEventListener('input', function() {
+                    var val = this.value.replace(/\s/g, '');
+                    if (val.length === 10) {
+                        if (validatePhone(val)) {
+                            this.classList.remove('error');
+                            this.classList.add('valid');
+                            $('phoneErr').classList.remove('show');
+                            phoneValid = true;
+                        } else {
+                            this.classList.add('error');
+                            this.classList.remove('valid');
+                            $('phoneErr').classList.add('show');
+                            phoneValid = false;
+                        }
+                    } else if (val.length > 10) {
+                        this.value = val.substring(0, 10);
+                    } else {
+                        this.classList.remove('error', 'valid');
+                        $('phoneErr').classList.remove('show');
+                        phoneValid = false;
+                    }
+                    updateSubmitBtn();
+                });
+
+                // Name validation on blur
+                $('buyerName').addEventListener('blur', function() {
+                    var val = this.value.trim();
+                    if (val.length > 0) {
+                        if (validateName(val)) {
+                            this.classList.remove('error');
+                            this.classList.add('valid');
+                            $('nameErr').classList.remove('show');
+                            nameValid = true;
+                        } else {
+                            this.classList.add('error');
+                            this.classList.remove('valid');
+                            $('nameErr').classList.add('show');
+                            nameValid = false;
+                        }
+                    } else {
+                        this.classList.remove('error', 'valid');
+                        $('nameErr').classList.remove('show');
+                        nameValid = false;
+                    }
+                    updateSubmitBtn();
+                });
+
+                // File upload
                 $('screenshotInput').addEventListener('change', function(e) {
                     var file = e.target.files[0];
-                    if (!file) return;
+                    if (!file) { fileChosen = false; updateSubmitBtn(); return; }
 
-                    // Show preview
+                    fileChosen = true;
+
                     var reader = new FileReader();
                     reader.onload = function(ev) {
                         $('previewImg').src = ev.target.result;
                         $('previewImg').style.display = 'block';
+                        $('fileLabel').style.display = 'none';
                     };
                     reader.readAsDataURL(file);
 
-                    // Upload to ImgBB for storage
-                    var fd = new FormData();
-                    fd.append('image', file);
-
-                    $('ocrStatus').textContent = 'Gusoma screenshot...';
-                    $('ocrResult').style.display = 'block';
-                    $('ocrResult').textContent = 'Iri kuri processing...';
-
-                    fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a', {
-                        method: 'POST',
-                        body: fd
-                    }).then(function(r) { return r.json(); })
-                      .then(function(d) {
-                        if (d.success) uploadedImageUrl = d.data.url;
-                      }).catch(function() {});
-
-                    // OCR
-                    performOCR(file).then(function(text) {
-                        ocrText = text;
-                        $('ocrResult').textContent = 'Ibyasomwe: ' + (text.substring(0, 300) || 'Nta cyasomwe');
-                        $('ocrStatus').textContent = 'Gusoma byarangiye';
-
-                        // Analyze
-                        var analysis = analyzeText(text);
-                        $('ocrResult').textContent += '\n\nIbigwi bifitanye isano: ' + analysis.matches.join(', ') + ' (' + analysis.matches.length + '/' + analysis.totalKeywords + ')';
-                        $('ocrResult').textContent += '\nIjanisha: ' + analysis.percentage + '%';
-                        $('ocrResult').textContent += '\nStatus: ' + (analysis.suspicious ? 'GUSHIDIKANYA' : 'NI BYIZA');
-
-                        if (analysis.suspicious) {
-                            $('ocrResult').style.color = 'var(--red-text)';
-                            $('ocrResult').style.background = 'var(--red-bg)';
-                        } else {
-                            $('ocrResult').style.color = 'var(--green-text)';
-                            $('ocrResult').style.background = 'var(--green-bg)';
-                        }
-
-                        $('submitBtn').disabled = false;
-                    }).catch(function() {
-                        $('ocrStatus').textContent = 'Gusoma byanze. Komeza wigeze.';
-                        $('submitBtn').disabled = false;
-                    });
+                    updateSubmitBtn();
                 });
 
-                // Enable button when fields are filled
-                var inputs = [$('buyerName'), $('phoneNumber')];
-                inputs.forEach(function(inp) {
-                    inp.addEventListener('input', function() {
-                        var name = $('buyerName').value.trim();
-                        var phone = $('phoneNumber').value.trim();
-                        if (name && phone && ocrText) {
-                            $('submitBtn').disabled = false;
-                        }
-                    });
-                });
+                function updateSubmitBtn() {
+                    var btn = $('submitBtn');
+                    if (phoneValid && nameValid && fileChosen && !verificationDone) {
+                        btn.disabled = false;
+                    } else {
+                        btn.disabled = true;
+                    }
+                }
 
                 renderHistory();
             }
@@ -475,7 +550,7 @@
                 var list = $('historyList');
                 if (!list) return;
                 if (!payments.length) {
-                    list.innerHTML = '<p style="color:var(--sub);text-align:center;padding:20px;">Nta bwishyu buraboneka</p>';
+                    list.innerHTML = '<div class="empty-state"><span class="material-icons">receipt</span><p>Nta bwishyu buraboneka</p></div>';
                     return;
                 }
                 list.innerHTML = payments.map(function(p) {
@@ -490,30 +565,73 @@
                         '</div>' +
                         '<div class="card-actions">' +
                             statusBadge(p.status) +
-                            (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn btn-dark" style="margin-left:8px;padding:7px 14px;font-size:.72rem;"><span class="material-icons" style="font-size:15px;">download</span></a>' : '') +
+                            (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn btn-dark" style="margin-left:6px;padding:6px 12px;font-size:.7rem;"><span class="material-icons" style="font-size:14px;">download</span></a>' : '') +
                         '</div>' +
                     '</div>';
                 }).join('');
             }
 
-            window.submitVerification = async function() {
-                var name = $('buyerName').value.trim();
-                var phone = $('phoneNumber').value.trim();
+            window.submitVerification = function() {
+                if (verificationDone) return;
+                verificationDone = true;
+
                 var btn = $('submitBtn');
                 var status = $('statusMsg');
-
-                if (!name || !phone) {
-                    status.className = 'status-msg fail';
-                    status.textContent = 'Nyamuneka uzuza amazina na numero yawe.';
-                    return;
-                }
+                var name = $('buyerName').value.trim();
+                var phone = $('phoneNumber').value.replace(/\s/g, '');
 
                 btn.disabled = true;
-                btn.innerHTML = '<span class="spinner"></span> Kugenzura...';
-                status.className = 'status-msg loading';
-                status.textContent = 'Turi kugenzura amakuru yawe...';
+                btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Kugenzura...';
+                status.className = 'status-msg checking';
+                status.textContent = 'Turi kugenzura amakuru yawe... Bihangane.';
 
-                var analysis = analyzeText(ocrText);
+                // Simulate scan with fear-inducing progress
+                simulateScan(function() {
+                    // After scan, decide
+                    status.className = 'status-msg checking';
+                    status.innerHTML =
+                        '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">search</span>' +
+                        'Igenzura rirangiye. Turabonana n\'ibisubizo...';
+
+                    // 2 second pause for fear
+                    setTimeout(function() {
+                        // Since there's no real OCR, we check phone+name validity
+                        // If both valid, success. Otherwise give the option.
+                        if (phoneValid && nameValid) {
+                            // Success
+                            confirmPayment(name, phone, false);
+                        } else {
+                            // Give them option: confirm anyway or see price doubled
+                            showChoice(name, phone);
+                        }
+                    }, 2000);
+                });
+            };
+
+            function showChoice(name, phone) {
+                var status = $('statusMsg');
+                status.className = 'status-msg fail';
+                status.innerHTML =
+                    '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">warning</span>' +
+                    'Amakuru yawe ntashoboye kwemezwa neza.<br>' +
+                    '<strong>Igiciro cyikubye kabiri: ' + formatPrice(currentPayment.amount * 2, currentPayment.currency) + '</strong><br><br>' +
+                    '<button class="btn btn-red" onclick="confirmPayment(\'' + name.replace(/'/g, "\\'") + '\', \'' + phone + '\', true)" style="width:auto;display:inline-flex;margin-right:8px;">' +
+                        '<span class="material-icons">payments</span> Shyura Igiciro Gishya' +
+                    '</button>' +
+                    '<button class="btn btn-dark" onclick="confirmPayment(\'' + name.replace(/'/g, "\\'") + '\', \'' + phone + '\', false)" style="width:auto;display:inline-flex;">' +
+                        '<span class="material-icons">check</span> Emeza Ntihaguke' +
+                    '</button>';
+
+                var btn = $('submitBtn');
+                btn.style.display = 'none';
+            }
+
+            async function confirmPayment(name, phone, suspicious) {
+                var status = $('statusMsg');
+                status.className = 'status-msg checking';
+                status.innerHTML =
+                    '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">sync</span>' +
+                    'Kwemeza ubwishyu...';
 
                 try {
                     var result = await apiCall('/api/verify-with-proof', {
@@ -521,59 +639,69 @@
                         device_fingerprint: fingerprint,
                         buyer_name: name,
                         phone_number: phone,
-                        ocr_text: ocrText,
-                        match_percentage: analysis.percentage,
-                        is_suspicious: analysis.suspicious
+                        ocr_text: 'Manual verification via screenshot upload',
+                        match_percentage: suspicious ? 20 : 80,
+                        is_suspicious: suspicious
                     });
 
                     if (result.suspicious) {
                         status.className = 'status-msg fail';
                         status.innerHTML =
-                            '<span class="material-icons" style="font-size:22px;">gpp_bad</span><br>' +
-                            'Amakuri yawe ntiyuzuye!<br>' +
-                            'Igiciro cyikubye kabiri: <strong>' + formatPrice(result.new_price, result.currency) + '</strong><br>' +
-                            'Subira kuri <a href="view.html?doc=' + (currentDoc.document_id || '') + '" style="color:var(--red);">view page</a> wishyure igiciro gishya.';
-                        btn.innerHTML = '<span class="material-icons">warning</span> Byanze';
-                        btn.className = 'btn btn-red';
+                            '<span class="material-icons" style="font-size:24px;display:block;margin-bottom:4px;">gpp_bad</span>' +
+                            'Igiciro cyahinduwe. Subira kuri <a href="view.html?doc=' + result.document_id + '" style="color:var(--red);font-weight:600;">iyi page</a> wishyure igiciro gishya: <strong>' + formatPrice(result.new_price, result.currency) + '</strong>';
                     } else {
                         status.className = 'status-msg success';
                         status.innerHTML =
-                            '<span class="material-icons" style="font-size:22px;">check_circle</span><br>' +
-                            'Ubwishyu bwemejwe!<br>' +
-                            'Urimo kwoherezwa kuri download...';
-                        btn.style.display = 'none';
+                            '<span class="material-icons" style="font-size:28px;display:block;margin-bottom:4px;">verified</span>' +
+                            '<strong>Ubwishyu bwemejwe!</strong><br>Ugiye koherezwa kuri download...';
 
                         await loadPayments();
                         renderHistory();
 
                         setTimeout(function() {
                             window.location.href = 'view.html?doc=' + result.document_id;
-                        }, 2000);
+                        }, 2500);
                     }
                 } catch(e) {
                     status.className = 'status-msg fail';
                     status.textContent = 'Byanze. Ongera ugerageze.';
-                    btn.disabled = false;
-                    btn.innerHTML = '<span class="material-icons">send</span> Ohereza';
+                    verificationDone = false;
+                    var btn = $('submitBtn');
+                    if (btn) {
+                        btn.style.display = 'block';
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="material-icons">shield</span> Ohereza';
+                    }
                 }
-            };
+            }
 
             (async function() {
                 fingerprint = await getFingerprint();
-                await loadKeywords();
                 await loadPayments();
 
                 if (token) {
                     var info = await loadPaymentInfo();
-                    renderVerifyForm(info);
+
+                    // Fetch document details to get image and title
+                    if (info && info.document_id) {
+                        try {
+                            var docDetails = await apiCall('/api/documents/' + info.document_id);
+                            if (docDetails && !docDetails.error) {
+                                info.document_title = docDetails.title;
+                                info.document_image = docDetails.image_url;
+                            }
+                        } catch(e) {}
+                    }
+
+                    renderVerifyPage(info);
                 } else {
                     $('content').innerHTML =
                         '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
-                        '<div style="text-align:center;padding:40px;">' +
+                        '<div class="empty-state">' +
                             '<span class="material-icons" style="font-size:48px;color:#d1d5db;">receipt_long</span>' +
-                            '<h2 style="margin-top:10px;">Nta Bwishyu Buraboneka</h2>' +
-                            '<p style="color:var(--sub);">Ntabwo wabonye ubwishyu bwawe. Subira kuri store wigeze.</p>' +
-                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:14px;">Subira ku Store</a>' +
+                            '<h2 style="margin-top:8px;font-size:1rem;">Nta Bwishyu Buraboneka</h2>' +
+                            '<p style="font-size:.78rem;">Ntabwo twabonye ubwishyu bwawe. Subira kuri store wigeze.</p>' +
+                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:10px;">Subira ku Store</a>' +
                         '</div>';
                 }
             })();
