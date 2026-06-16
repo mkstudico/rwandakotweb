@@ -23,9 +23,10 @@
     <style>
         :root {
             --bg:#f8f9fb; --surface:#fff; --text:#111; --sub:#6b7280;
-            --border:#eef0f2; --accent:#111; --accent-hover:#2d2d44;
+            --border:#eef0f2; --accent:#0a0a0a; --accent-hover:#1a1a1a;
             --green:#059669; --green-bg:#ecfdf5; --green-text:#065f46;
             --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
+            --amber:#d97706; --amber-bg:#fffbeb; --amber-text:#92400e;
             --radius:18px; --radius-sm:12px;
             --tr:0.2s cubic-bezier(0.4,0,0.2,1);
         }
@@ -104,6 +105,8 @@
         .btn-paid:hover{background:#d1fae5}
         .btn-paid:active{transform:scale(.97)}
         .btn-expired{background:var(--red-bg);color:var(--red-text)}
+        .btn-doubled{background:var(--red);color:#fff}
+        .btn-doubled:hover{background:#b91c1c}
 
         .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
         .info-card{
@@ -126,6 +129,13 @@
             border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
         }
         .timer-badge.expired{background:var(--red-bg);color:var(--red-text)}
+
+        .suspicious-badge{
+            display:inline-flex;align-items:center;gap:6px;
+            background:var(--red-bg);color:var(--red-text);padding:8px 14px;
+            border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
+        }
+        .suspicious-badge .material-icons{font-size:18px}
 
         .state-wrap{text-align:center;padding:60px 20px}
         .state-wrap .material-icons{font-size:56px;color:#d1d5db;margin-bottom:12px}
@@ -187,6 +197,8 @@
             var fingerprint = null;
             var isPaid = false;
             var withinWindow = false;
+            var isDoubled = false;
+            var doubledPrice = null;
             var payToken = null;
             var paidAt = null;
 
@@ -292,14 +304,36 @@
                         device_fingerprint: fingerprint,
                         document_id: docId
                     });
+
                     isPaid = r.already_paid === true;
                     withinWindow = r.within_window === true;
-                    if (r.payment && r.payment.created_at) {
-                        paidAt = new Date(r.payment.created_at);
+
+                    if (r.payment) {
+                        if (r.payment.created_at) paidAt = new Date(r.payment.created_at);
+
+                        // Check if this payment was flagged suspicious (price doubled)
+                        if (r.payment.status === 'pending_verification') {
+                            isDoubled = true;
+                            // Fetch the actual payment to get the doubled price
+                            var payInfo = await apiCall('/api/check-payment', {
+                                device_fingerprint: fingerprint,
+                                document_id: docId
+                            });
+                            if (payInfo.payment && payInfo.payment.amount) {
+                                doubledPrice = payInfo.payment.amount;
+                            }
+                        }
+                    }
+
+                    // Also check if there's a pending_verification payment
+                    if (!isDoubled && r.payment && r.payment.status === 'pending_verification') {
+                        isDoubled = true;
+                        doubledPrice = r.payment.amount;
                     }
                 } catch(e) {
                     isPaid = false;
                     withinWindow = false;
+                    isDoubled = false;
                 }
             }
 
@@ -317,11 +351,15 @@
                 var expired = isPaid && !withinWindow;
                 var canDownload = isPaid && withinWindow;
                 var timerHtml = '';
+                var statusHtml = '';
+                var priceToShow = isDoubled && doubledPrice ? doubledPrice : doc.price;
 
                 if (canDownload) {
                     timerHtml = '<div class="timer-badge"><span class="material-icons">timer</span> Download available for ' + timeLeft + ' more minutes</div>';
                 } else if (expired) {
                     timerHtml = '<div class="timer-badge expired"><span class="material-icons">timer_off</span> Download window expired — purchase again</div>';
+                } else if (isDoubled) {
+                    statusHtml = '<div class="suspicious-badge"><span class="material-icons">gpp_bad</span> Your info was flagged suspicious. Price doubled to ' + formatPrice(priceToShow, doc.currency) + '.</div>';
                 }
 
                 $('pageContent').innerHTML =
@@ -336,11 +374,15 @@
                         '<div class="hero-body">' +
                             '<h1 class="doc-title">' + doc.title + '</h1>' +
                             '<p class="doc-desc">' + (doc.description || 'No description provided.') + '</p>' +
-                            '<div class="price-display"><span class="val">' + parseInt(doc.price).toLocaleString() + '</span><span class="cur">' + (doc.currency || 'RWF') + '</span></div>' +
+                            '<div class="price-display"><span class="val">' + parseInt(priceToShow).toLocaleString() + '</span><span class="cur">' + (doc.currency || 'RWF') + '</span></div>' +
                             timerHtml +
+                            statusHtml +
                             (canDownload
-                                ? '<button class="btn btn-paid" id="downloadBtn" onclick="downloadDocument()"><span class="material-icons">download</span> Download Document</button>'
-                                : '<button class="btn ' + (expired ? 'btn-expired' : 'btn-primary') + '" id="payBtn" onclick="startPayment()"><span class="material-icons">' + (expired ? 'refresh' : 'lock') + '</span> ' + (expired ? 'Purchase Again' : 'Pay to Download') + '</button>'
+                                ? '<button class="btn btn-paid" id="downloadBtn"><span class="material-icons">download</span> Download Document</button>'
+                                : (isDoubled
+                                    ? '<button class="btn btn-doubled" id="payBtn"><span class="material-icons">payments</span> Pay ' + formatPrice(priceToShow, doc.currency) + '</button>'
+                                    : '<button class="btn ' + (expired ? 'btn-expired' : 'btn-primary') + '" id="payBtn"><span class="material-icons">' + (expired ? 'refresh' : 'lock') + '</span> ' + (expired ? 'Purchase Again' : 'Pay to Download') + '</button>'
+                                )
                             ) +
                         '</div>' +
                     '</div>' +
@@ -351,11 +393,22 @@
                         '</div>' +
                         '<div class="info-card">' +
                             '<div class="ic-icon payments"><span class="material-icons">payment</span></div>' +
-                            '<div><div class="ic-val">' + (isPaid ? 'Paid' : 'Pending') + '</div><div class="ic-label">Your Status</div></div>' +
+                            '<div><div class="ic-val">' + (canDownload ? 'Paid' : (isDoubled ? 'Flagged' : 'Pending')) + '</div><div class="ic-label">Your Status</div></div>' +
                         '</div>' +
                     '</div>';
 
-                // Update OG meta tags for social sharing
+                // Attach event listeners
+                var dlBtn = $('downloadBtn');
+                var payBtn = $('payBtn');
+
+                if (dlBtn) {
+                    dlBtn.addEventListener('click', downloadDocument);
+                }
+                if (payBtn) {
+                    payBtn.addEventListener('click', startPayment);
+                }
+
+                // Update OG meta
                 setMeta('og:title', doc.title + ' — DocStore');
                 setMeta('og:description', doc.description || 'Purchase and download this document securely via MTN or Airtel Money.');
                 setMeta('og:image', doc.image_url || '');
@@ -366,7 +419,7 @@
                 document.title = doc.title + ' — DocStore';
             }
 
-            window.startPayment = function() {
+            function startPayment() {
                 if (!doc || !fingerprint) {
                     toast('Please wait, loading...', true);
                     return;
@@ -380,6 +433,9 @@
 
                 payToken = genToken();
 
+                // Use doubled price if flagged
+                var amountToPay = isDoubled && doubledPrice ? doubledPrice : doc.price;
+
                 apiCall('/api/init-payment', {
                     document_id: docId,
                     device_fingerprint: fingerprint,
@@ -388,6 +444,7 @@
                     if (r.already_paid) {
                         isPaid = true;
                         withinWindow = true;
+                        isDoubled = false;
                         render();
                         toast('You already own this document!');
                         return;
@@ -408,8 +465,8 @@
                     form.style.display = 'none';
 
                     var fields = {
-                        amount: parseInt(r.amount),
-                        currency: r.currency,
+                        amount: parseInt(amountToPay),
+                        currency: r.currency || doc.currency,
                         comment: doc.title,
                         client_token: payToken,
                         return_url: window.location.origin + '/cart.html?doc=' + docId + '&token=' + payToken,
@@ -434,9 +491,9 @@
                         btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
                     }
                 });
-            };
+            }
 
-            window.downloadDocument = function() {
+            function downloadDocument() {
                 var btn = $('downloadBtn');
                 if (btn) {
                     btn.disabled = true;
@@ -464,7 +521,7 @@
                         btn.innerHTML = '<span class="material-icons">download</span> Download Document';
                     }
                 });
-            };
+            }
 
             // ─── INIT ────────────────────────────
             (async function init() {
@@ -473,12 +530,9 @@
                     await loadDocument();
                     fingerprint = await fpPromise;
                     await checkPayment();
-                    // Track view silently
                     fetch('/api/documents/' + docId + '/click', { method: 'POST' }).catch(function() {});
                     render();
-                } catch(e) {
-                    // Error already handled in loadDocument
-                }
+                } catch(e) {}
             })();
         })();
     </script>
