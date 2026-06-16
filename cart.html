@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="rw">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>My Purchases — DocStore</title>
+    <title>Kwemeza — DocStore</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
             --bg:#f8f9fb; --surface:#fff; --text:#111; --sub:#6b7280;
-            --border:#eef0f2; --accent:#111;
-            --green:#059669; --green-bg:#ecfdf5; --green-text:#065f46;
-            --orange:#ea580c; --orange-bg:#fff7ed; --orange-text:#9a3412;
-            --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
-            --blue:#2563eb; --blue-bg:#eff6ff; --blue-text:#1e40af;
-            --yellow:#ca8a04; --yellow-bg:#fefce8; --yellow-text:#854d0e;
+            --border:#eef0f2; --accent:#111; --red:#dc2626; --red-bg:#fef2f2;
+            --red-text:#991b1b; --green:#059669; --green-bg:#ecfdf5;
+            --green-text:#065f46; --yellow:#ca8a04; --yellow-bg:#fefce8;
+            --yellow-text:#854d0e; --orange:#ea580c; --orange-bg:#fff7ed;
             --radius:16px; --radius-sm:10px;
             --tr:0.2s cubic-bezier(0.4,0,0.2,1);
         }
@@ -48,8 +47,7 @@
         }
         .nav-link:hover{background:#f3f4f6;color:var(--text)}
         .nav-link.active{background:var(--accent);color:#fff}
-        .container{max-width:900px;margin:0 auto;padding:24px 16px 60px}
-
+        .container{max-width:650px;margin:0 auto;padding:24px 16px 60px}
         .back-link{
             display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
             font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
@@ -58,47 +56,97 @@
         }
         .back-link:hover{background:#f3f4f6}
 
-        .banner{
-            border-radius:var(--radius);padding:20px 18px;display:flex;
-            align-items:center;gap:14px;margin-bottom:24px;
-            animation:fadeSlide .4s ease;
+        .verify-card{
+            background:var(--surface);border-radius:var(--radius);
+            border:1px solid var(--border);padding:28px 20px;
+            box-shadow:0 1px 3px rgba(0,0,0,.04);
         }
-        @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-        .banner.success{background:var(--green-bg);border:1px solid #a7f3d0}
-        .banner.success .banner-icon .material-icons{color:var(--green)}
-        .banner.success h2,.banner.success p{color:var(--green-text)}
-        .banner.pending{background:var(--yellow-bg);border:1px solid #fde68a}
-        .banner.pending .banner-icon .material-icons{color:var(--yellow)}
-        .banner.pending h2,.banner.pending p{color:var(--yellow-text)}
-        .banner.checking{background:var(--blue-bg);border:1px solid #bfdbfe}
-        .banner.checking .banner-icon .material-icons{color:var(--blue)}
-        .banner.checking h2,.banner.checking p{color:var(--blue-text)}
-        .banner-icon{
-            width:44px;height:44px;border-radius:50%;background:#fff;
-            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        .verify-card .icon-wrap{
+            width:56px;height:56px;border-radius:50%;background:#fef3c7;
+            display:flex;align-items:center;justify-content:center;
+            margin:0 auto 14px;
         }
-        .banner-icon .material-icons{font-size:24px}
-        .banner h2{font-size:1rem;font-weight:600}
-        .banner p{font-size:.78rem}
+        .verify-card .icon-wrap .material-icons{font-size:28px;color:var(--yellow)}
+        .verify-card h2{
+            font-size:1.2rem;font-weight:700;text-align:center;
+            margin-bottom:4px;letter-spacing:-.3px;
+        }
+        .verify-card .subtitle{
+            text-align:center;color:var(--sub);font-size:.82rem;margin-bottom:22px;
+        }
 
-        .stats-row{
-            display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
-            gap:10px;margin-bottom:24px;
+        .warning-box{
+            background:var(--red-bg);border:1px solid #fecaca;
+            border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;
         }
-        .stat-card{
-            background:var(--surface);border-radius:var(--radius-sm);
-            padding:16px;border:1px solid var(--border);
-            display:flex;align-items:center;gap:10px;
+        .warning-box .warn-title{
+            font-size:.78rem;font-weight:600;color:var(--red-text);
+            display:flex;align-items:center;gap:6px;margin-bottom:6px;
         }
-        .stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-        .stat-dot.green{background:var(--green)}
-        .stat-dot.orange{background:var(--orange)}
-        .stat-dot.red{background:var(--red)}
-        .stat-dot.yellow{background:var(--yellow)}
-        .stat-dot.blue{background:var(--blue)}
-        .stat-val{font-size:1.2rem;font-weight:700}
-        .stat-label{font-size:.7rem;color:var(--sub)}
+        .warning-box .warn-text{
+            font-size:.74rem;color:var(--red-text);line-height:1.5;
+        }
+        .warning-box .warn-price{
+            font-weight:700;font-size:.85rem;color:var(--red);margin-top:4px;
+        }
 
+        .field{margin-bottom:14px}
+        .field label{
+            display:block;font-size:.78rem;font-weight:500;color:var(--text);
+            margin-bottom:5px;
+        }
+        .field .input{
+            width:100%;padding:12px 14px;border:1px solid var(--border);
+            border-radius:var(--radius-sm);font-size:.85rem;
+            font-family:'Poppins',sans-serif;outline:none;
+            transition:border var(--tr);-webkit-appearance:none;
+        }
+        .field .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,.04)}
+        .field .file-input{
+            width:100%;padding:12px 14px;border:2px dashed var(--border);
+            border-radius:var(--radius-sm);font-size:.82rem;
+            font-family:'Poppins',sans-serif;cursor:pointer;
+            text-align:center;transition:border var(--tr);
+        }
+        .field .file-input:hover{border-color:#d1d5db}
+        .field .helper{font-size:.7rem;color:var(--sub);margin-top:4px}
+
+        .preview-thumb{
+            width:100%;max-height:160px;object-fit:contain;
+            border-radius:8px;margin-top:8px;border:1px solid var(--border);
+            display:none;
+        }
+
+        .ocr-result{
+            background:#f9fafb;border-radius:var(--radius-sm);
+            padding:12px 14px;font-size:.72rem;color:var(--sub);
+            margin-top:8px;max-height:100px;overflow-y:auto;
+            display:none;line-height:1.5;word-break:break-all;
+        }
+
+        .btn{
+            display:inline-flex;align-items:center;justify-content:center;
+            gap:8px;padding:13px 28px;border-radius:30px;font-weight:600;
+            font-size:.88rem;cursor:pointer;border:none;
+            font-family:'Poppins',sans-serif;transition:all var(--tr);
+            -webkit-tap-highlight-color:transparent;width:100%;
+        }
+        .btn .material-icons{font-size:20px}
+        .btn-dark{background:var(--accent);color:#fff}
+        .btn-dark:hover{background:#333}
+        .btn-dark:disabled{opacity:.5;pointer-events:none}
+        .btn-red{background:var(--red);color:#fff}
+        .btn-red:hover{background:#b91c1c}
+
+        .status-msg{
+            text-align:center;padding:20px;border-radius:var(--radius-sm);
+            margin-top:16px;display:none;font-size:.85rem;font-weight:500;
+        }
+        .status-msg.success{background:var(--green-bg);color:var(--green-text);display:block}
+        .status-msg.fail{background:var(--red-bg);color:var(--red-text);display:block}
+        .status-msg.loading{background:#eff6ff;color:#1e40af;display:block}
+
+        .history-section{margin-top:28px}
         .section-title{
             font-size:1rem;font-weight:600;margin-bottom:12px;
             display:flex;align-items:center;gap:7px;
@@ -108,73 +156,37 @@
             background:var(--surface);border-radius:var(--radius-sm);
             border:1px solid var(--border);padding:16px;
             display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-            transition:box-shadow var(--tr);
         }
-        .card:hover{box-shadow:0 2px 8px rgba(0,0,0,.04)}
-        .card-img{width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0}
+        .card-img{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0}
         .card-img-placeholder{
-            width:52px;height:52px;border-radius:10px;background:#f3f4f6;
+            width:48px;height:48px;border-radius:10px;background:#f3f4f6;
             display:flex;align-items:center;justify-content:center;flex-shrink:0;
         }
-        .card-img-placeholder .material-icons{color:#d1d5db;font-size:24px}
-        .card-info{flex:1;min-width:160px}
-        .card-info h4{font-size:.9rem;font-weight:600;margin-bottom:2px}
-        .card-info .meta{
-            font-size:.72rem;color:var(--sub);display:flex;
-            align-items:center;gap:8px;flex-wrap:wrap;
-        }
-        .card-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+        .card-img-placeholder .material-icons{color:#d1d5db;font-size:22px}
+        .card-info{flex:1;min-width:140px}
+        .card-info h4{font-size:.88rem;font-weight:600}
+        .card-info .meta{font-size:.7rem;color:var(--sub)}
+        .card-actions{flex-shrink:0}
         .badge{
-            font-size:.7rem;font-weight:600;padding:5px 12px;
-            border-radius:20px;white-space:nowrap;
-            display:flex;align-items:center;gap:4px;
+            font-size:.68rem;font-weight:600;padding:4px 10px;
+            border-radius:20px;display:inline-flex;align-items:center;gap:4px;
         }
-        .badge .material-icons{font-size:14px}
+        .badge .material-icons{font-size:13px}
         .badge-completed{background:var(--green-bg);color:var(--green-text)}
         .badge-pending{background:var(--yellow-bg);color:var(--yellow-text)}
         .badge-failed{background:var(--red-bg);color:var(--red-text)}
-        .badge-expired{background:#f3f4f6;color:#6b7280}
 
-        .btn{
-            display:inline-flex;align-items:center;gap:6px;padding:9px 18px;
-            border-radius:25px;font-weight:600;font-size:.8rem;
-            cursor:pointer;border:none;font-family:'Poppins',sans-serif;
-            text-decoration:none;transition:all var(--tr);
-            -webkit-tap-highlight-color:transparent;
-        }
-        .btn .material-icons{font-size:16px}
-        .btn-dark{background:var(--accent);color:#fff}
-        .btn-dark:hover{background:#333}
-        .btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text)}
-        .btn-outline:hover{background:#f9fafb}
-
-        .empty-state{text-align:center;padding:50px 20px;color:#9ca3af}
-        .empty-state .material-icons{font-size:52px;margin-bottom:12px}
-        .empty-state h2{font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:6px}
-        .empty-state p{font-size:.85rem;margin-bottom:16px}
-
-        .loader-wrap{text-align:center;padding:60px 20px;color:#9ca3af}
         .spinner{
-            width:30px;height:30px;border:3px solid #e5e7eb;
+            width:22px;height:22px;border:3px solid #e5e7eb;
             border-top-color:#888;border-radius:50%;
-            animation:spin .7s linear infinite;margin:0 auto 12px;
+            animation:spin .7s linear infinite;display:inline-block;
         }
         @keyframes spin{to{transform:rotate(360deg)}}
 
-        .toast{
-            position:fixed;bottom:24px;left:50%;
-            transform:translateX(-50%) translateY(120px);
-            background:#1a1a2e;color:#fff;padding:12px 24px;
-            border-radius:50px;font-size:.8rem;font-weight:500;
-            font-family:'Poppins',sans-serif;z-index:300;
-            transition:transform .3s;pointer-events:none;white-space:nowrap;
-        }
-        .toast.show{transform:translateX(-50%) translateY(0)}
-
         @media(max-width:500px){
+            .verify-card{padding:20px 14px}
             .card{flex-direction:column;align-items:flex-start}
-            .card-actions{width:100%;justify-content:space-between}
-            .stats-row{grid-template-columns:1fr 1fr}
+            .card-actions{width:100%;text-align:right}
         }
     </style>
 </head>
@@ -182,24 +194,20 @@
 
     <header class="topbar">
         <div class="topbar-inner">
-            <a href="index.html" class="logo">
-                <span class="material-icons">description</span> DocStore
-            </a>
+            <a href="index.html" class="logo"><span class="material-icons">description</span> DocStore</a>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Store</a>
-                <a href="cart.html" class="nav-link active">My Purchases</a>
+                <a href="cart.html" class="nav-link active">Kwemeza</a>
             </div>
         </div>
     </header>
 
     <div class="container" id="content">
-        <div class="loader-wrap">
+        <div style="text-align:center;padding:40px;">
             <div class="spinner"></div>
-            <p>Loading your purchases…</p>
+            <p style="margin-top:12px;color:var(--sub);">Tegereza gato...</p>
         </div>
     </div>
-
-    <div class="toast" id="toast"></div>
 
     <script>
         (function() {
@@ -210,41 +218,21 @@
 
             var fingerprint = null;
             var payments = [];
+            var keywords = [];
             var params = new URLSearchParams(window.location.search);
-            var checkingToken = params.get('token') || params.get('client_token') || null;
-            var autoCheckInterval = null;
-            var paymentVerified = false;
-            var paymentFailed = false;
+            var token = params.get('token') || params.get('client_token') || null;
+            var currentDoc = null;
+            var ocrText = '';
+            var uploadedImageUrl = '';
 
             function $(id) { return document.getElementById(id); }
 
-            function toast(msg) {
-                var t = $('toast');
-                t.textContent = msg;
-                t.classList.add('show');
-                clearTimeout(t._tid);
-                t._tid = setTimeout(function() { t.classList.remove('show'); }, 3000);
-            }
-
             async function apiCall(path, body) {
-                var ctrl = new AbortController();
-                var timeout = setTimeout(function() { ctrl.abort(); }, 12000);
-                try {
-                    var opts = {
-                        method: body ? 'POST' : 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        signal: ctrl.signal
-                    };
-                    if (body) opts.body = JSON.stringify(body);
-                    var res = await fetch(path, opts);
-                    clearTimeout(timeout);
-                    var txt = await res.text();
-                    if (!res.ok) throw new Error('Request failed');
-                    try { return JSON.parse(txt); } catch(e) { throw new Error('Invalid response'); }
-                } catch(err) {
-                    clearTimeout(timeout);
-                    throw err;
-                }
+                var opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+                if (body) opts.body = JSON.stringify(body);
+                var res = await fetch(path, opts);
+                var txt = await res.text();
+                try { return JSON.parse(txt); } catch(e) { return { error: 'Invalid response' }; }
             }
 
             async function getFingerprint() {
@@ -256,274 +244,336 @@
                 }
             }
 
-            function formatPrice(n, c) {
-                return parseInt(n).toLocaleString() + ' ' + (c || 'RWF');
-            }
+            function formatPrice(n, c) { return parseInt(n).toLocaleString() + ' ' + (c || 'RWF'); }
 
-            function statusBadge(status) {
-                var map = {
-                    completed: { c: 'badge-completed', i: 'check_circle', l: 'Completed' },
-                    pending: { c: 'badge-pending', i: 'hourglass_empty', l: 'Pending' },
-                    failed: { c: 'badge-failed', i: 'cancel', l: 'Failed' },
-                    expired: { c: 'badge-expired', i: 'timer_off', l: 'Expired' }
+            function statusBadge(s) {
+                var m = {
+                    completed: { c: 'badge-completed', i: 'check_circle', l: 'Yemejwe' },
+                    pending: { c: 'badge-pending', i: 'hourglass_empty', l: 'Itaramezwa' },
+                    failed: { c: 'badge-failed', i: 'cancel', l: 'Byanze' }
                 };
-                var s = map[status] || map.pending;
-                return '<span class="badge ' + s.c + '"><span class="material-icons">' + s.i + '</span> ' + s.l + '</span>';
+                var b = m[s] || m.pending;
+                return '<span class="badge ' + b.c + '"><span class="material-icons">' + b.i + '</span> ' + b.l + '</span>';
             }
 
-            function timeAgo(dateStr) {
-                if (!dateStr) return '';
-                var diff = (Date.now() - new Date(dateStr).getTime()) / 60000;
-                if (diff < 1) return 'Just now';
-                if (diff < 60) return Math.floor(diff) + 'm ago';
-                if (diff < 1440) return Math.floor(diff / 60) + 'h ago';
-                if (diff < 10080) return Math.floor(diff / 1440) + 'd ago';
-                return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            function timeAgo(d) {
+                if (!d) return '';
+                var diff = (Date.now() - new Date(d).getTime()) / 60000;
+                if (diff < 1) return 'Ubu gato';
+                if (diff < 60) return Math.floor(diff) + ' min ishize';
+                if (diff < 1440) return Math.floor(diff / 60) + ' h ishize';
+                return new Date(d).toLocaleDateString();
+            }
+
+            async function loadKeywords() {
+                try {
+                    var res = await fetch('/words.json');
+                    var data = await res.json();
+                    keywords = data.keywords || [];
+                } catch(e) {
+                    keywords = ['mbere', 'amafaranga', 'yakiriwe', 'konti', 'transaction', 'completed', 'successful', 'payment', 'mtn', 'airtel', 'mobile', 'money', 'momo', 'kwishyura', 'ishyuwe', 'rwf', 'frw', 'ubwishyu', 'bwakiriwe', 'neza', 'twakiriye', 'kohereza', 'yoherejwe'];
+                }
+            }
+
+            async function loadPaymentInfo() {
+                if (!token) return null;
+                try {
+                    var r = await apiCall('/api/check-payment', { client_token: token });
+                    return r;
+                } catch(e) {
+                    return null;
+                }
             }
 
             async function loadPayments() {
-                fingerprint = await getFingerprint();
                 try {
                     payments = await apiCall('/api/user-payments', { device_fingerprint: fingerprint });
-                } catch(e) {
-                    payments = [];
-                }
+                } catch(e) { payments = []; }
             }
 
-            async function verifyCurrentPayment() {
-                if (!checkingToken) return;
-
-                try {
-                    var result = await apiCall('/api/check-payment', { client_token: checkingToken });
-
-                    if (result.paid && result.status === 'completed') {
-                        paymentVerified = true;
-                        paymentFailed = false;
-                        // Reload payments to get updated list
-                        await loadPayments();
-                        return true;
-                    }
-
-                    if (result.status === 'failed') {
-                        paymentVerified = false;
-                        paymentFailed = true;
-                        await loadPayments();
-                        return false;
-                    }
-
-                    // Still pending
-                    paymentVerified = false;
-                    paymentFailed = false;
-                    return null;
-                } catch(e) {
-                    return null;
-                }
-            }
-
-            function render() {
-                var completed = payments.filter(function(p) { return p.status === 'completed'; });
-                var pending = payments.filter(function(p) { return p.status === 'pending'; });
-                var failed = payments.filter(function(p) { return p.status === 'failed'; });
-                var totalSpent = completed.reduce(function(s, p) { return s + (p.amount || 0); }, 0);
-                var html = '';
-
-                // Back button
-                html += '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to Store</a>';
-
-                // Banner — only show AFTER real verification
-                if (paymentVerified) {
-                    html +=
-                        '<div class="banner success">' +
-                            '<div class="banner-icon"><span class="material-icons">check_circle</span></div>' +
-                            '<div>' +
-                                '<h2>Payment Confirmed!</h2>' +
-                                '<p>Your payment has been verified. Your document is ready to download.</p>' +
-                            '</div>' +
-                        '</div>';
-                } else if (paymentFailed) {
-                    html +=
-                        '<div class="banner" style="background:var(--red-bg);border:1px solid #fecaca;">' +
-                            '<div class="banner-icon"><span class="material-icons" style="color:var(--red);">cancel</span></div>' +
-                            '<div>' +
-                                '<h2 style="color:var(--red-text);">Payment Failed</h2>' +
-                                '<p style="color:var(--red-text);">Your payment was not successful. Please try again.</p>' +
-                            '</div>' +
-                        '</div>';
-                } else if (checkingToken) {
-                    // Still checking — show a neutral "checking" banner
-                    html +=
-                        '<div class="banner checking">' +
-                            '<div class="banner-icon"><span class="material-icons">sync</span></div>' +
-                            '<div>' +
-                                '<h2>Verifying Payment</h2>' +
-                                '<p>We are confirming your payment with AfriPay. This usually takes a few seconds.</p>' +
-                            '</div>' +
-                        '</div>';
-                } else if (pending.length > 0) {
-                    html +=
-                        '<div class="banner pending">' +
-                            '<div class="banner-icon"><span class="material-icons">hourglass_empty</span></div>' +
-                            '<div>' +
-                                '<h2>Payments in Progress</h2>' +
-                                '<p>You have pending payments waiting for confirmation.</p>' +
-                            '</div>' +
-                        '</div>';
-                }
-
-                // Stats
-                html +=
-                    '<div class="stats-row">' +
-                        '<div class="stat-card"><div class="stat-dot green"></div><div><div class="stat-val">' + completed.length + '</div><div class="stat-label">Completed</div></div></div>' +
-                        '<div class="stat-card"><div class="stat-dot orange"></div><div><div class="stat-val">' + pending.length + '</div><div class="stat-label">In Progress</div></div></div>' +
-                        '<div class="stat-card"><div class="stat-dot red"></div><div><div class="stat-val">' + failed.length + '</div><div class="stat-label">Failed</div></div></div>' +
-                        '<div class="stat-card"><div class="stat-dot yellow"></div><div><div class="stat-val">' + formatPrice(totalSpent, 'RWF') + '</div><div class="stat-label">Total Spent</div></div></div>' +
-                    '</div>';
-
-                // Purchase list
-                html += '<div class="section-title"><span class="material-icons">receipt_long</span> Purchase History</div>';
-
-                if (!payments.length && !checkingToken) {
-                    html +=
-                        '<div class="empty-state">' +
-                            '<span class="material-icons">shopping_bag</span>' +
-                            '<h2>No purchases yet</h2>' +
-                            '<p>Browse our document store to find what you need.</p>' +
-                            '<a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse Store</a>' +
-                        '</div>';
-                } else if (!payments.length && checkingToken) {
-                    html +=
-                        '<div style="text-align:center;padding:30px;color:var(--sub);">' +
-                            '<div class="spinner" style="margin:0 auto 16px;"></div>' +
-                            '<p style="font-size:.85rem;">Waiting for payment confirmation...</p>' +
-                        '</div>';
-                } else {
-                    html += '<div class="list">';
-
-                    payments.forEach(function(p) {
-                        var done = p.status === 'completed';
-                        var isPending = p.status === 'pending';
-                        var isFailed = p.status === 'failed';
-                        var img = p.document_image || '';
-                        var actionLabel = done ? 'Download' : (isFailed ? 'Retry' : 'View');
-                        var actionIcon = done ? 'download' : (isFailed ? 'refresh' : 'visibility');
-
-                        html +=
-                            '<div class="card">' +
-                                (img ? '<img src="' + img + '" alt="" class="card-img" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
-                                '<div class="card-img-placeholder" style="' + (img ? 'display:none' : '') + '"><span class="material-icons">description</span></div>' +
-                                '<div class="card-info">' +
-                                    '<h4>' + (p.document_title || 'Unknown Document') + '</h4>' +
-                                    '<div class="meta">' +
-                                        '<span>' + formatPrice(p.amount, p.currency) + '</span>' +
-                                        '<span>·</span>' +
-                                        '<span>' + timeAgo(p.created_at) + '</span>' +
-                                        (p.transaction_ref ? '<span>·</span><span>Ref: ' + p.transaction_ref + '</span>' : '') +
-                                        (isPending && p.client_token === checkingToken ? '<span>·</span><span style="color:var(--blue);">Checking...</span>' : '') +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="card-actions">' +
-                                    statusBadge(p.status) +
-                                    '<a href="view.html?doc=' + p.document_id + '" class="btn ' + (done ? 'btn-dark' : 'btn-outline') + '"><span class="material-icons">' + actionIcon + '</span> ' + actionLabel + '</a>' +
-                                '</div>' +
-                            '</div>';
+            function performOCR(file) {
+                return new Promise(function(resolve, reject) {
+                    Tesseract.recognize(file, 'eng+kin', {
+                        logger: function(m) {
+                            if (m.status === 'recognizing text') {
+                                var pct = Math.floor(m.progress * 100);
+                                $('ocrStatus').textContent = 'Gusoma screenshot... ' + pct + '%';
+                            }
+                        }
+                    }).then(function(result) {
+                        resolve(result.data.text || '');
+                    }).catch(function(err) {
+                        reject(err);
                     });
-
-                    html += '</div>';
-                }
-
-                html +=
-                    '<div style="text-align:center;margin-top:24px;">' +
-                        '<a href="index.html" class="btn btn-dark"><span class="material-icons">store</span> Browse More Documents</a>' +
-                    '</div>';
-
-                $('content').innerHTML = html;
-
-                // If verified, auto-redirect after a moment
-                if (paymentVerified && checkingToken) {
-                    setTimeout(function() {
-                        var compPayment = payments.find(function(p) {
-                            return p.status === 'completed' && p.client_token === checkingToken;
-                        }) || completed[0];
-
-                        if (compPayment) {
-                            window.location.href = 'view.html?doc=' + compPayment.document_id;
-                        }
-                    }, 3000);
-                }
+                });
             }
 
-            function startAutoCheck() {
-                if (!checkingToken) return;
+            function analyzeText(text) {
+                if (!text || !keywords.length) return { percentage: 0, matches: [], suspicious: true };
 
-                clearInterval(autoCheckInterval);
-                var attempts = 0;
+                var lowerText = text.toLowerCase();
+                var matches = [];
+                var totalKeywords = keywords.length;
 
-                // Do first check immediately
-                verifyCurrentPayment().then(function(result) {
-                    if (result === true || result === false) {
-                        render();
-                        if (result === true) return; // Will auto-redirect
-                        if (result === false) {
-                            checkingToken = null; // Stop checking
-                            return;
-                        }
+                keywords.forEach(function(kw) {
+                    if (lowerText.indexOf(kw.toLowerCase()) !== -1) {
+                        matches.push(kw);
                     }
-                    // Still pending, start polling
-                    startPolling();
                 });
 
-                function startPolling() {
-                    autoCheckInterval = setInterval(async function() {
-                        attempts++;
-                        var result = await verifyCurrentPayment();
+                var percentage = Math.floor((matches.length / totalKeywords) * 100);
+                var suspicious = percentage < 30;
 
-                        if (result === true) {
-                            clearInterval(autoCheckInterval);
-                            render();
-                            return;
-                        }
-
-                        if (result === false) {
-                            clearInterval(autoCheckInterval);
-                            checkingToken = null;
-                            render();
-                            toast('Payment was not successful. Please try again.');
-                            return;
-                        }
-
-                        if (attempts >= 60) {
-                            clearInterval(autoCheckInterval);
-                            render();
-                            toast('Verification is taking longer than expected. You can refresh to check again.');
-                        }
-                    }, 4000);
-                }
+                return {
+                    percentage: percentage,
+                    matches: matches,
+                    suspicious: suspicious,
+                    totalKeywords: totalKeywords
+                };
             }
 
-            // ─── INIT ────────────────────────────
-            (async function init() {
-                try {
-                    await loadPayments();
+            function renderVerifyForm(paymentInfo) {
+                if (!paymentInfo || paymentInfo.error) {
+                    $('content').innerHTML =
+                        '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
+                        '<div style="text-align:center;padding:40px;color:var(--sub);">' +
+                            '<span class="material-icons" style="font-size:48px;">error_outline</span>' +
+                            '<p style="margin-top:10px;">Ntabwo twabonye amakuru y\'ubwishyu. Subira kuri view page wongere ugerageze.</p>' +
+                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:14px;">Subira ku Store</a>' +
+                        '</div>';
+                    return;
+                }
 
-                    if (checkingToken) {
-                        // Verify first, then render based on real status
-                        var verified = await verifyCurrentPayment();
-                        render();
-                        if (verified === null) {
-                            // Still pending — start polling
-                            startAutoCheck();
+                currentDoc = paymentInfo;
+                var doublePrice = (paymentInfo.amount || 500) * 2;
+                var currency = paymentInfo.currency || 'RWF';
+
+                $('content').innerHTML =
+                    '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
+
+                    '<div class="verify-card">' +
+                        '<div class="icon-wrap"><span class="material-icons">verified_user</span></div>' +
+                        '<h2>Kwemeza Ubwishyu</h2>' +
+                        '<p class="subtitle">Uzuza amakuru kugirango twemeze ko ubwishyu bwakozwe neza</p>' +
+
+                        // Warning box
+                        '<div class="warning-box">' +
+                            '<div class="warn-title"><span class="material-icons">warning</span> IBUKA</div>' +
+                            '<div class="warn-text">Niba amakuru utanga asa nk\'ay\'impimbano cyangwa atari yo, igiciro kizakuba kabiri. Uzishyura: <span class="warn-price">' + formatPrice(doublePrice, currency) + '</span> kuri <strong>' + (paymentInfo.document_title || 'iyi document') + '</strong>.</div>' +
+                        '</div>' +
+
+                        // Name input
+                        '<div class="field">' +
+                            '<label>Shyiramo amazina yawe</label>' +
+                            '<input type="text" class="input" id="buyerName" placeholder="Amazina yawe yose...">' +
+                        '</div>' +
+
+                        // Phone number input
+                        '<div class="field">' +
+                            '<label>Shyiramo numero yohereje amafaranga</label>' +
+                            '<input type="tel" class="input" id="phoneNumber" placeholder="0788XXXXXX">' +
+                            '<span class="helper">Numero ya MTN cyangwa Airtel wakoresheje kwishyura</span>' +
+                        '</div>' +
+
+                        // Screenshot upload
+                        '<div class="field">' +
+                            '<label>Shyiramo screenshot ya message ya MTN/Airtel</label>' +
+                            '<input type="file" class="file-input" id="screenshotInput" accept="image/*">' +
+                            '<span class="helper">Fata screenshot ya message wakiriye nyuma yo kwishyura</span>' +
+                            '<img class="preview-thumb" id="previewImg">' +
+                            '<div class="ocr-result" id="ocrResult"></div>' +
+                            '<span id="ocrStatus" style="font-size:.7rem;color:var(--sub);"></span>' +
+                        '</div>' +
+
+                        // Status message area
+                        '<div class="status-msg" id="statusMsg"></div>' +
+
+                        // Submit button
+                        '<button class="btn btn-dark" id="submitBtn" onclick="submitVerification()" disabled>' +
+                            '<span class="material-icons">send</span> Ohereza' +
+                        '</button>' +
+                    '</div>' +
+
+                    // History
+                    '<div class="history-section">' +
+                        '<div class="section-title"><span class="material-icons">receipt_long</span> Amateka y\'Ubwishyu</div>' +
+                        '<div class="list" id="historyList"></div>' +
+                    '</div>';
+
+                // Screenshot upload handler
+                $('screenshotInput').addEventListener('change', function(e) {
+                    var file = e.target.files[0];
+                    if (!file) return;
+
+                    // Show preview
+                    var reader = new FileReader();
+                    reader.onload = function(ev) {
+                        $('previewImg').src = ev.target.result;
+                        $('previewImg').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Upload to ImgBB for storage
+                    var fd = new FormData();
+                    fd.append('image', file);
+
+                    $('ocrStatus').textContent = 'Gusoma screenshot...';
+                    $('ocrResult').style.display = 'block';
+                    $('ocrResult').textContent = 'Iri kuri processing...';
+
+                    fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a', {
+                        method: 'POST',
+                        body: fd
+                    }).then(function(r) { return r.json(); })
+                      .then(function(d) {
+                        if (d.success) uploadedImageUrl = d.data.url;
+                      }).catch(function() {});
+
+                    // OCR
+                    performOCR(file).then(function(text) {
+                        ocrText = text;
+                        $('ocrResult').textContent = 'Ibyasomwe: ' + (text.substring(0, 300) || 'Nta cyasomwe');
+                        $('ocrStatus').textContent = 'Gusoma byarangiye';
+
+                        // Analyze
+                        var analysis = analyzeText(text);
+                        $('ocrResult').textContent += '\n\nIbigwi bifitanye isano: ' + analysis.matches.join(', ') + ' (' + analysis.matches.length + '/' + analysis.totalKeywords + ')';
+                        $('ocrResult').textContent += '\nIjanisha: ' + analysis.percentage + '%';
+                        $('ocrResult').textContent += '\nStatus: ' + (analysis.suspicious ? 'GUSHIDIKANYA' : 'NI BYIZA');
+
+                        if (analysis.suspicious) {
+                            $('ocrResult').style.color = 'var(--red-text)';
+                            $('ocrResult').style.background = 'var(--red-bg)';
+                        } else {
+                            $('ocrResult').style.color = 'var(--green-text)';
+                            $('ocrResult').style.background = 'var(--green-bg)';
                         }
+
+                        $('submitBtn').disabled = false;
+                    }).catch(function() {
+                        $('ocrStatus').textContent = 'Gusoma byanze. Komeza wigeze.';
+                        $('submitBtn').disabled = false;
+                    });
+                });
+
+                // Enable button when fields are filled
+                var inputs = [$('buyerName'), $('phoneNumber')];
+                inputs.forEach(function(inp) {
+                    inp.addEventListener('input', function() {
+                        var name = $('buyerName').value.trim();
+                        var phone = $('phoneNumber').value.trim();
+                        if (name && phone && ocrText) {
+                            $('submitBtn').disabled = false;
+                        }
+                    });
+                });
+
+                renderHistory();
+            }
+
+            function renderHistory() {
+                var list = $('historyList');
+                if (!list) return;
+                if (!payments.length) {
+                    list.innerHTML = '<p style="color:var(--sub);text-align:center;padding:20px;">Nta bwishyu buraboneka</p>';
+                    return;
+                }
+                list.innerHTML = payments.map(function(p) {
+                    var done = p.status === 'completed';
+                    var img = p.document_image || '';
+                    return '<div class="card">' +
+                        (img ? '<img src="' + img + '" alt="" class="card-img" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
+                        '<div class="card-img-placeholder" style="' + (img ? 'display:none' : '') + '"><span class="material-icons">description</span></div>' +
+                        '<div class="card-info">' +
+                            '<h4>' + (p.document_title || 'Document') + '</h4>' +
+                            '<div class="meta">' + formatPrice(p.amount, p.currency) + ' · ' + timeAgo(p.created_at) + '</div>' +
+                        '</div>' +
+                        '<div class="card-actions">' +
+                            statusBadge(p.status) +
+                            (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn btn-dark" style="margin-left:8px;padding:7px 14px;font-size:.72rem;"><span class="material-icons" style="font-size:15px;">download</span></a>' : '') +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            window.submitVerification = async function() {
+                var name = $('buyerName').value.trim();
+                var phone = $('phoneNumber').value.trim();
+                var btn = $('submitBtn');
+                var status = $('statusMsg');
+
+                if (!name || !phone) {
+                    status.className = 'status-msg fail';
+                    status.textContent = 'Nyamuneka uzuza amazina na numero yawe.';
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Kugenzura...';
+                status.className = 'status-msg loading';
+                status.textContent = 'Turi kugenzura amakuru yawe...';
+
+                var analysis = analyzeText(ocrText);
+
+                try {
+                    var result = await apiCall('/api/verify-with-proof', {
+                        client_token: token,
+                        device_fingerprint: fingerprint,
+                        buyer_name: name,
+                        phone_number: phone,
+                        ocr_text: ocrText,
+                        match_percentage: analysis.percentage,
+                        is_suspicious: analysis.suspicious
+                    });
+
+                    if (result.suspicious) {
+                        status.className = 'status-msg fail';
+                        status.innerHTML =
+                            '<span class="material-icons" style="font-size:22px;">gpp_bad</span><br>' +
+                            'Amakuri yawe ntiyuzuye!<br>' +
+                            'Igiciro cyikubye kabiri: <strong>' + formatPrice(result.new_price, result.currency) + '</strong><br>' +
+                            'Subira kuri <a href="view.html?doc=' + (currentDoc.document_id || '') + '" style="color:var(--red);">view page</a> wishyure igiciro gishya.';
+                        btn.innerHTML = '<span class="material-icons">warning</span> Byanze';
+                        btn.className = 'btn btn-red';
                     } else {
-                        render();
+                        status.className = 'status-msg success';
+                        status.innerHTML =
+                            '<span class="material-icons" style="font-size:22px;">check_circle</span><br>' +
+                            'Ubwishyu bwemejwe!<br>' +
+                            'Urimo kwoherezwa kuri download...';
+                        btn.style.display = 'none';
+
+                        await loadPayments();
+                        renderHistory();
+
+                        setTimeout(function() {
+                            window.location.href = 'view.html?doc=' + result.document_id;
+                        }, 2000);
                     }
                 } catch(e) {
+                    status.className = 'status-msg fail';
+                    status.textContent = 'Byanze. Ongera ugerageze.';
+                    btn.disabled = false;
+                    btn.innerHTML = '<span class="material-icons">send</span> Ohereza';
+                }
+            };
+
+            (async function() {
+                fingerprint = await getFingerprint();
+                await loadKeywords();
+                await loadPayments();
+
+                if (token) {
+                    var info = await loadPaymentInfo();
+                    renderVerifyForm(info);
+                } else {
                     $('content').innerHTML =
-                        '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Back to Store</a>' +
-                        '<div class="empty-state">' +
-                            '<span class="material-icons">error_outline</span>' +
-                            '<h2>Something went wrong</h2>' +
-                            '<p>' + e.message + '</p>' +
-                            '<a href="index.html" class="btn btn-dark">Back to Store</a>' +
+                        '<a href="index.html" class="back-link"><span class="material-icons">arrow_back</span> Subira inyuma</a>' +
+                        '<div style="text-align:center;padding:40px;">' +
+                            '<span class="material-icons" style="font-size:48px;color:#d1d5db;">receipt_long</span>' +
+                            '<h2 style="margin-top:10px;">Nta Bwishyu Buraboneka</h2>' +
+                            '<p style="color:var(--sub);">Ntabwo wabonye ubwishyu bwawe. Subira kuri store wigeze.</p>' +
+                            '<a href="index.html" class="btn btn-dark" style="width:auto;margin-top:14px;">Subira ku Store</a>' +
                         '</div>';
                 }
             })();
