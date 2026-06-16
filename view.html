@@ -30,14 +30,11 @@
             --radius:18px; --radius-sm:12px;
             --tr:0.2s cubic-bezier(0.4,0,0.2,1);
         }
-
         *{margin:0;padding:0;box-sizing:border-box}
-
         body{
             font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);
             min-height:100vh;-webkit-font-smoothing:antialiased;
         }
-
         .skeleton{
             background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);
             background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;
@@ -49,9 +46,7 @@
         .sk-text.short{width:50%}
         .sk-price{height:36px;width:35%;margin-bottom:14px}
         .sk-btn{height:50px;width:100%;border-radius:30px}
-
         .container{max-width:700px;margin:0 auto;padding:20px 16px 80px}
-
         .back-link{
             display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
             font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
@@ -59,7 +54,6 @@
             -webkit-tap-highlight-color:transparent;
         }
         .back-link:hover{background:#f3f4f6}
-
         .hero{
             background:var(--surface);border-radius:var(--radius);
             border:1px solid var(--border);overflow:hidden;
@@ -88,7 +82,6 @@
         .hero-body .price-display .cur{
             font-size:.78rem;color:#9ca3af;font-weight:400;
         }
-
         .btn{
             display:inline-flex;align-items:center;justify-content:center;
             gap:8px;padding:14px 28px;border-radius:30px;font-weight:600;
@@ -107,7 +100,6 @@
         .btn-expired{background:var(--red-bg);color:var(--red-text)}
         .btn-doubled{background:var(--red);color:#fff}
         .btn-doubled:hover{background:#b91c1c}
-
         .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
         .info-card{
             background:var(--surface);border-radius:var(--radius-sm);
@@ -122,26 +114,21 @@
         .info-card .ic-icon.payments{background:#fef3c7;color:#d97706}
         .info-card .ic-val{font-size:1.1rem;font-weight:700}
         .info-card .ic-label{font-size:.7rem;color:var(--sub)}
-
         .timer-badge{
             display:inline-flex;align-items:center;gap:6px;
             background:#fef3c7;color:#92400e;padding:8px 14px;
             border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
         }
         .timer-badge.expired{background:var(--red-bg);color:var(--red-text)}
-
         .suspicious-badge{
             display:inline-flex;align-items:center;gap:6px;
             background:var(--red-bg);color:var(--red-text);padding:8px 14px;
             border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
         }
-        .suspicious-badge .material-icons{font-size:18px}
-
         .state-wrap{text-align:center;padding:60px 20px}
         .state-wrap .material-icons{font-size:56px;color:#d1d5db;margin-bottom:12px}
         .state-wrap h2{font-size:1.2rem;font-weight:600;margin-bottom:6px}
         .state-wrap p{color:var(--sub);font-size:.85rem;margin-bottom:16px}
-
         .toast{
             position:fixed;bottom:24px;left:50%;
             transform:translateX(-50%) translateY(120px);
@@ -153,7 +140,6 @@
         }
         .toast.show{transform:translateX(-50%) translateY(0)}
         .toast.err{background:var(--red)}
-
         @media(max-width:500px){
             .hero-body{padding:18px 14px}
             .hero-body .doc-title{font-size:1.15rem}
@@ -201,6 +187,7 @@
             var doubledPrice = null;
             var payToken = null;
             var paidAt = null;
+            var completedToken = null;
 
             function $(id) { return document.getElementById(id); }
 
@@ -298,6 +285,20 @@
                 }
             }
 
+            async function findCompletedPayment() {
+                try {
+                    var payments = await apiCall('/api/user-payments', { device_fingerprint: fingerprint });
+                    if (payments && payments.length) {
+                        for (var i = 0; i < payments.length; i++) {
+                            if (payments[i].document_id === docId && payments[i].status === 'completed') {
+                                return payments[i].client_token;
+                            }
+                        }
+                    }
+                } catch(e) {}
+                return null;
+            }
+
             async function checkPayment() {
                 try {
                     var r = await apiCall('/api/check-payment', {
@@ -311,24 +312,15 @@
                     if (r.payment) {
                         if (r.payment.created_at) paidAt = new Date(r.payment.created_at);
 
-                        // Check if this payment was flagged suspicious (price doubled)
                         if (r.payment.status === 'pending_verification') {
                             isDoubled = true;
-                            // Fetch the actual payment to get the doubled price
-                            var payInfo = await apiCall('/api/check-payment', {
-                                device_fingerprint: fingerprint,
-                                document_id: docId
-                            });
-                            if (payInfo.payment && payInfo.payment.amount) {
-                                doubledPrice = payInfo.payment.amount;
-                            }
+                            doubledPrice = r.payment.amount;
                         }
                     }
 
-                    // Also check if there's a pending_verification payment
-                    if (!isDoubled && r.payment && r.payment.status === 'pending_verification') {
-                        isDoubled = true;
-                        doubledPrice = r.payment.amount;
+                    // Find a valid completed token
+                    if (isPaid) {
+                        completedToken = await findCompletedPayment();
                     }
                 } catch(e) {
                     isPaid = false;
@@ -397,18 +389,12 @@
                         '</div>' +
                     '</div>';
 
-                // Attach event listeners
                 var dlBtn = $('downloadBtn');
                 var payBtn = $('payBtn');
 
-                if (dlBtn) {
-                    dlBtn.addEventListener('click', downloadDocument);
-                }
-                if (payBtn) {
-                    payBtn.addEventListener('click', startPayment);
-                }
+                if (dlBtn) dlBtn.addEventListener('click', downloadDocument);
+                if (payBtn) payBtn.addEventListener('click', startPayment);
 
-                // Update OG meta
                 setMeta('og:title', doc.title + ' — DocStore');
                 setMeta('og:description', doc.description || 'Purchase and download this document securely via MTN or Airtel Money.');
                 setMeta('og:image', doc.image_url || '');
@@ -432,8 +418,6 @@
                 }
 
                 payToken = genToken();
-
-                // Use doubled price if flagged
                 var amountToPay = isDoubled && doubledPrice ? doubledPrice : doc.price;
 
                 apiCall('/api/init-payment', {
@@ -445,6 +429,7 @@
                         isPaid = true;
                         withinWindow = true;
                         isDoubled = false;
+                        completedToken = payToken;
                         render();
                         toast('You already own this document!');
                         return;
@@ -458,7 +443,6 @@
                         return;
                     }
 
-                    // Build form and submit in SAME tab
                     var form = document.createElement('form');
                     form.method = 'POST';
                     form.action = AFRIPAY_URL;
@@ -485,7 +469,7 @@
                     document.body.appendChild(form);
                     form.submit();
                 }).catch(function(err) {
-                    toast(err.message || 'Failed to initiate payment', true);
+                    toast(err.message || 'Failed', true);
                     if (btn) {
                         btn.disabled = false;
                         btn.innerHTML = '<span class="material-icons">lock</span> Pay to Download';
@@ -500,30 +484,55 @@
                     btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Generating...';
                 }
 
-                apiCall('/api/download', {
-                    client_token: payToken,
-                    device_fingerprint: fingerprint,
-                    document_id: docId
-                }).then(function(r) {
-                    if (r.url) {
-                        window.location.href = r.url;
-                    } else {
-                        toast(r.error || 'Download failed', true);
+                // Use completedToken if available, otherwise fall back to payToken, then try to find one
+                var tokenToUse = completedToken || payToken;
+
+                function attemptDownload(token) {
+                    if (!token) {
+                        toast('Cannot find payment. Please refresh.', true);
                         if (btn) {
                             btn.disabled = false;
                             btn.innerHTML = '<span class="material-icons">download</span> Download Document';
                         }
+                        return;
                     }
-                }).catch(function(err) {
-                    toast(err.message || 'Download failed', true);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<span class="material-icons">download</span> Download Document';
-                    }
-                });
+
+                    apiCall('/api/download', {
+                        client_token: token,
+                        device_fingerprint: fingerprint,
+                        document_id: docId
+                    }).then(function(r) {
+                        if (r.url) {
+                            window.location.href = r.url;
+                        } else {
+                            toast(r.error || 'Download failed', true);
+                            if (btn) {
+                                btn.disabled = false;
+                                btn.innerHTML = '<span class="material-icons">download</span> Download Document';
+                            }
+                        }
+                    }).catch(function(err) {
+                        toast(err.message || 'Download failed', true);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<span class="material-icons">download</span> Download Document';
+                        }
+                    });
+                }
+
+                if (tokenToUse) {
+                    attemptDownload(tokenToUse);
+                } else {
+                    // Last resort: find the completed token
+                    findCompletedPayment().then(function(foundToken) {
+                        if (foundToken) {
+                            completedToken = foundToken;
+                        }
+                        attemptDownload(completedToken);
+                    });
+                }
             }
 
-            // ─── INIT ────────────────────────────
             (async function init() {
                 try {
                     var fpPromise = getFingerprint();
