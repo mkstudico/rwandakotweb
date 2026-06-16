@@ -49,8 +49,6 @@
         @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-        @keyframes scanPulse{0%{width:0%}50%{width:70%}100%{width:100%}}
 
         .topbar{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1rem;height:50px;display:flex;align-items:center;position:sticky;top:0;z-index:50}
         .topbar-inner{max-width:640px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -93,12 +91,12 @@
         .field-group .err-msg.show{display:block}
         .field-group .helper{font-size:.64rem;color:var(--text-tertiary);margin-top:2px}
 
-        .file-upload-area{width:100%;padding:16px 12px;border:2px dashed var(--border);border-radius:var(--radius-md);text-align:center;cursor:pointer;transition:all var(--transition-fast);background:var(--bg-input)}
+        .file-upload-area{width:100%;padding:16px 12px;border:2px dashed var(--border);border-radius:var(--radius-md);text-align:center;cursor:pointer;transition:all var(--transition-fast);background:var(--bg-input);position:relative}
         .file-upload-area:hover{border-color:var(--primary);background:var(--bg-surface)}
         .file-upload-area.has-file{border-color:var(--success);background:var(--success-bg)}
         .file-upload-area i{font-size:24px;color:#d1d5db;display:block;margin:0 auto 3px}
         .file-upload-area .upload-text{font-size:.7rem;color:var(--text-tertiary)}
-        .file-upload-area input[type=file]{position:absolute;opacity:0;width:0;height:0}
+        .file-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
         .preview-thumb{width:100%;max-height:120px;object-fit:contain;border-radius:var(--radius-sm);margin-top:6px;border:1px solid var(--border);display:none}
 
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 22px;border-radius:var(--radius-full);font-weight:600;font-size:.82rem;cursor:pointer;border:none;font-family:var(--font-family);transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.06)}
@@ -107,11 +105,9 @@
         .btn-primary{background:var(--primary);color:#fff}
         .btn-primary:hover{background:var(--primary-hover);box-shadow:0 4px 16px rgba(108,71,255,.3)}
         .btn-primary:disabled{opacity:.45;pointer-events:none}
-        .btn-danger{background:var(--danger);color:#fff}
+        .btn-danger{background:var(--danger);color:#fff;width:auto;display:inline-flex}
         .btn-danger:hover{background:#b91c1c}
-        .btn-outline{background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);box-shadow:none}
 
-        /* Big loader */
         .big-loader-wrap{display:none;text-align:center;padding:1.5rem 1rem;animation:fadeIn .3s ease}
         .big-loader-wrap.active{display:block}
         .big-spinner{width:52px;height:52px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
@@ -179,7 +175,6 @@
         </div>
     </div>
 
-    <!-- PC Block Overlay -->
     <div class="pc-block-overlay" id="pcBlockOverlay">
         <div class="pc-block-card">
             <i class="bx bx-desktop"></i>
@@ -219,7 +214,6 @@
 
             function isMobile() { return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && window.innerWidth < 768); }
 
-            // PC BLOCK
             if (!isMobile()) {
                 $('content').innerHTML = '<div class="empty-state"><i class="bx bx-desktop"></i><h2 style="font-size:1rem;">Ntabwo Bishoboka Kuri PC</h2><p style="font-size:.76rem;">Iyi page ikora gusa kuri telefone.</p></div>';
                 $('pcBlockOverlay').classList.add('active');
@@ -251,17 +245,16 @@
             function validatePhone(num) { return /^07[89]\d{7}$/.test(num.replace(/\s/g, '')); }
             function validateName(name) { var parts = name.trim().split(/\s+/); return parts.length >= 2 && parts[0].length >= 2 && parts[1].length >= 2; }
 
-            // ── LOAD KEYWORDS ──
             async function loadKeywords() {
                 try { var r = await fetch('/words.json'); var d = await r.json(); keywords = d.keywords || []; }
                 catch(e) { keywords = ['mbere','amafaranga','yakiriwe','konti','transaction','completed','successful','payment','mtn','airtel','mobile','money','momo','kwishyura','ishyuwe','rwf','frw','ubwishyu','bwakiriwe','neza','twakiriye','kohereza','yoherejwe']; }
             }
 
-            // ── REAL OCR WITH TESSERACT.JS ──
+            // ── REAL OCR — ENGLISH ONLY (kin data doesn't exist on CDN) ──
             async function performOCR(file) {
                 return new Promise(function(resolve) {
                     try {
-                        Tesseract.recognize(file, 'eng+kin', {
+                        Tesseract.recognize(file, 'eng', {
                             logger: function(info) {
                                 if (info.status === 'recognizing text') {
                                     var pct = Math.round(info.progress * 100);
@@ -280,7 +273,6 @@
                 });
             }
 
-            // ── KEYWORD MATCHING ──
             function analyzeOCR(text) {
                 if (!text || !keywords.length) return { percentage: 0, matches: [], total: keywords.length, passed: false };
                 var lower = text.toLowerCase();
@@ -293,7 +285,6 @@
                 return { percentage: pct, matches: matches, total: keywords.length, passed: passed };
             }
 
-            // ── SIMULATED SCAN PROGRESS (visual only) ──
             function runScanAnimation(callback) {
                 var barWrap = $('bigLoaderWrap');
                 var fill = $('scanFill');
@@ -311,14 +302,7 @@
                     { to: 100, ms: 400, text: 'Birangiye.' }
                 ];
                 var i = 0;
-                function next() {
-                    if (i >= steps.length) { setTimeout(callback, 350); return; }
-                    var s = steps[i];
-                    fill.style.width = s.to + '%';
-                    if (label) label.textContent = s.text;
-                    i++;
-                    setTimeout(next, s.ms);
-                }
+                function next() { if (i >= steps.length) { setTimeout(callback, 350); return; } var s = steps[i]; fill.style.width = s.to + '%'; if (label) label.textContent = s.text; i++; setTimeout(next, s.ms); }
                 next();
             }
 
@@ -376,7 +360,6 @@
                         '<div class="list" id="historyList"></div>' +
                     '</div>';
 
-                // ── FILE UPLOAD ──
                 var fileArea = $('fileArea');
                 var fileInput = $('screenshotInput');
                 fileArea.addEventListener('click', function(e) { if (e.target !== fileInput) fileInput.click(); });
@@ -387,20 +370,14 @@
                     fileChosen = true; uploadedFile = file;
                     fileArea.classList.add('has-file');
                     fileArea.querySelector('.upload-text').textContent = '✓ ' + file.name;
-
                     var reader = new FileReader();
                     reader.onload = function(ev) { $('previewImg').src = ev.target.result; $('previewImg').style.display = 'block'; };
                     reader.readAsDataURL(file);
-
-                    // Start OCR in background immediately
                     ocrDone = false;
-                    performOCR(file).then(function(text) {
-                        ocrText = text; ocrDone = true;
-                    });
+                    performOCR(file).then(function(text) { ocrText = text; ocrDone = true; });
                     updateSubmit();
                 });
 
-                // ── PHONE VALIDATION ──
                 var phoneInput = $('phoneNumber');
                 phoneInput.addEventListener('input', function() {
                     var val = this.value.replace(/\s/g, '');
@@ -412,7 +389,6 @@
                     updateSubmit();
                 });
 
-                // ── NAME VALIDATION ──
                 var nameInput = $('buyerName');
                 nameInput.addEventListener('blur', function() {
                     var val = this.value.trim();
@@ -423,50 +399,24 @@
                     updateSubmit();
                 });
 
-                function updateSubmit() {
-                    var btn = $('submitBtn');
-                    if (btn && phoneValid && nameValid && fileChosen && !verificationDone) btn.disabled = false;
-                    else if (btn) btn.disabled = true;
-                }
+                function updateSubmit() { var btn = $('submitBtn'); if (btn && phoneValid && nameValid && fileChosen && !verificationDone) btn.disabled = false; else if (btn) btn.disabled = true; }
 
-                // ── SUBMIT ──
                 $('submitBtn').addEventListener('click', function() {
                     if (verificationDone) return;
                     verificationDone = true;
+                    var btn = this, status = $('statusMsg'), name = $('buyerName').value.trim(), phone = $('phoneNumber').value.replace(/\s/g, '');
+                    btn.disabled = true; btn.style.display = 'none';
+                    status.className = 'status-msg checking'; status.textContent = 'Turi kugenzura amakuru yawe...';
 
-                    var btn = this;
-                    var status = $('statusMsg');
-                    var name = $('buyerName').value.trim();
-                    var phone = $('phoneNumber').value.replace(/\s/g, '');
-
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Kugenzura...';
-                    btn.style.display = 'none';
-                    status.className = 'status-msg checking';
-                    status.textContent = 'Turi kugenzura amakuru yawe...';
-
-                    // Run scan animation
                     runScanAnimation(function() {
-                        // OCR should be done by now, but wait if not
                         function finishCheck() {
                             var analysis = analyzeOCR(ocrText);
                             var suspicious = !analysis.passed;
-
-                            // Store suspicious status locally
-                            if (suspicious) {
-                                var sp = JSON.parse(localStorage.getItem('kw_suspicious') || '{}');
-                                sp[token] = { amount: currentPayment.amount * 2, date: Date.now() };
-                                localStorage.setItem('kw_suspicious', JSON.stringify(sp));
-                            }
-
+                            if (suspicious) { var sp = JSON.parse(localStorage.getItem('kw_suspicious') || '{}'); sp[token] = { amount: currentPayment.amount * 2, date: Date.now() }; localStorage.setItem('kw_suspicious', JSON.stringify(sp)); }
                             confirmPayment(name, phone, suspicious, analysis.percentage);
                         }
-
-                        if (!ocrDone && uploadedFile) {
-                            performOCR(uploadedFile).then(function(text) { ocrText = text; finishCheck(); });
-                        } else {
-                            finishCheck();
-                        }
+                        if (!ocrDone && uploadedFile) { performOCR(uploadedFile).then(function(text) { ocrText = text; finishCheck(); }); }
+                        else { finishCheck(); }
                     });
                 });
 
@@ -478,14 +428,8 @@
                 if (!list) return;
                 if (!payments.length) { list.innerHTML = '<div class="empty-state"><i class="bx bx-receipt"></i><p>Nta bwishyu buraboneka</p></div>'; return; }
                 list.innerHTML = payments.map(function(p) {
-                    var done = p.status === 'completed';
-                    var img = p.document_image || '';
-                    return '<div class="card">' +
-                        (img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
-                        '<div class="card-icon-placeholder" style="' + (img ? 'display:none' : '') + '"><i class="bx bx-file"></i></div>' +
-                        '<div class="card-info"><h4>' + (p.document_title || 'Document') + '</h4><div class="meta">' + formatPrice(p.amount, p.currency) + ' · ' + timeAgo(p.created_at) + '</div></div>' +
-                        '<div class="card-actions">' + statusBadge(p.status) + (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn-sm"><i class="bx bx-download"></i></a>' : '') + '</div>' +
-                    '</div>';
+                    var done = p.status === 'completed', img = p.document_image || '';
+                    return '<div class="card">' + (img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') + '<div class="card-icon-placeholder" style="' + (img ? 'display:none' : '') + '"><i class="bx bx-file"></i></div>' + '<div class="card-info"><h4>' + (p.document_title || 'Document') + '</h4><div class="meta">' + formatPrice(p.amount, p.currency) + ' · ' + timeAgo(p.created_at) + '</div></div>' + '<div class="card-actions">' + statusBadge(p.status) + (done ? '<a href="view.html?doc=' + p.document_id + '" class="btn-sm"><i class="bx bx-download"></i></a>' : '') + '</div></div>';
                 }).join('');
             }
 
@@ -493,40 +437,18 @@
                 var status = $('statusMsg');
                 status.className = 'status-msg checking';
                 status.innerHTML = '<i class="bx bx-loader bx-spin" style="font-size:22px;display:block;margin-bottom:6px;"></i> Kwemeza ubwishyu...';
-
                 try {
-                    var result = await apiCall('/api/verify-with-proof', {
-                        client_token: token, device_fingerprint: fingerprint,
-                        buyer_name: name, phone_number: phone,
-                        ocr_text: ocrText.substring(0, 1000),
-                        match_percentage: matchPct,
-                        is_suspicious: suspicious
-                    });
-
+                    var result = await apiCall('/api/verify-with-proof', { client_token: token, device_fingerprint: fingerprint, buyer_name: name, phone_number: phone, ocr_text: ocrText.substring(0, 1000), match_percentage: matchPct, is_suspicious: suspicious });
                     if (result.suspicious) {
                         status.className = 'status-msg fail';
-                        status.innerHTML =
-                            '<i class="bx bx-shield-x" style="font-size:28px;display:block;margin-bottom:6px;"></i>' +
-                            '<strong>Amakuru yawe ntiyemejwe!</strong><br>' +
-                            'Igiciro cyikubye kabiri kuri wowe:<br>' +
-                            '<strong style="font-size:1rem;">' + formatPrice(result.new_price, result.currency) + '</strong><br><br>' +
-                            '<a href="view.html?doc=' + result.document_id + '" class="btn btn-danger" style="width:auto;display:inline-flex;">Shyura ' + formatPrice(result.new_price, result.currency) + '</a>';
+                        status.innerHTML = '<i class="bx bx-shield-x" style="font-size:28px;display:block;margin-bottom:6px;"></i><strong>Amakuru yawe ntiyemejwe!</strong><br>Igiciro cyikubye kabiri kuri wowe:<br><strong style="font-size:1rem;">' + formatPrice(result.new_price, result.currency) + '</strong><br><br><a href="view.html?doc=' + result.document_id + '" class="btn btn-danger">Shyura ' + formatPrice(result.new_price, result.currency) + '</a>';
                     } else {
                         status.className = 'status-msg success';
-                        status.innerHTML =
-                            '<i class="bx bx-check-shield" style="font-size:32px;display:block;margin-bottom:6px;"></i>' +
-                            '<strong>Ubwishyu bwemejwe!</strong><br>Ugiye koherezwa kuri download...';
-                        await loadPayments();
-                        renderHistory();
+                        status.innerHTML = '<i class="bx bx-check-shield" style="font-size:32px;display:block;margin-bottom:6px;"></i><strong>Ubwishyu bwemejwe!</strong><br>Ugiye koherezwa kuri download...';
+                        await loadPayments(); renderHistory();
                         setTimeout(function() { window.location.href = 'view.html?doc=' + result.document_id; }, 2500);
                     }
-                } catch(e) {
-                    status.className = 'status-msg fail';
-                    status.textContent = 'Byanze. Ongera ugerageze.';
-                    verificationDone = false;
-                    var btn = $('submitBtn');
-                    if (btn) { btn.style.display = 'block'; btn.disabled = false; btn.innerHTML = 'Ohereza'; }
-                }
+                } catch(e) { status.className = 'status-msg fail'; status.textContent = 'Byanze. Ongera ugerageze.'; verificationDone = false; var btn = $('submitBtn'); if (btn) { btn.style.display = 'block'; btn.disabled = false; btn.innerHTML = 'Ohereza'; } }
             }
 
             (async function() {
