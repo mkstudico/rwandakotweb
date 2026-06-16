@@ -30,11 +30,14 @@
             --radius:18px; --radius-sm:12px;
             --tr:0.2s cubic-bezier(0.4,0,0.2,1);
         }
+
         *{margin:0;padding:0;box-sizing:border-box}
+
         body{
             font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);
             min-height:100vh;-webkit-font-smoothing:antialiased;
         }
+
         .skeleton{
             background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);
             background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;
@@ -46,7 +49,9 @@
         .sk-text.short{width:50%}
         .sk-price{height:36px;width:35%;margin-bottom:14px}
         .sk-btn{height:50px;width:100%;border-radius:30px}
+
         .container{max-width:700px;margin:0 auto;padding:20px 16px 80px}
+
         .back-link{
             display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
             font-weight:500;color:var(--text);text-decoration:none;padding:10px 14px;
@@ -54,6 +59,7 @@
             -webkit-tap-highlight-color:transparent;
         }
         .back-link:hover{background:#f3f4f6}
+
         .hero{
             background:var(--surface);border-radius:var(--radius);
             border:1px solid var(--border);overflow:hidden;
@@ -82,6 +88,7 @@
         .hero-body .price-display .cur{
             font-size:.78rem;color:#9ca3af;font-weight:400;
         }
+
         .btn{
             display:inline-flex;align-items:center;justify-content:center;
             gap:8px;padding:14px 28px;border-radius:30px;font-weight:600;
@@ -100,6 +107,7 @@
         .btn-expired{background:var(--red-bg);color:var(--red-text)}
         .btn-doubled{background:var(--red);color:#fff}
         .btn-doubled:hover{background:#b91c1c}
+
         .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
         .info-card{
             background:var(--surface);border-radius:var(--radius-sm);
@@ -114,21 +122,26 @@
         .info-card .ic-icon.payments{background:#fef3c7;color:#d97706}
         .info-card .ic-val{font-size:1.1rem;font-weight:700}
         .info-card .ic-label{font-size:.7rem;color:var(--sub)}
+
         .timer-badge{
             display:inline-flex;align-items:center;gap:6px;
             background:#fef3c7;color:#92400e;padding:8px 14px;
             border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
         }
         .timer-badge.expired{background:var(--red-bg);color:var(--red-text)}
+
         .suspicious-badge{
             display:inline-flex;align-items:center;gap:6px;
             background:var(--red-bg);color:var(--red-text);padding:8px 14px;
             border-radius:20px;font-size:.78rem;font-weight:500;margin-bottom:14px;
         }
+        .suspicious-badge .material-icons{font-size:18px}
+
         .state-wrap{text-align:center;padding:60px 20px}
         .state-wrap .material-icons{font-size:56px;color:#d1d5db;margin-bottom:12px}
         .state-wrap h2{font-size:1.2rem;font-weight:600;margin-bottom:6px}
         .state-wrap p{color:var(--sub);font-size:.85rem;margin-bottom:16px}
+
         .toast{
             position:fixed;bottom:24px;left:50%;
             transform:translateX(-50%) translateY(120px);
@@ -140,6 +153,7 @@
         }
         .toast.show{transform:translateX(-50%) translateY(0)}
         .toast.err{background:var(--red)}
+
         @media(max-width:500px){
             .hero-body{padding:18px 14px}
             .hero-body .doc-title{font-size:1.15rem}
@@ -318,7 +332,6 @@
                         }
                     }
 
-                    // Find a valid completed token
                     if (isPaid) {
                         completedToken = await findCompletedPayment();
                     }
@@ -481,10 +494,9 @@
                 var btn = $('downloadBtn');
                 if (btn) {
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Generating...';
+                    btn.innerHTML = '<span class="material-icons">hourglass_empty</span> Downloading...';
                 }
 
-                // Use completedToken if available, otherwise fall back to payToken, then try to find one
                 var tokenToUse = completedToken || payToken;
 
                 function attemptDownload(token) {
@@ -502,15 +514,51 @@
                         device_fingerprint: fingerprint,
                         document_id: docId
                     }).then(function(r) {
-                        if (r.url) {
-                            window.location.href = r.url;
-                        } else {
+                        if (!r.url) {
                             toast(r.error || 'Download failed', true);
                             if (btn) {
                                 btn.disabled = false;
                                 btn.innerHTML = '<span class="material-icons">download</span> Download Document';
                             }
+                            return;
                         }
+
+                        if (btn) btn.innerHTML = '<span class="material-icons">cloud_download</span> Fetching file...';
+
+                        fetch(r.url)
+                            .then(function(response) {
+                                if (!response.ok) throw new Error('Failed to fetch file');
+                                return response.blob();
+                            })
+                            .then(function(blob) {
+                                var filename = r.filename || 'document';
+                                var blobUrl = window.URL.createObjectURL(blob);
+                                var a = document.createElement('a');
+                                a.style.display = 'none';
+                                a.href = blobUrl;
+                                a.download = filename;
+                                document.body.appendChild(a);
+                                a.click();
+
+                                setTimeout(function() {
+                                    document.body.removeChild(a);
+                                    window.URL.revokeObjectURL(blobUrl);
+                                }, 200);
+
+                                if (btn) {
+                                    btn.disabled = false;
+                                    btn.innerHTML = '<span class="material-icons">download</span> Download Again';
+                                }
+                                toast('Download started!');
+                            })
+                            .catch(function() {
+                                window.open(r.url, '_blank');
+                                if (btn) {
+                                    btn.disabled = false;
+                                    btn.innerHTML = '<span class="material-icons">download</span> Download Document';
+                                }
+                            });
+
                     }).catch(function(err) {
                         toast(err.message || 'Download failed', true);
                         if (btn) {
@@ -523,11 +571,8 @@
                 if (tokenToUse) {
                     attemptDownload(tokenToUse);
                 } else {
-                    // Last resort: find the completed token
                     findCompletedPayment().then(function(foundToken) {
-                        if (foundToken) {
-                            completedToken = foundToken;
-                        }
+                        if (foundToken) completedToken = foundToken;
                         attemptDownload(completedToken);
                     });
                 }
