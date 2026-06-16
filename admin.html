@@ -11,368 +11,127 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --bg: #f8f9fb;
-            --surface: #fff;
-            --text: #111;
-            --sub: #6b7280;
-            --border: #eef0f2;
-            --accent: #111;
-            --red: #dc2626;
-            --red-bg: #fef2f2;
-            --red-text: #991b1b;
-            --green: #059669;
-            --green-bg: #ecfdf5;
-            --green-text: #065f46;
-            --orange: #ea580c;
-            --orange-bg: #fff7ed;
-            --radius: 14px;
-            --radius-sm: 10px;
-            --tr: 0.2s cubic-bezier(0.4,0,0.2,1);
+            --bg:#f8f9fb; --surface:#fff; --text:#0a0a0a; --sub:#6b7280;
+            --border:#eef0f2; --accent:#0a0a0a;
+            --red:#dc2626; --red-bg:#fef2f2; --red-text:#991b1b;
+            --green:#059669; --green-bg:#ecfdf5; --green-text:#065f46;
+            --orange:#ea580c; --orange-bg:#fff7ed; --orange-text:#9a3412;
+            --yellow:#ca8a04; --yellow-bg:#fefce8; --yellow-text:#854d0e;
+            --blue:#2563eb; --blue-bg:#eff6ff; --blue-text:#1e40af;
+            --radius:14px; --radius-sm:10px;
+            --tr:0.2s cubic-bezier(0.4,0,0.2,1);
         }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-        * { margin:0; padding:0; box-sizing:border-box; }
+        .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .login-card{background:var(--surface);border-radius:var(--radius);padding:40px 28px 32px;border:1px solid var(--border);text-align:center;max-width:380px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.05)}
+        .login-card .icon-circle{width:60px;height:60px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+        .login-card .icon-circle .material-icons{font-size:28px;color:var(--accent)}
+        .login-card h1{font-size:1.3rem;font-weight:700;margin-bottom:4px;letter-spacing:-.3px}
+        .login-card .subtitle{font-size:.82rem;color:var(--sub);margin-bottom:20px}
+        .form-group{text-align:left;margin-bottom:14px}
+        .form-group label{display:block;font-size:.78rem;font-weight:500;color:var(--sub);margin-bottom:5px}
+        .input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:'Poppins',sans-serif;outline:none;transition:border var(--tr);-webkit-appearance:none}
+        .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;border-radius:30px;font-weight:600;font-size:.84rem;cursor:pointer;border:none;font-family:'Poppins',sans-serif;transition:all var(--tr);-webkit-tap-highlight-color:transparent}
+        .btn .material-icons{font-size:18px}
+        .btn-dark{background:var(--accent);color:#fff;width:100%}
+        .btn-dark:hover{background:#1a1a1a}
+        .btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+        .btn-outline:hover{background:#f9fafb}
+        .btn-red{background:var(--red);color:#fff}
+        .btn-red:hover{background:#b91c1c}
+        .btn-sm{padding:6px 11px;font-size:.72rem;border-radius:8px}
+        .btn-icon{padding:7px;border-radius:8px;min-width:34px}
+        .error-text{color:var(--red);font-size:.78rem;margin-top:8px;display:none}
+        .error-text.show{display:block}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
+        .dashboard{display:none;max-width:1000px;margin:0 auto;padding:20px 14px 60px}
+        .dash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+        .dash-header h1{font-size:1.3rem;font-weight:700;display:flex;align-items:center;gap:7px;letter-spacing:-.3px}
+        .dash-header h1 .material-icons{font-size:24px}
 
-        /* ── LOGIN SCREEN ── */
-        .login-screen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .login-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 40px 28px 32px;
-            border: 1px solid var(--border);
-            text-align: center;
-            max-width: 380px;
-            width: 100%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
-        }
-        .login-card .icon-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-        }
-        .login-card .icon-circle .material-icons {
-            font-size: 28px;
-            color: var(--accent);
-        }
-        .login-card h1 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-            letter-spacing: -0.3px;
-        }
-        .login-card .subtitle {
-            font-size: 0.82rem;
-            color: var(--sub);
-            margin-bottom: 20px;
-        }
-        .form-group {
-            text-align: left;
-            margin-bottom: 14px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 500;
-            color: var(--sub);
-            margin-bottom: 5px;
-        }
-        .input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            font-family: 'Poppins', sans-serif;
-            outline: none;
-            transition: border var(--tr);
-            -webkit-appearance: none;
-        }
-        .input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: none;
-            font-family: 'Poppins', sans-serif;
-            transition: all var(--tr);
-            -webkit-tap-highlight-color: transparent;
-        }
-        .btn .material-icons { font-size: 18px; }
-        .btn-dark {
-            background: var(--accent);
-            color: #fff;
-            width: 100%;
-        }
-        .btn-dark:hover { background: #2d2d44; }
-        .btn-dark:active { transform: scale(0.97); }
-        .btn-outline {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        .btn-outline:hover { background: #f9fafb; }
-        .btn-red { background: var(--red); color: #fff; }
-        .btn-red:hover { background: #b91c1c; }
-        .btn-sm { padding: 7px 12px; font-size: 0.75rem; border-radius: 8px; }
-        .btn-icon { padding: 8px; border-radius: 8px; min-width: 36px; }
-        .error-text {
-            color: var(--red);
-            font-size: 0.78rem;
-            margin-top: 8px;
-            display: none;
-        }
-        .error-text.show { display: block; }
+        .tab-nav{display:flex;gap:3px;background:#f3f4f6;border-radius:30px;padding:3px;margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+        .tab-nav::-webkit-scrollbar{display:none}
+        .tab-btn{padding:9px 18px;border-radius:28px;font-size:.78rem;font-weight:500;border:none;cursor:pointer;background:transparent;color:var(--sub);font-family:'Poppins',sans-serif;white-space:nowrap;transition:all var(--tr);display:flex;align-items:center;gap:5px;flex-shrink:0}
+        .tab-btn .material-icons{font-size:16px}
+        .tab-btn.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+        .tab-content{display:none}
+        .tab-content.active{display:block;animation:fadeIn .25s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-        /* ── DASHBOARD ── */
-        .dashboard {
-            display: none;
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 24px 16px 60px;
-        }
-        .dash-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .dash-header h1 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: -0.3px;
-        }
-        .dash-header h1 .material-icons { font-size: 26px; }
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 18px 16px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .stat-card .stat-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .stat-card .stat-icon.blue { background: #eff6ff; color: #2563eb; }
-        .stat-card .stat-icon.green { background: var(--green-bg); color: var(--green); }
-        .stat-card .stat-icon.orange { background: var(--orange-bg); color: var(--orange); }
-        .stat-card .stat-val { font-size: 1.3rem; font-weight: 700; }
-        .stat-card .stat-label { font-size: 0.72rem; color: var(--sub); }
+        .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+        .stat-card{background:var(--surface);border-radius:var(--radius);padding:16px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px}
+        .stat-card .stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .stat-card .stat-icon.blue{background:var(--blue-bg);color:var(--blue)}
+        .stat-card .stat-icon.green{background:var(--green-bg);color:var(--green)}
+        .stat-card .stat-icon.orange{background:var(--orange-bg);color:var(--orange)}
+        .stat-card .stat-icon.red{background:var(--red-bg);color:var(--red)}
+        .stat-card .stat-icon.yellow{background:var(--yellow-bg);color:var(--yellow)}
+        .stat-val{font-size:1.2rem;font-weight:700}
+        .stat-label{font-size:.68rem;color:var(--sub)}
 
-        /* Form Card */
-        .form-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 22px 18px;
-            border: 1px solid var(--border);
-            margin-bottom: 22px;
-        }
-        .form-card h2 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            letter-spacing: -0.2px;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .form-group-full { grid-column: 1/-1; }
-        .field { margin-bottom: 10px; }
-        .field label {
-            display: block;
-            font-size: 0.76rem;
-            font-weight: 500;
-            color: var(--sub);
-            margin-bottom: 4px;
-        }
-        .field .input, .field textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-family: 'Poppins', sans-serif;
-            outline: none;
-            resize: vertical;
-            transition: border var(--tr);
-        }
-        .field .input:focus, .field textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
-        }
-        .field textarea { min-height: 65px; }
-        .preview-img {
-            width: 100%;
-            max-height: 130px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-top: 6px;
-            border: 1px solid var(--border);
-            display: none;
-        }
-        .file-status {
-            font-size: 0.72rem;
-            color: var(--sub);
-            margin-top: 3px;
-        }
-        .btn-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-            flex-wrap: wrap;
-        }
+        .form-card{background:var(--surface);border-radius:var(--radius);padding:20px 16px;border:1px solid var(--border);margin-bottom:18px}
+        .form-card h2{font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:6px;letter-spacing:-.2px}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .form-group-full{grid-column:1/-1}
+        .field{margin-bottom:8px}
+        .field label{display:block;font-size:.73rem;font-weight:500;color:var(--sub);margin-bottom:3px}
+        .field .input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.84rem;font-family:'Poppins',sans-serif;outline:none;resize:vertical;transition:border var(--tr)}
+        .field .input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,.04)}
+        .field textarea{min-height:60px}
+        .paste-area{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all var(--tr);background:#fafbfc;position:relative;overflow:hidden}
+        .paste-area:hover{border-color:#c4c8cf;background:#f9fafb}
+        .paste-area.has-image{border-color:var(--green);background:var(--green-bg)}
+        .paste-area .material-icons{font-size:26px;color:#d1d5db;display:block;margin:0 auto 3px}
+        .paste-area .paste-text{font-size:.74rem;color:var(--sub)}
+        .paste-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+        .preview-img{width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-top:6px;border:1px solid var(--border);display:none}
+        .file-status{font-size:.7rem;color:var(--sub);margin-top:2px}
+        .btn-row{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
 
-        /* Docs list */
-        .section-title {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            letter-spacing: -0.2px;
-        }
-        .doc-list { display: grid; gap: 8px; }
-        .doc-row {
-            background: var(--surface);
-            border-radius: var(--radius-sm);
-            padding: 14px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            transition: box-shadow var(--tr);
-        }
-        .doc-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .doc-thumb {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-        .doc-thumb-placeholder {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            background: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .doc-thumb-placeholder .material-icons { color: #d1d5db; }
-        .doc-info { flex: 1; min-width: 140px; }
-        .doc-info h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .doc-info .meta {
-            font-size: 0.72rem;
-            color: var(--sub);
-            margin-top: 1px;
-        }
-        .badge {
-            font-size: 0.64rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        .badge-active { background: var(--green-bg); color: var(--green-text); }
-        .badge-hidden { background: var(--red-bg); color: var(--red-text); }
-        .doc-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        .section-title{font-size:.95rem;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:-.2px}
+        .doc-list{display:grid;gap:7px}
+        .doc-row{background:var(--surface);border-radius:var(--radius-sm);padding:12px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;transition:box-shadow var(--tr)}
+        .doc-row:hover{box-shadow:0 2px 8px rgba(0,0,0,.04)}
+        .doc-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0}
+        .doc-thumb-placeholder{width:44px;height:44px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .doc-thumb-placeholder .material-icons{color:#d1d5db;font-size:20px}
+        .doc-info{flex:1;min-width:130px}
+        .doc-info h4{font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+        .doc-info .meta{font-size:.7rem;color:var(--sub);margin-top:1px}
+        .badge{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:16px;display:inline-flex;align-items:center;gap:3px}
+        .badge .material-icons{font-size:11px}
+        .badge-active{background:var(--green-bg);color:var(--green-text)}
+        .badge-hidden{background:var(--red-bg);color:var(--red-text)}
+        .doc-actions{display:flex;gap:4px;flex-shrink:0}
 
-        .loading-text { text-align: center; color: var(--sub); padding: 30px; }
+        .loading-text{text-align:center;color:var(--sub);padding:25px;font-size:.82rem}
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #111;
-            color: #fff;
-            padding: 12px 22px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            font-family: 'Poppins', sans-serif;
-            z-index: 200;
-            transition: transform 0.3s;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast.error { background: var(--red); }
+        .txn-card{background:var(--surface);border-radius:var(--radius-sm);padding:12px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}
+        .txn-card .txn-info{flex:1;min-width:150px}
+        .txn-card .txn-info h4{font-size:.82rem;font-weight:600}
+        .txn-card .txn-info .meta{font-size:.68rem;color:var(--sub);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .txn-card .txn-actions{flex-shrink:0}
 
-        @media (max-width: 540px) {
-            .form-row { grid-template-columns: 1fr; }
-            .doc-row { flex-direction: column; align-items: flex-start; }
-            .doc-actions { width: 100%; justify-content: flex-end; margin-top: 6px; }
-            .dash-header { flex-direction: column; align-items: flex-start; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
+        .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120px);background:#1a1a2e;color:#fff;padding:11px 20px;border-radius:40px;font-size:.78rem;font-weight:500;font-family:'Poppins',sans-serif;z-index:300;transition:transform .3s;pointer-events:none;white-space:nowrap}
+        .toast.show{transform:translateX(-50%) translateY(0)}
+        .toast.error{background:var(--red)}
+
+        @media(max-width:540px){
+            .form-row{grid-template-columns:1fr}
+            .doc-row{flex-direction:column;align-items:flex-start}
+            .doc-actions{width:100%;justify-content:flex-end;margin-top:4px}
+            .txn-card{flex-direction:column;align-items:flex-start}
+            .dash-header{flex-direction:column;align-items:flex-start}
+            .stats-row{grid-template-columns:1fr 1fr}
+            .tab-btn{padding:7px 12px;font-size:.72rem}
         }
     </style>
 </head>
 <body>
 
-    <!-- ── LOGIN SCREEN ── -->
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
             <div class="icon-circle"><span class="material-icons">shield</span></div>
@@ -383,159 +142,122 @@
                     <label for="adminKey">Admin Key</label>
                     <input type="password" class="input" id="adminKey" placeholder="Enter admin key" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-dark">
-                    <span class="material-icons">login</span> Sign In
-                </button>
+                <button type="submit" class="btn btn-dark"><span class="material-icons">login</span> Sign In</button>
             </form>
             <p class="error-text" id="loginError">Invalid admin key. Please try again.</p>
         </div>
     </div>
 
-    <!-- ── DASHBOARD ── -->
     <div class="dashboard" id="dashboard">
         <div class="dash-header">
-            <h1><span class="material-icons">dashboard</span> Document Manager</h1>
-            <button class="btn btn-outline" onclick="logout()">
-                <span class="material-icons">logout</span> Logout
-            </button>
+            <h1><span class="material-icons">dashboard</span> Admin Panel</h1>
+            <button class="btn btn-outline" onclick="logout()"><span class="material-icons">logout</span> Logout</button>
         </div>
 
-        <!-- Stats -->
+        <div class="tab-nav" id="tabNav">
+            <button class="tab-btn active" data-tab="docs"><span class="material-icons">description</span> Documents</button>
+            <button class="tab-btn" data-tab="add"><span class="material-icons">add_circle</span> Add New</button>
+            <button class="tab-btn" data-tab="transactions"><span class="material-icons">receipt_long</span> Transactions</button>
+        </div>
+
         <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-icon blue"><span class="material-icons">description</span></div>
-                <div><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Documents</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><span class="material-icons">visibility</span></div>
-                <div><div class="stat-val" id="statActive">0</div><div class="stat-label">Active</div></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon orange"><span class="material-icons">trending_up</span></div>
-                <div><div class="stat-val" id="statClicks">0</div><div class="stat-label">Total Views</div></div>
+            <div class="stat-card"><div class="stat-icon blue"><span class="material-icons">description</span></div><div><div class="stat-val" id="statTotal">0</div><div class="stat-label">Documents</div></div></div>
+            <div class="stat-card"><div class="stat-icon green"><span class="material-icons">visibility</span></div><div><div class="stat-val" id="statActive">0</div><div class="stat-label">Active</div></div></div>
+            <div class="stat-card"><div class="stat-icon orange"><span class="material-icons">trending_up</span></div><div><div class="stat-val" id="statClicks">0</div><div class="stat-label">Views</div></div></div>
+            <div class="stat-card"><div class="stat-icon red"><span class="material-icons">gpp_maybe</span></div><div><div class="stat-val" id="statSuspicious">0</div><div class="stat-label">Suspicious</div></div></div>
+            <div class="stat-card"><div class="stat-icon yellow"><span class="material-icons">payments</span></div><div><div class="stat-val" id="statPaid">0</div><div class="stat-label">Verified</div></div></div>
+        </div>
+
+        <div class="tab-content active" id="tab-docs">
+            <div class="section-title"><span class="material-icons">library_books</span> All Documents</div>
+            <div class="doc-list" id="docsList"><p class="loading-text">Loading...</p></div>
+        </div>
+
+        <div class="tab-content" id="tab-add">
+            <div class="form-card">
+                <h2 id="formTitle"><span class="material-icons">add_circle</span> Add New Document</h2>
+                <div class="form-row">
+                    <div class="field form-group-full"><label>Title *</label><input type="text" class="input" id="dTitle" placeholder="Document title"></div>
+                    <div class="field form-group-full"><label>Description</label><textarea id="dDesc" placeholder="Brief description..."></textarea></div>
+                    <div class="field"><label>Price (RWF) *</label><input type="number" class="input" id="dPrice" placeholder="500" min="1"></div>
+                    <div class="field"><label>Currency</label><input type="text" class="input" id="dCurrency" value="RWF"></div>
+                    <div class="field form-group-full">
+                        <label>Preview Image (click or Ctrl+V paste)</label>
+                        <div class="paste-area" id="pasteArea" tabindex="0">
+                            <span class="material-icons">add_photo_alternate</span>
+                            <span class="paste-text">Click or paste image here</span>
+                            <input type="file" id="dImage" accept="image/*">
+                        </div>
+                        <img class="preview-img" id="imgPreview">
+                        <input type="hidden" id="imgUrl">
+                    </div>
+                    <div class="field form-group-full">
+                        <label>Document File *</label>
+                        <div class="paste-area" id="fileDropArea" tabindex="0">
+                            <span class="material-icons">upload_file</span>
+                            <span class="paste-text">Click or drop file here</span>
+                            <input type="file" id="dFile">
+                        </div>
+                        <span class="file-status" id="fileStatus"></span>
+                        <input type="hidden" id="filePath">
+                    </div>
+                </div>
+                <input type="hidden" id="editId">
+                <div class="btn-row" style="margin-top:8px;">
+                    <button class="btn btn-dark" onclick="saveDocument()" id="saveBtn"><span class="material-icons">save</span> Save</button>
+                    <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;"><span class="material-icons">close</span> Cancel</button>
+                </div>
             </div>
         </div>
 
-        <!-- Add / Edit Form -->
-        <div class="form-card" id="formCard">
-            <h2 id="formTitle"><span class="material-icons">add_circle</span> Add New Document</h2>
-            <div class="form-row">
-                <div class="field form-group-full">
-                    <label>Title *</label>
-                    <input type="text" class="input" id="dTitle" placeholder="e.g. Complete Programming Guide">
-                </div>
-                <div class="field form-group-full">
-                    <label>Description</label>
-                    <textarea id="dDesc" placeholder="Brief description of the document..."></textarea>
-                </div>
-                <div class="field">
-                    <label>Price *</label>
-                    <input type="number" class="input" id="dPrice" placeholder="500" min="1">
-                </div>
-                <div class="field">
-                    <label>Currency</label>
-                    <input type="text" class="input" id="dCurrency" value="RWF" placeholder="RWF">
-                </div>
-                <div class="field form-group-full">
-                    <label>Preview Image</label>
-                    <input type="file" id="dImage" accept="image/*" style="font-size:0.8rem;font-family:'Poppins',sans-serif;">
-                    <img class="preview-img" id="imgPreview">
-                    <input type="hidden" id="imgUrl">
-                </div>
-                <div class="field form-group-full">
-                    <label>Document File *</label>
-                    <input type="file" id="dFile" style="font-size:0.8rem;font-family:'Poppins',sans-serif;">
-                    <span class="file-status" id="fileStatus"></span>
-                    <input type="hidden" id="filePath">
-                </div>
-            </div>
-            <input type="hidden" id="editId">
-            <div class="btn-row">
-                <button class="btn btn-dark" onclick="saveDocument()" id="saveBtn">
-                    <span class="material-icons">save</span> Save Document
-                </button>
-                <button class="btn btn-outline" onclick="resetForm()" id="cancelBtn" style="display:none;">
-                    <span class="material-icons">close</span> Cancel
-                </button>
-            </div>
-        </div>
-
-        <!-- Document List -->
-        <div class="section-title"><span class="material-icons">library_books</span> All Documents</div>
-        <div class="doc-list" id="docsList">
-            <p class="loading-text">Loading documents...</p>
+        <div class="tab-content" id="tab-transactions">
+            <div class="section-title"><span class="material-icons">receipt_long</span> Payment Verifications</div>
+            <div id="txnList"><p class="loading-text">Loading...</p></div>
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
         (function() {
-            const IMGBB_KEY = '2077df548acf5a4f53658b930c7fe87a';
-            let adminToken = null;
+            var IMGBB_KEY = '2077df548acf5a4f53658b930c7fe87a';
+            var adminToken = null;
 
-            // Helpers
             function $(id) { return document.getElementById(id); }
 
-            function toast(msg, isError = false) {
-                const t = $('toast');
+            function toast(msg, isError) {
+                var t = $('toast');
                 t.textContent = msg;
                 t.className = 'toast show' + (isError ? ' error' : '');
                 clearTimeout(t._tid);
-                t._tid = setTimeout(() => t.classList.remove('show'), 2800);
+                t._tid = setTimeout(function() { t.classList.remove('show'); }, 2800);
             }
 
-            async function api(path, body = null, method = null) {
-                const opts = {
-                    method: method || (body ? 'POST' : 'GET'),
-                    headers: { 'Content-Type': 'application/json' }
-                };
+            async function api(path, body, method) {
+                var opts = { method: method || (body ? 'POST' : 'GET'), headers: { 'Content-Type': 'application/json' } };
                 if (adminToken) opts.headers['Authorization'] = 'Bearer ' + adminToken;
                 if (body) opts.body = JSON.stringify(body);
-
-                const res = await fetch(path, opts);
-
-                if (res.status === 401) {
-                    logout();
-                    throw new Error('Unauthorized');
-                }
-
-                const text = await res.text();
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch {
-                    console.error('Invalid JSON response:', text.substring(0, 200));
-                    throw new Error('Server returned invalid response');
-                }
-
-                if (!res.ok) {
-                    throw new Error(data.error || 'Request failed');
-                }
-
+                var res = await fetch(path, opts);
+                if (res.status === 401) { logout(); throw new Error('Unauthorized'); }
+                var txt = await res.text();
+                var data;
+                try { data = JSON.parse(txt); } catch(e) { throw new Error('Invalid server response'); }
+                if (!res.ok) throw new Error(data.error || 'Request failed');
                 return data;
             }
 
-            // Login
             async function login(key) {
                 if (!key) return;
                 adminToken = key;
                 try {
-                    const res = await api('/api/admin/verify', {});
+                    var res = await api('/api/admin/verify', {});
                     if (res.authenticated) {
                         localStorage.setItem('adm_tok', key);
                         $('loginScreen').style.display = 'none';
                         $('dashboard').style.display = 'block';
-                        await loadDocuments();
-                    } else {
-                        adminToken = null;
-                        $('loginError').classList.add('show');
-                    }
-                } catch {
-                    adminToken = null;
-                    $('loginError').classList.add('show');
-                }
+                        loadAll();
+                    } else { adminToken = null; $('loginError').classList.add('show'); }
+                } catch(e) { adminToken = null; $('loginError').classList.add('show'); }
             }
 
             function logout() {
@@ -547,125 +269,139 @@
                 $('loginError').classList.remove('show');
             }
 
-            // Login form submit
             $('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 $('loginError').classList.remove('show');
                 login($('adminKey').value);
             });
 
-            // Auto login
-            const saved = localStorage.getItem('adm_tok');
-            if (saved) {
-                login(saved).catch(() => {});
-            }
+            // Tab switching
+            $('tabNav').addEventListener('click', function(e) {
+                var btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                var tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+                $('tab-' + tab).classList.add('active');
+                if (tab === 'docs') loadDocuments();
+                if (tab === 'transactions') loadTransactions();
+            });
 
-            // Image upload
-            $('dImage').addEventListener('change', async function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+            // Image paste
+            var pasteArea = $('pasteArea');
+            pasteArea.addEventListener('paste', function(e) {
+                var items = e.clipboardData.items;
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        var file = items[i].getAsFile();
+                        handleImageFile(file);
+                        break;
+                    }
+                }
+            });
+            pasteArea.addEventListener('dragover', function(e) { e.preventDefault(); });
+            pasteArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                var file = e.dataTransfer.files[0];
+                if (file && file.type.indexOf('image') !== -1) handleImageFile(file);
+            });
 
-                const reader = new FileReader();
-                reader.onload = ev => {
+            $('dImage').addEventListener('change', function(e) {
+                if (e.target.files[0]) handleImageFile(e.target.files[0]);
+            });
+
+            function handleImageFile(file) {
+                var reader = new FileReader();
+                reader.onload = function(ev) {
                     $('imgPreview').src = ev.target.result;
                     $('imgPreview').style.display = 'block';
+                    pasteArea.classList.add('has-image');
+                    pasteArea.querySelector('.paste-text').textContent = '✓ ' + file.name;
                 };
                 reader.readAsDataURL(file);
 
-                const fd = new FormData();
+                var fd = new FormData();
                 fd.append('image', file);
-                try {
-                    const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: fd });
-                    const d = await r.json();
-                    if (d.success) {
-                        $('imgUrl').value = d.data.url;
-                        toast('Image uploaded successfully');
-                    } else {
-                        toast('Image upload failed', true);
-                    }
-                } catch {
-                    toast('Image upload error', true);
-                }
-            });
+                toast('Uploading image...');
+                fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method: 'POST', body: fd })
+                    .then(function(r) { return r.json(); })
+                    .then(function(d) {
+                        if (d.success) { $('imgUrl').value = d.data.url; toast('Image uploaded!'); }
+                        else { toast('Image upload failed', true); }
+                    })
+                    .catch(function() { toast('Upload error', true); });
+            }
 
             // File upload
-            $('dFile').addEventListener('change', async function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                $('fileStatus').textContent = 'Uploading...';
-                const fd = new FormData();
-                fd.append('file', file);
-
-                try {
-                    const r = await fetch('/api/admin/upload', {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + adminToken },
-                        body: fd
-                    });
-                    const d = await r.json();
-                    if (d.file_path) {
-                        $('filePath').value = d.file_path;
-                        $('fileStatus').textContent = '✅ ' + d.filename;
-                        toast('File uploaded');
-                    } else {
-                        $('fileStatus').textContent = '❌ ' + (d.error || 'Failed');
-                        toast('Upload failed', true);
-                    }
-                } catch {
-                    $('fileStatus').textContent = '❌ Upload error';
-                    toast('Upload error', true);
-                }
+            var fileDrop = $('fileDropArea');
+            fileDrop.addEventListener('dragover', function(e) { e.preventDefault(); });
+            fileDrop.addEventListener('drop', function(e) {
+                e.preventDefault();
+                var file = e.dataTransfer.files[0];
+                if (file) uploadFile(file);
             });
 
-            // Save document
+            $('dFile').addEventListener('change', function(e) {
+                if (e.target.files[0]) uploadFile(e.target.files[0]);
+            });
+
+            function uploadFile(file) {
+                $('fileStatus').textContent = 'Uploading...';
+                fileDrop.querySelector('.paste-text').textContent = '⏳ ' + file.name;
+                var fd = new FormData();
+                fd.append('file', file);
+                fetch('/api/admin/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + adminToken }, body: fd })
+                    .then(function(r) { return r.json(); })
+                    .then(function(d) {
+                        if (d.file_path) {
+                            $('filePath').value = d.file_path;
+                            $('fileStatus').textContent = '✅ ' + d.filename + ' (' + (d.size ? (d.size/1024).toFixed(1) + ' KB' : '') + ')';
+                            fileDrop.querySelector('.paste-text').textContent = '✅ ' + d.filename;
+                            toast('File uploaded!');
+                        } else {
+                            $('fileStatus').textContent = '❌ ' + (d.error || 'Failed');
+                            toast('Upload failed', true);
+                        }
+                    })
+                    .catch(function() { $('fileStatus').textContent = '❌ Error'; toast('Upload error', true); });
+            }
+
             async function saveDocument() {
-                const title = $('dTitle').value.trim();
-                const desc = $('dDesc').value.trim();
-                const price = $('dPrice').value;
-                const currency = $('dCurrency').value.trim() || 'RWF';
-                const img = $('imgUrl').value.trim();
-                const fp = $('filePath').value.trim();
-                const editId = $('editId').value;
+                var title = $('dTitle').value.trim();
+                var desc = $('dDesc').value.trim();
+                var price = $('dPrice').value;
+                var currency = $('dCurrency').value.trim() || 'RWF';
+                var img = $('imgUrl').value.trim();
+                var fp = $('filePath').value.trim();
+                var editId = $('editId').value;
 
                 if (!title) { toast('Title is required', true); return; }
-                if (!price || parseInt(price) <= 0) { toast('Valid price is required', true); return; }
-                if (!fp && !editId) { toast('Please upload the document file', true); return; }
-
-                const body = {
-                    title,
-                    description: desc,
-                    price: parseInt(price),
-                    currency: currency.toUpperCase(),
-                    image_url: img,
-                    file_path: fp
-                };
+                if (!price || parseInt(price) <= 0) { toast('Valid price required', true); return; }
+                if (!fp && !editId) { toast('Upload the document file', true); return; }
 
                 try {
-                    await api('/api/admin/documents', body);
-                    toast(editId ? 'Document updated!' : 'Document added!');
+                    await api('/api/admin/documents', {
+                        title: title, description: desc, price: parseInt(price),
+                        currency: currency.toUpperCase(), image_url: img, file_path: fp
+                    });
+                    toast(editId ? 'Updated!' : 'Added!');
                     resetForm();
-                    await loadDocuments();
-                } catch (err) {
-                    toast(err.message || 'Failed to save', true);
-                }
+                    loadDocuments();
+                } catch(err) { toast(err.message, true); }
             }
 
             function resetForm() {
-                $('dTitle').value = '';
-                $('dDesc').value = '';
-                $('dPrice').value = '';
-                $('dCurrency').value = 'RWF';
-                $('imgUrl').value = '';
-                $('filePath').value = '';
-                $('editId').value = '';
-                $('dImage').value = '';
-                $('dFile').value = '';
-                $('imgPreview').style.display = 'none';
-                $('fileStatus').textContent = '';
+                $('dTitle').value = ''; $('dDesc').value = ''; $('dPrice').value = '';
+                $('dCurrency').value = 'RWF'; $('imgUrl').value = ''; $('filePath').value = '';
+                $('editId').value = ''; $('dImage').value = ''; $('dFile').value = '';
+                $('imgPreview').style.display = 'none'; $('fileStatus').textContent = '';
+                pasteArea.classList.remove('has-image');
+                pasteArea.querySelector('.paste-text').textContent = 'Click or paste image here';
+                fileDrop.querySelector('.paste-text').textContent = 'Click or drop file here';
                 $('formTitle').innerHTML = '<span class="material-icons">add_circle</span> Add New Document';
                 $('cancelBtn').style.display = 'none';
-                $('saveBtn').innerHTML = '<span class="material-icons">save</span> Save Document';
+                $('saveBtn').innerHTML = '<span class="material-icons">save</span> Save';
             }
 
             function editDocument(doc) {
@@ -678,94 +414,80 @@
                 $('editId').value = doc.id;
                 $('formTitle').innerHTML = '<span class="material-icons">edit</span> Edit Document';
                 $('cancelBtn').style.display = 'inline-flex';
-                $('saveBtn').innerHTML = '<span class="material-icons">save</span> Update Document';
-
+                $('saveBtn').innerHTML = '<span class="material-icons">save</span> Update';
                 if (doc.image_url) {
                     $('imgPreview').src = doc.image_url;
                     $('imgPreview').style.display = 'block';
+                    pasteArea.classList.add('has-image');
+                    pasteArea.querySelector('.paste-text').textContent = '✓ Has image';
                 }
-
-                $('formCard').scrollIntoView({ behavior: 'smooth' });
+                document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+                document.querySelector('.tab-btn[data-tab="add"]').classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+                $('tab-add').classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             async function toggleDocument(docId) {
-                try {
-                    await api(`/api/admin/documents/${docId}/toggle`, {}, 'PUT');
-                    await loadDocuments();
-                } catch (err) {
-                    toast(err.message || 'Toggle failed', true);
-                }
+                try { await api('/api/admin/documents/' + docId + '/toggle', {}, 'PUT'); loadDocuments(); }
+                catch(err) { toast(err.message, true); }
             }
 
             async function deleteDocument(docId, title) {
-                if (!confirm(`Permanently delete "${title}"?\n\nThis action cannot be undone.`)) return;
-                try {
-                    await api(`/api/admin/documents/${docId}`, {}, 'DELETE');
-                    toast('Document deleted');
-                    await loadDocuments();
-                } catch (err) {
-                    toast(err.message || 'Delete failed', true);
-                }
+                if (!confirm('Delete "' + title + '" permanently?\n\nThis cannot be undone.')) return;
+                try { await api('/api/admin/documents/' + docId, {}, 'DELETE'); toast('Deleted'); loadDocuments(); }
+                catch(err) { toast(err.message, true); }
             }
 
             async function loadDocuments() {
-                const list = $('docsList');
-                list.innerHTML = '<p class="loading-text">Loading documents...</p>';
-
+                var list = $('docsList');
+                list.innerHTML = '<p class="loading-text">Loading...</p>';
                 try {
-                    const docs = await api('/api/admin/documents');
-
-                    // Update stats
+                    var docs = await api('/api/admin/documents');
                     $('statTotal').textContent = docs.length;
-                    $('statActive').textContent = docs.filter(d => d.active).length;
-                    $('statClicks').textContent = docs.reduce((sum, d) => sum + (d.clicks || 0), 0);
-
-                    if (!docs.length) {
-                        list.innerHTML = '<p class="loading-text">No documents yet. Add your first one above.</p>';
-                        return;
-                    }
-
-                    list.innerHTML = docs.map(d => `
-                        <div class="doc-row">
-                            ${d.image_url
-                                ? `<img src="${d.image_url}" alt="" class="doc-thumb" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`
-                                : ''}
-                            <div class="doc-thumb-placeholder" style="${d.image_url ? 'display:none' : ''}">
-                                <span class="material-icons">description</span>
-                            </div>
-                            <div class="doc-info">
-                                <h4>
-                                    ${d.title}
-                                    <span class="badge ${d.active ? 'badge-active' : 'badge-hidden'}">
-                                        ${d.active ? 'Active' : 'Hidden'}
-                                    </span>
-                                </h4>
-                                <span class="meta">
-                                    ${parseInt(d.price).toLocaleString()} ${d.currency} · 
-                                    ${d.clicks || 0} views · 
-                                    ${d.file_path ? d.file_path.split('/').pop() : 'No file'}
-                                </span>
-                            </div>
-                            <div class="doc-actions">
-                                <button class="btn btn-outline btn-sm btn-icon" onclick='editDocument(${JSON.stringify(d).replace(/'/g, "&#39;")})' title="Edit">
-                                    <span class="material-icons">edit</span>
-                                </button>
-                                <button class="btn btn-outline btn-sm btn-icon" onclick="toggleDocument('${d.id}')" title="${d.active ? 'Hide' : 'Show'}">
-                                    <span class="material-icons">${d.active ? 'visibility_off' : 'visibility'}</span>
-                                </button>
-                                <button class="btn btn-red btn-sm btn-icon" onclick="deleteDocument('${d.id}', '${d.title.replace(/'/g, "\\'")}')" title="Delete">
-                                    <span class="material-icons">delete</span>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-
-                } catch (err) {
-                    list.innerHTML = `<p class="loading-text" style="color:#dc2626;">Failed to load: ${err.message}</p>`;
-                }
+                    $('statActive').textContent = docs.filter(function(d) { return d.active; }).length;
+                    $('statClicks').textContent = docs.reduce(function(s, d) { return s + (d.clicks || 0); }, 0);
+                    if (!docs.length) { list.innerHTML = '<p class="loading-text">No documents yet.</p>'; return; }
+                    list.innerHTML = docs.map(function(d) {
+                        return '<div class="doc-row">' +
+                            (d.image_url ? '<img src="' + d.image_url + '" alt="" class="doc-thumb" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
+                            '<div class="doc-thumb-placeholder" style="' + (d.image_url ? 'display:none' : '') + '"><span class="material-icons">description</span></div>' +
+                            '<div class="doc-info"><h4>' + d.title + ' <span class="badge ' + (d.active ? 'badge-active' : 'badge-hidden') + '">' + (d.active ? 'Active' : 'Hidden') + '</span></h4><span class="meta">' + parseInt(d.price).toLocaleString() + ' ' + d.currency + ' · ' + (d.clicks||0) + ' views · ' + (d.file_path ? d.file_path.split('/').pop() : 'No file') + '</span></div>' +
+                            '<div class="doc-actions">' +
+                                '<button class="btn btn-outline btn-sm btn-icon" onclick="editDocument(' + JSON.stringify(d).replace(/'/g, '&#39;') + ')" title="Edit"><span class="material-icons">edit</span></button>' +
+                                '<button class="btn btn-outline btn-sm btn-icon" onclick="toggleDocument(\'' + d.id + '\')" title="' + (d.active ? 'Hide' : 'Show') + '"><span class="material-icons">' + (d.active ? 'visibility_off' : 'visibility') + '</span></button>' +
+                                '<button class="btn btn-red btn-sm btn-icon" onclick="deleteDocument(\'' + d.id + '\',\'' + d.title.replace(/'/g, "\\'") + '\')" title="Delete"><span class="material-icons">delete</span></button>' +
+                            '</div></div>';
+                    }).join('');
+                } catch(err) { list.innerHTML = '<p class="loading-text" style="color:#dc2626;">' + err.message + '</p>'; }
             }
 
-            // Expose to global scope for onclick handlers
+            async function loadTransactions() {
+                var list = $('txnList');
+                list.innerHTML = '<p class="loading-text">Loading...</p>';
+                try {
+                    var txns = await api('/api/admin/verifications');
+                    $('statSuspicious').textContent = txns.filter(function(t) { return t.is_suspicious; }).length;
+                    $('statPaid').textContent = txns.filter(function(t) { return !t.is_suspicious; }).length;
+                    if (!txns.length) { list.innerHTML = '<p class="loading-text">No transactions yet.</p>'; return; }
+                    list.innerHTML = txns.map(function(t) {
+                        var dt = t.verified_at ? new Date(t.verified_at).toLocaleString() : 'N/A';
+                        return '<div class="txn-card">' +
+                            '<div class="txn-info">' +
+                                '<h4>' + (t.buyer_name || 'Unknown Buyer') + ' <span class="badge ' + (t.is_suspicious ? 'badge-hidden' : 'badge-active') + '"><span class="material-icons">' + (t.is_suspicious ? 'gpp_bad' : 'check_circle') + '</span> ' + (t.is_suspicious ? 'Suspicious' : 'Verified') + '</span></h4>' +
+                                '<span class="meta"><span>📱 ' + (t.phone_number || 'N/A') + '</span><span>·</span><span>Match: ' + (t.match_percentage || 0) + '%</span><span>·</span><span>' + dt + '</span></span>' +
+                            '</div>' +
+                            '<div class="txn-actions"><span style="font-size:.65rem;color:var(--sub);">#' + (t.client_token ? t.client_token.substring(0, 14) : 'N/A') + '</span></div>' +
+                        '</div>';
+                    }).join('');
+                } catch(err) { list.innerHTML = '<p class="loading-text" style="color:#dc2626;">' + err.message + '</p>'; }
+            }
+
+            function loadAll() { loadDocuments(); loadTransactions(); }
+
+            var saved = localStorage.getItem('adm_tok');
+            if (saved) { login(saved).catch(function() {}); }
+
             window.login = login;
             window.logout = logout;
             window.saveDocument = saveDocument;
@@ -774,7 +496,7 @@
             window.toggleDocument = toggleDocument;
             window.deleteDocument = deleteDocument;
             window.loadDocuments = loadDocuments;
-
+            window.loadTransactions = loadTransactions;
         })();
     </script>
 </body>
