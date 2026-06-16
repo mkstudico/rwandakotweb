@@ -27,7 +27,7 @@
             --danger: #d11124;
             --danger-bg: #fdecea;
             --card-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-            --card-hover-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --card-hover-shadow: 0 8px 24px rgba(0,0,0,0.08);
             --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
             --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
             --radius-sm: 0.375rem;
@@ -43,15 +43,15 @@
         button{cursor:pointer;font-family:inherit;border:none;background:transparent}
         input{font-family:inherit;font-size:inherit}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
         @keyframes toastUp{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
         .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
 
-        .navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center}
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center}
         .navbar-inner{max-width:1128px;margin:0 auto;width:100%;display:flex;align-items:center;gap:.75rem}
         .navbar-brand{display:flex;align-items:center;gap:.5rem;flex-shrink:0;cursor:pointer}
-        .navbar-logo{width:34px;height:34px;border-radius:8px 2px 8px 2px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.85rem;flex-shrink:0}
+        .navbar-logo{width:34px;height:34px;clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.85rem;flex-shrink:0}
         .navbar-title{font-size:1rem;font-weight:800;letter-spacing:-.4px;color:var(--text-primary)}
         .navbar-search{flex:1;max-width:340px}
         .search-wrap{display:flex;align-items:center;background:var(--bg-input);border-radius:var(--radius-full);padding:0 .7rem;height:34px;gap:.4rem;transition:all var(--transition-fast);border:1.5px solid transparent}
@@ -59,63 +59,70 @@
         .search-wrap input{flex:1;border:none;background:transparent;outline:none;font-size:.82rem;color:var(--text-primary)}
         .search-wrap input::placeholder{color:var(--text-tertiary)}
         .search-wrap i{color:var(--text-tertiary);font-size:15px;flex-shrink:0}
+        #docCount{font-size:.7rem;font-weight:600;color:var(--text-tertiary);flex-shrink:0}
 
         .main-layout{max-width:1128px;margin:0 auto;padding:.85rem;padding-bottom:3rem}
-        .section{margin-bottom:1.5rem}
-        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:.5rem}
-        .section-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.4rem;color:var(--text-primary)}
-        .section-title i{color:var(--primary);font-size:1.1rem}
+        .section{margin-bottom:1.8rem}
+        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;gap:.5rem}
+        .section-title{font-size:.92rem;font-weight:700;display:flex;align-items:center;gap:.4rem;color:var(--text-primary)}
+        .section-title i{color:var(--primary);font-size:1.15rem}
         .section-badge{font-size:.65rem;font-weight:600;color:var(--text-tertiary);background:var(--bg-input);padding:3px 10px;border-radius:var(--radius-full)}
 
-        /* Small card grid */
-        .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.65rem}
+        /* Bigger cards */
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem}
         .card{
             background:var(--bg-surface);
             border:1px solid var(--border);
-            clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
-            padding:.85rem .7rem .7rem;
+            clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);
+            padding:1.1rem 1rem 1rem;
             cursor:pointer;
-            transition:all var(--transition-fast);
-            display:flex;flex-direction:column;gap:.4rem;
+            transition:all var(--transition-base);
+            display:flex;flex-direction:column;gap:.5rem;
             position:relative;
-            animation:fadeIn .25s ease-out;
+            animation:fadeIn .3s ease-out;
             text-decoration:none;
             color:inherit;
             -webkit-tap-highlight-color:transparent;
         }
-        .card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--card-hover-shadow)}
-        .card:active{transform:scale(.96)}
-        .card-icon-wrap{width:38px;height:38px;border-radius:8px 2px 8px 2px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-        .card-icon-wrap.doc{background:#e3f2fd;color:#0d47a1}
-        .card-icon-wrap.pdf{background:#ffebee;color:#c62828}
-        .card-icon-wrap.image{background:#ede7f6;color:#311b92}
-        .card-icon-wrap.other{background:#eceff1;color:#37474f}
-        .card-icon-wrap i{font-size:1.3rem}
-        .card-tag{position:absolute;top:6px;right:6px;font-size:.55rem;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);background:var(--primary-light);color:var(--primary);text-transform:uppercase}
+        .card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:var(--card-hover-shadow)}
+        .card:active{transform:scale(.97)}
+        .card-img-wrap{width:100%;height:130px;background:var(--bg-input);border-radius:6px 2px 6px 2px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+        .card-img-wrap img{width:100%;height:100%;object-fit:cover}
+        .card-img-wrap .card-icon-big{font-size:3rem;color:#d1d5db}
+        .card-tag{position:absolute;top:10px;right:10px;font-size:.6rem;font-weight:700;padding:3px 9px;border-radius:var(--radius-full);background:var(--primary-light);color:var(--primary);text-transform:uppercase;z-index:2}
         .card-body{flex:1;min-width:0}
-        .card-body h4{font-size:.78rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-        .card-body .card-desc{font-size:.65rem;color:var(--text-tertiary);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-        .card-footer{display:flex;align-items:center;justify-content:space-between;gap:.3rem}
-        .card-footer .price{font-size:.78rem;font-weight:700;color:var(--primary)}
-        .card-footer .views{font-size:.62rem;color:var(--text-tertiary);display:flex;align-items:center;gap:3px}
+        .card-body h4{font-size:.88rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;margin-bottom:3px}
+        .card-body .card-desc{font-size:.7rem;color:var(--text-tertiary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+        .card-footer{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-top:auto}
+        .card-footer .price{font-size:.9rem;font-weight:700;color:var(--primary)}
+        .card-footer .meta-row{display:flex;align-items:center;gap:.5rem;font-size:.65rem;color:var(--text-tertiary)}
+        .card-footer .meta-row span{display:flex;align-items:center;gap:3px}
 
-        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);border-radius:2px}
-        .table-wrap table{width:100%;border-collapse:collapse;font-size:.75rem;min-width:500px}
-        .table-wrap th{text-align:left;padding:10px 12px;font-weight:600;font-size:.65rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.3px;background:var(--bg-hover);border-bottom:1px solid var(--border);white-space:nowrap}
+        /* Table */
+        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
+        .table-wrap table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:550px}
+        .table-wrap th{text-align:left;padding:10px 12px;font-weight:600;font-size:.68rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.3px;background:var(--bg-hover);border-bottom:1px solid var(--border);white-space:nowrap}
         .table-wrap td{padding:9px 12px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
         .table-wrap tbody tr{cursor:pointer;transition:background var(--transition-fast)}
         .table-wrap tbody tr:hover{background:var(--bg-hover)}
-        .td-title{display:flex;align-items:center;gap:7px;font-weight:500}
-        .td-title img{width:28px;height:28px;border-radius:4px;object-fit:cover}
-        .td-status{font-size:.68rem;font-weight:500}
+        .td-title{display:flex;align-items:center;gap:8px;font-weight:500}
+        .td-title img{width:30px;height:30px;border-radius:4px;object-fit:cover}
+        .td-status{font-size:.7rem;font-weight:500}
         .td-status.paid{color:var(--success)}
         .td-status.unpaid{color:var(--text-tertiary)}
+
+        /* Price filter */
+        .filter-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+        .filter-row .filter-label{font-size:.7rem;font-weight:600;color:var(--text-secondary);white-space:nowrap}
+        .filter-row input{width:80px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-full);font-size:.72rem;background:var(--bg-surface);color:var(--text-primary);outline:none;font-family:var(--font-family)}
+        .filter-row input:focus{border-color:var(--primary)}
+        .filter-row .filter-sep{color:var(--text-tertiary);font-size:.7rem}
 
         .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-tertiary)}
         .empty-state i{font-size:48px;display:block;margin-bottom:.5rem;color:#d1d5db}
         .loading-wrap{text-align:center;padding:3rem 1rem;color:var(--text-tertiary)}
 
-        /* Modal - Onboarding */
+        /* Modal */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all var(--transition-base)}
         .modal-overlay.active{opacity:1;visibility:visible}
         .modal{background:var(--bg-surface);border-radius:var(--radius-xl);width:100%;max-width:440px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.15);animation:fadeIn .25s ease-out;padding:1.5rem}
@@ -129,13 +136,13 @@
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:.3rem;padding:.55rem 1.1rem;border-radius:var(--radius-full);font-weight:600;font-size:.82rem;transition:all var(--transition-fast);font-family:var(--font-family);width:100%}
         .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
 
-        /* Popup - Unseen */
+        /* Popup */
         .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all var(--transition-base)}
         .popup-overlay.active{opacity:1;visibility:visible}
         .popup{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;max-width:480px;width:100%;padding:1.25rem 1rem 1.5rem;animation:slideUp .3s ease;max-height:60vh;overflow-y:auto;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
         @media(min-width:500px){.popup-overlay{align-items:center}.popup{border-radius:var(--radius-xl);animation:fadeIn .25s ease}}
         .popup h4{font-size:.9rem;font-weight:700;margin-bottom:3px}
-        .popup .popup-sub{font-size:.72rem;color:var(--text-secondary);margin-bottom:12px}
+        .popup-sub{font-size:.72rem;color:var(--text-secondary);margin-bottom:12px}
         .mini-list{display:grid;gap:7px}
         .mini-card{display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--bg-hover);border-radius:var(--radius-lg);cursor:pointer;transition:all var(--transition-fast);text-decoration:none;color:inherit}
         .mini-card:hover{background:var(--primary-light)}
@@ -149,13 +156,19 @@
         .toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:toastUp .3s ease-out;pointer-events:auto;white-space:nowrap}
 
         @media(max-width:500px){
-            .card-grid{grid-template-columns:repeat(2,1fr);gap:.45rem}
-            .card{padding:.65rem .5rem .55rem}
-            .card-body h4{font-size:.7rem}
-            .card-footer .price{font-size:.7rem}
+            .card-grid{grid-template-columns:repeat(2,1fr);gap:.55rem}
+            .card{padding:.8rem .6rem .75rem}
+            .card-img-wrap{height:100px}
+            .card-body h4{font-size:.76rem}
+            .card-footer .price{font-size:.78rem}
             .navbar-title{display:none}
             .navbar-search{max-width:200px}
-            .section-title{font-size:.8rem}
+            .section-title{font-size:.82rem}
+        }
+        @media(max-width:360px){
+            .card-grid{grid-template-columns:1fr 1fr;gap:.4rem}
+            .card{padding:.6rem .45rem .55rem}
+            .card-img-wrap{height:85px}
         }
     </style>
 </head>
@@ -173,7 +186,7 @@
                     <input type="text" id="searchInput" placeholder="Search documents..." autocomplete="off">
                 </div>
             </div>
-            <span style="font-size:.7rem;font-weight:600;color:var(--text-tertiary);flex-shrink:0;" id="docCount">0 docs</span>
+            <span id="docCount">0 docs</span>
         </div>
     </nav>
 
@@ -181,7 +194,6 @@
         <div class="loading-wrap"><div class="spinner"></div><p style="font-size:.8rem;margin-top:.5rem;">Loading documents…</p></div>
     </div>
 
-    <!-- Onboarding Modal -->
     <div class="modal-overlay" id="onboardModal">
         <div class="modal">
             <h3>🎯 Personalize Your Experience</h3>
@@ -194,7 +206,6 @@
         </div>
     </div>
 
-    <!-- Unseen Popup -->
     <div class="popup-overlay" id="unseenPopup">
         <div class="popup" id="unseenContent"></div>
     </div>
@@ -212,6 +223,8 @@
             var paidSet = new Set();
             var userPrefs = null;
             var searchTerm = '';
+            var priceMin = '';
+            var priceMax = '';
             var debounceTimer = null;
             var selectedClass = null;
             var selectedSubjects = [];
@@ -248,32 +261,44 @@
                 return score;
             }
 
+            function getPopularityScore(doc) {
+                return (doc.clicks||0) + (getMatchScore(doc) * 2);
+            }
+
             function filterDocs() {
                 var docs = allDocs;
                 if (searchTerm.trim()) {
                     var q = searchTerm.toLowerCase().trim();
                     docs = docs.filter(function(d) { return d.title.toLowerCase().indexOf(q)!==-1||(d.description||'').toLowerCase().indexOf(q)!==-1; });
                 }
+                if (priceMin !== '' && !isNaN(priceMin)) {
+                    docs = docs.filter(function(d) { return d.price >= parseInt(priceMin); });
+                }
+                if (priceMax !== '' && !isNaN(priceMax)) {
+                    docs = docs.filter(function(d) { return d.price <= parseInt(priceMax); });
+                }
                 return docs;
             }
 
             function getSuggested(docs) {
-                return docs.slice().sort(function(a,b){ return getMatchScore(b)-getMatchScore(a); }).slice(0,8);
+                return docs.slice().sort(function(a,b){ return getPopularityScore(b) - getPopularityScore(a); }).slice(0,5);
             }
 
             function getCategory(fn) { var e=(fn||'').split('.').pop().toLowerCase(); if(['pdf','doc','docx','xls','xlsx','ppt','pptx','txt'].includes(e)) return e; if(['jpg','jpeg','png','gif','svg','webp'].includes(e)) return 'image'; return 'other'; }
             function getIcon(fn) { var c=getCategory(fn); var m={pdf:'bxs-file-pdf',doc:'bxs-file-doc',docx:'bxs-file-doc',xls:'bx-spreadsheet',xlsx:'bx-spreadsheet',ppt:'bxs-slideshow',pptx:'bxs-slideshow',image:'bx-image-alt'}; return m[c]||'bx-file-blank'; }
-            function getIconClass(fn) { var c=getCategory(fn); var m={pdf:'pdf',doc:'doc',docx:'doc',xls:'other',xlsx:'other',image:'image'}; return m[c]||'other'; }
 
             function cardHTML(d, tag) {
                 var score = getMatchScore(d);
-                var cat = getIconClass(d.image_url||'pdf');
-                var icon = getIcon(d.image_url||'pdf');
                 return '<a href="view.html?doc='+d.id+'" class="card" onclick="trackClick(\''+d.id+'\')">' +
                     (tag && score>=3 ? '<span class="card-tag">For You</span>' : '') +
-                    '<div class="card-icon-wrap '+cat+'"><i class="bx '+icon+'"></i></div>' +
+                    '<div class="card-img-wrap">' +
+                        (d.image_url ? '<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'bx bx-file card-icon-big\\\'></i>\'">' : '<i class="bx bx-file card-icon-big"></i>') +
+                    '</div>' +
                     '<div class="card-body"><h4>'+d.title+'</h4><p class="card-desc">'+(d.description||'')+'</p></div>' +
-                    '<div class="card-footer"><span class="price">'+formatPrice(d.price,d.currency)+'</span><span class="views"><i class="bx bx-show" style="font-size:10px;"></i> '+(d.clicks||0)+'</span></div>' +
+                    '<div class="card-footer">' +
+                        '<span class="price">'+formatPrice(d.price,d.currency)+'</span>' +
+                        '<div class="meta-row"><span><i class="bx bx-show" style="font-size:11px;"></i> '+(d.clicks||0)+'</span></div>' +
+                    '</div>' +
                 '</a>';
             }
 
@@ -288,13 +313,13 @@
 
             function render() {
                 var docs = filterDocs();
-                var recent = docs.slice().sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,8);
+                var recent = docs.slice().sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,5);
                 var suggested = getSuggested(docs);
                 var content = $('content');
                 $('docCount').textContent = docs.length + ' docs';
 
                 if (!docs.length) {
-                    content.innerHTML = '<div class="empty-state"><i class="bx bx-folder-open"></i><p>'+(searchTerm?'No matches found':'No documents yet')+'</p></div>';
+                    content.innerHTML = '<div class="empty-state"><i class="bx bx-folder-open"></i><p>'+(searchTerm||priceMin||priceMax?'No matches found':'No documents yet')+'</p></div>';
                     return;
                 }
 
@@ -313,8 +338,30 @@
                     '</div>' +
                     '<div class="section">' +
                         '<div class="section-header"><div class="section-title"><i class="bx bx-list-ul"></i> Full List</div></div>' +
+                        '<div class="filter-row">' +
+                            '<span class="filter-label">Price:</span>' +
+                            '<input type="number" id="priceMin" placeholder="Min" value="'+(priceMin||'')+'">' +
+                            '<span class="filter-sep">–</span>' +
+                            '<input type="number" id="priceMax" placeholder="Max" value="'+(priceMax||'')+'">' +
+                        '</div>' +
                         '<div class="table-wrap"><table><thead><tr><th>Document</th><th>Views</th><th>Price</th><th>Status</th></tr></thead><tbody>'+docs.map(tableRow).join('')+'</tbody></table></div>' +
                     '</div>';
+
+                // Attach price filter listeners
+                var pmin = $('priceMin');
+                var pmax = $('priceMax');
+                if (pmin && pmax) {
+                    pmin.addEventListener('input', function() {
+                        clearTimeout(debounceTimer);
+                        var self = this;
+                        debounceTimer = setTimeout(function() { priceMin = self.value; render(); }, 400);
+                    });
+                    pmax.addEventListener('input', function() {
+                        clearTimeout(debounceTimer);
+                        var self = this;
+                        debounceTimer = setTimeout(function() { priceMax = self.value; render(); }, 400);
+                    });
+                }
             }
 
             window.trackClick = function(id) { addSeen(id); fetch('/api/documents/'+id+'/click',{method:'POST'}).catch(function(){}); };
