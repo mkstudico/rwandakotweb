@@ -70,7 +70,7 @@ export default async function handler(req, res) {
     if (method === 'OPTIONS') return res.status(200).end();
 
     if (method === 'POST' && path !== '/api/rwandapay-callback' && !path.startsWith('/api/admin/upload')) {
-        if (!rateLimit(ip)) return res.status(429).json({ error: 'Too many requests' });
+        if (!rateLimit(ip)) return res.status(429).json({ error: 'Too many requests. Please wait.' });
     }
 
     try {
@@ -84,7 +84,12 @@ export default async function handler(req, res) {
                 .select('id,title,description,image_url,price,currency,clicks,created_at')
                 .eq('active', true)
                 .order('created_at', { ascending: false });
-            if (error) return res.status(500).json({ error: 'Failed to fetch documents' });
+
+            if (error) {
+                console.error('GET documents error:', error);
+                return res.status(500).json({ error: 'Failed to fetch documents' });
+            }
+
             return res.status(200).json(data || []);
         }
 
@@ -94,21 +99,28 @@ export default async function handler(req, res) {
         if (path.match(/^\/api\/documents\/[a-f0-9-]+$/) && method === 'GET') {
             const docId = path.split('/').pop();
             if (!vu(docId)) return res.status(400).json({ error: 'Invalid document ID' });
+
             const { data, error } = await supabase
                 .from('documents')
                 .select('id,title,description,image_url,price,currency,clicks,created_at')
-                .eq('id', docId).eq('active', true).single();
+                .eq('id', docId)
+                .eq('active', true)
+                .single();
+
             if (error || !data) return res.status(404).json({ error: 'Document not found' });
             return res.status(200).json(data);
         }
 
         // ═══════════════════════════════════════════
-        // PUBLIC: Track click
+        // PUBLIC: Track document click
         // ═══════════════════════════════════════════
         if (path.match(/^\/api\/documents\/[a-f0-9-]+\/click$/) && method === 'POST') {
             const docId = path.split('/')[3];
-            if (!vu(docId)) return res.status(400).json({ error: 'Invalid ID' });
-            await supabase.rpc('increment_click', { doc_id: docId });
+            if (!vu(docId)) return res.status(400).json({ error: 'Invalid document ID' });
+
+            const { error } = await supabase.rpc('increment_click', { doc_id: docId });
+            if (error) console.error('Click track error:', error);
+
             return res.status(200).json({ ok: true });
         }
 
@@ -116,12 +128,13 @@ export default async function handler(req, res) {
         // RWANDAPAY: Initialize payment
         // ═══════════════════════════════════════════
         if (path === '/api/rwandapay-init' && method === 'POST') {
-            const { document_id, device_fingerprint, phone, client_token } = req.body;
+            const { document_id, device_fingerprint, phone, client_token, customer_name } = req.body;
 
             if (!vu(document_id) || !vf(device_fingerprint) || !vphone(phone) || !vt(client_token)) {
                 return res.status(400).json({ error: 'Invalid parameters' });
             }
 
+            // Check if already paid on this device
             const { data: exist } = await supabase
                 .from('payments')
                 .select('id, created_at')
@@ -130,41 +143,77 @@ export default async function handler(req, res) {
                 .eq('status', 'completed')
                 .limit(1);
 
-            if (exist?.length) {
-                const diffMin = (Date.now() - new Date(exist[0].created_at).getTime()) / 60000;
+            if (exist && exist.length > 0) {
+                const paidAt = new Date(exist[0].created_at);
+                const diffMin = (Date.now() - paidAt.getTime()) / 60000;
                 if (diffMin <= DOWNLOAD_WINDOW_MINUTES) {
                     return res.status(200).json({ already_paid: true });
                 }
             }
 
+            // Get document details
             const { data: doc, error: docErr } = await supabase
                 .from('documents')
                 .select('price,currency,title')
-                .eq('id', document_id).eq('active', true).single();
-            if (docErr || !doc) return res.status(404).json({ error: 'Document not found' });
+                .eq('id', document_id)
+                .eq('active', true)
+                .single();
 
-            await supabase.from('payments').insert({
-                document_id, device_fingerprint, client_token,
-                amount: doc.price, currency: doc.currency,
-                status: 'pending', payment_method: 'rwandapay'
-            });
+            if (docErr || !doc) {
+                return res.status(404).json({ error: 'Document not found' });
+            }
 
+            // Create pending payment record
+            const { error: insertErr } = await supabase
+                .from('payments')
+                .insert({
+                    document_id,
+                    device_fingerprint,
+                    client_token,
+                    amount: doc.price,
+                    currency: doc.currency,
+                    status: 'pending',
+                    payment_method: 'rwandapay'
+                });
+
+            if (insertErr) {
+                console.error('Payment insert error:', insertErr);
+                return res.status(500).json({ error: 'Failed to create payment record' });
+            }
+
+            // Normalize phone number (remove leading 0 for RwandaPay)
             let normalizedPhone = phone.replace(/\s/g, '');
-            if (normalizedPhone.startsWith('0')) normalizedPhone = normalizedPhone.substring(1);
+            if (normalizedPhone.startsWith('0')) {
+                normalizedPhone = normalizedPhone.substring(1);
+            }
 
+            // Build the customer name
+            const customerDisplayName = customer_name && customer_name.trim().length > 0
+                ? customer_name.trim()
+                : 'Customer';
+
+            // Generate email from name
+            const nameSlug = customerDisplayName.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const customerEmail = nameSlug + '@kotweb.rw';
+
+            // Build RwandaPay request body
             const rpBody = {
                 amount: parseInt(doc.price),
                 tx_ref: client_token,
                 currency: doc.currency || 'RWF',
                 customer: {
-                    name: 'Customer',
-                    email: 'customer@kotweb.rw',
+                    name: customerDisplayName,
+                    email: customerEmail,
                     phone: normalizedPhone
                 },
                 redirect_url: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/view.html?doc=${document_id}&rp_ref=${client_token}`,
                 webhook_url: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/rwandapay-callback`,
                 description: doc.title || 'Document Purchase',
-                meta: { document_id, device_fingerprint }
+                meta: {
+                    document_id,
+                    device_fingerprint,
+                    customer_name: customerDisplayName
+                }
             };
 
             try {
@@ -177,12 +226,21 @@ export default async function handler(req, res) {
                     },
                     body: JSON.stringify(rpBody)
                 });
+
                 const rpData = await rpRes.json();
 
                 if (rpData.success && rpData.data?.payment_url) {
-                    await supabase.from('payments').update({
-                        transaction_ref: rpData.data.reference || client_token
-                    }).eq('client_token', client_token);
+                    // Update payment with session reference
+                    const { error: updateErr } = await supabase
+                        .from('payments')
+                        .update({
+                            transaction_ref: rpData.data.reference || client_token
+                        })
+                        .eq('client_token', client_token);
+
+                    if (updateErr) {
+                        console.error('Update reference error:', updateErr);
+                    }
 
                     return res.status(200).json({
                         success: true,
@@ -190,50 +248,97 @@ export default async function handler(req, res) {
                         reference: rpData.data.reference || client_token,
                         session_id: rpData.data.session_id
                     });
+                } else {
+                    console.error('RwandaPay init error:', JSON.stringify(rpData));
+                    return res.status(500).json({
+                        error: rpData.message || 'Payment initialization failed. Please try again.'
+                    });
                 }
-                return res.status(500).json({ error: rpData.message || 'Payment initialization failed' });
             } catch (err) {
-                return res.status(500).json({ error: 'Payment service unavailable' });
+                console.error('RwandaPay API error:', err);
+                return res.status(500).json({
+                    error: 'Payment service temporarily unavailable. Please try again.'
+                });
             }
         }
 
         // ═══════════════════════════════════════════
-        // RWANDAPAY: Verify payment status
+        // RWANDAPAY: Verify payment status (polling)
         // ═══════════════════════════════════════════
         if (path === '/api/rwandapay-verify' && method === 'POST') {
-            const { reference, client_token, device_fingerprint, document_id } = req.body;
+            const { reference, client_token, document_id } = req.body;
+
             const verifyRef = reference || client_token;
-            if (!verifyRef) return res.status(400).json({ error: 'Missing reference' });
+            if (!verifyRef) {
+                return res.status(400).json({ error: 'Missing reference or token' });
+            }
 
             try {
                 const rpRes = await fetch(`${RWANDAPAY_BASE}/checkout/${verifyRef}/verify`, {
                     headers: { 'Accept': 'application/json' }
                 });
+
                 const rpData = await rpRes.json();
 
+                // Payment successful
                 if (rpData.completed && rpData.success && rpData.status === 'successful') {
-                    await supabase.from('payments').update({
-                        status: 'completed', payment_method: 'rwandapay'
-                    }).eq('client_token', verifyRef).eq('status', 'pending');
+                    // Update payment status in Supabase
+                    const { error: updateErr } = await supabase
+                        .from('payments')
+                        .update({
+                            status: 'completed',
+                            payment_method: 'rwandapay'
+                        })
+                        .eq('client_token', verifyRef)
+                        .eq('status', 'pending');
 
-                    return res.status(200).json({ verified: true, status: 'completed', document_id });
+                    if (updateErr) {
+                        console.error('Update payment error:', updateErr);
+                    }
+
+                    return res.status(200).json({
+                        verified: true,
+                        status: 'completed',
+                        document_id: document_id
+                    });
                 }
 
+                // Payment failed
                 if (rpData.completed && !rpData.success) {
-                    await supabase.from('payments').update({
-                        status: 'failed'
-                    }).eq('client_token', verifyRef).eq('status', 'pending');
-                    return res.status(200).json({ verified: false, status: 'failed', message: rpData.message });
+                    const { error: failErr } = await supabase
+                        .from('payments')
+                        .update({
+                            status: 'failed'
+                        })
+                        .eq('client_token', verifyRef)
+                        .eq('status', 'pending');
+
+                    if (failErr) {
+                        console.error('Fail update error:', failErr);
+                    }
+
+                    return res.status(200).json({
+                        verified: false,
+                        status: 'failed',
+                        message: rpData.message || 'Payment was not successful'
+                    });
                 }
 
-                return res.status(200).json({ verified: false, status: rpData.status || 'pending', message: rpData.message });
+                // Still pending
+                return res.status(200).json({
+                    verified: false,
+                    status: rpData.status || 'pending',
+                    message: rpData.message || 'Waiting for payment confirmation...'
+                });
+
             } catch (err) {
-                return res.status(500).json({ error: 'Verification failed' });
+                console.error('Verify error:', err);
+                return res.status(500).json({ error: 'Payment verification failed. Please try again.' });
             }
         }
 
         // ═══════════════════════════════════════════
-        // RWANDAPAY: Webhook callback
+        // RWANDAPAY: Webhook callback (server-to-server)
         // ═══════════════════════════════════════════
         if (path === '/api/rwandapay-callback' && method === 'POST') {
             let payload;
@@ -241,14 +346,19 @@ export default async function handler(req, res) {
                 const chunks = [];
                 for await (const chunk of req) chunks.push(chunk);
                 payload = JSON.parse(Buffer.concat(chunks).toString());
-            } catch(e) {
-                return res.status(200).json({ received: true });
+            } catch (e) {
+                console.error('Webhook parse error:', e);
+                return res.status(200).json({ received: true, note: 'Invalid payload' });
             }
 
-            console.log('[RP Webhook]', JSON.stringify(payload).substring(0, 300));
+            console.log('[RwandaPay Webhook]', JSON.stringify(payload).substring(0, 400));
 
-            const signature = req.headers['x-rwandapay-signature'] || req.headers['rwandapay-signature'] || '';
+            // Verify signature if present
+            const signature = req.headers['x-rwandapay-signature'] ||
+                             req.headers['rwandapay-signature'] || '';
+
             if (signature && !verifyRwandaPaySignature(payload, signature)) {
+                console.warn('[RwandaPay Webhook] Invalid signature');
                 return res.status(200).json({ received: true, note: 'Invalid signature' });
             }
 
@@ -256,26 +366,60 @@ export default async function handler(req, res) {
             const data = payload.data;
 
             if (event === 'payment.successful' && data?.reference) {
-                const { data: payment } = await supabase
-                    .from('payments').select('id, status')
-                    .eq('client_token', data.reference).single();
+                const ref = data.reference;
 
-                if (payment && payment.status === 'pending') {
-                    await supabase.from('payments').update({
-                        status: 'completed',
-                        transaction_ref: data.transaction_id || data.reference,
-                        payment_method: 'rwandapay',
-                        amount: data.amount
-                    }).eq('id', payment.id);
-                    console.log('[RP Webhook] Confirmed:', data.reference);
+                // Find the pending payment
+                const { data: payment, error: fetchErr } = await supabase
+                    .from('payments')
+                    .select('id, status')
+                    .eq('client_token', ref)
+                    .single();
+
+                if (fetchErr || !payment) {
+                    console.log('[RwandaPay Webhook] Payment not found:', ref);
+                    return res.status(200).json({ received: true, note: 'Payment not found' });
+                }
+
+                if (payment.status === 'completed') {
+                    console.log('[RwandaPay Webhook] Already completed:', ref);
+                    return res.status(200).json({ received: true, note: 'Already completed' });
+                }
+
+                if (payment.status === 'pending') {
+                    const { error: updateErr } = await supabase
+                        .from('payments')
+                        .update({
+                            status: 'completed',
+                            transaction_ref: data.transaction_id || ref,
+                            payment_method: 'rwandapay',
+                            amount: data.amount || undefined
+                        })
+                        .eq('id', payment.id);
+
+                    if (updateErr) {
+                        console.error('[RwandaPay Webhook] Update error:', updateErr);
+                    } else {
+                        console.log('[RwandaPay Webhook] Payment confirmed:', ref);
+                    }
                 }
             }
 
             if (event === 'payment.failed' && data?.reference) {
-                await supabase.from('payments').update({
-                    status: 'failed'
-                }).eq('client_token', data.reference).eq('status', 'pending');
-                console.log('[RP Webhook] Failed:', data.reference);
+                const ref = data.reference;
+
+                const { error: failErr } = await supabase
+                    .from('payments')
+                    .update({
+                        status: 'failed'
+                    })
+                    .eq('client_token', ref)
+                    .eq('status', 'pending');
+
+                if (failErr) {
+                    console.error('[RwandaPay Webhook] Fail update error:', failErr);
+                } else {
+                    console.log('[RwandaPay Webhook] Payment failed:', ref);
+                }
             }
 
             return res.status(200).json({ received: true });
@@ -287,43 +431,59 @@ export default async function handler(req, res) {
         if (path === '/api/check-payment' && method === 'POST') {
             const { client_token, device_fingerprint, document_id } = req.body;
 
+            // Check by client token
             if (client_token) {
                 if (!vt(client_token)) return res.status(400).json({ error: 'Invalid token' });
-                const { data } = await supabase
+
+                const { data, error } = await supabase
                     .from('payments')
                     .select('status, document_id, amount, currency, created_at')
-                    .eq('client_token', client_token).single();
-                if (!data) return res.status(404).json({ error: 'Not found' });
+                    .eq('client_token', client_token)
+                    .single();
+
+                if (error || !data) {
+                    return res.status(404).json({ error: 'Payment not found' });
+                }
+
                 return res.status(200).json({
-                    paid: data.status === 'completed', status: data.status,
-                    document_id: data.document_id, amount: data.amount,
-                    currency: data.currency, created_at: data.created_at
+                    paid: data.status === 'completed',
+                    status: data.status,
+                    document_id: data.document_id,
+                    amount: data.amount,
+                    currency: data.currency,
+                    created_at: data.created_at
                 });
             }
 
+            // Check by device fingerprint + document ID
             if (device_fingerprint && document_id) {
-                if (!vf(device_fingerprint) || !vu(document_id))
-                    return res.status(400).json({ error: 'Invalid params' });
+                if (!vf(device_fingerprint) || !vu(document_id)) {
+                    return res.status(400).json({ error: 'Invalid parameters' });
+                }
 
-                const { data } = await supabase
+                const { data, error } = await supabase
                     .from('payments')
                     .select('id, status, amount, created_at')
                     .eq('device_fingerprint', device_fingerprint)
                     .eq('document_id', document_id)
-                    .order('created_at', { ascending: false }).limit(1);
+                    .order('created_at', { ascending: false })
+                    .limit(1);
 
-                const found = data?.length > 0;
+                if (error) return res.status(500).json({ error: 'Check failed' });
+
+                const found = data && data.length > 0;
                 const payment = found ? data[0] : null;
                 let withinWindow = false;
 
-                if (payment?.created_at && payment.status === 'completed') {
+                if (payment && payment.created_at && payment.status === 'completed') {
                     const diffMin = (Date.now() - new Date(payment.created_at).getTime()) / 60000;
                     withinWindow = diffMin <= DOWNLOAD_WINDOW_MINUTES;
                 }
 
                 return res.status(200).json({
                     already_paid: found && payment.status === 'completed' && withinWindow,
-                    payment, within_window: withinWindow
+                    payment: payment,
+                    within_window: withinWindow
                 });
             }
 
@@ -335,39 +495,80 @@ export default async function handler(req, res) {
         // ═══════════════════════════════════════════
         if (path === '/api/download' && method === 'POST') {
             const { client_token, device_fingerprint, document_id } = req.body;
-            if (!vt(client_token) || !vf(device_fingerprint) || !vu(document_id))
-                return res.status(400).json({ error: 'Invalid parameters' });
 
-            const { data: payment } = await supabase
-                .from('payments').select('*')
+            if (!vt(client_token) || !vf(device_fingerprint) || !vu(document_id)) {
+                return res.status(400).json({ error: 'Invalid parameters' });
+            }
+
+            // Find completed payment for this device + document
+            const { data: payment, error: payErr } = await supabase
+                .from('payments')
+                .select('*')
                 .eq('device_fingerprint', device_fingerprint)
                 .eq('document_id', document_id)
                 .eq('status', 'completed')
-                .order('created_at', { ascending: false }).limit(1).single();
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
 
-            if (!payment) return res.status(403).json({ error: 'Payment not confirmed' });
+            if (payErr || !payment) {
+                return res.status(403).json({
+                    error: 'Payment not confirmed. Please complete payment first.'
+                });
+            }
 
+            // Check 30-minute download window
             const paidAt = new Date(payment.created_at);
             const diffMinutes = (Date.now() - paidAt.getTime()) / 60000;
-            if (diffMinutes > DOWNLOAD_WINDOW_MINUTES)
-                return res.status(410).json({ error: 'Download window expired', expired: true });
 
-            const { data: doc } = await supabase
-                .from('documents').select('file_path').eq('id', document_id).single();
-            if (!doc) return res.status(404).json({ error: 'Document not found' });
+            if (diffMinutes > DOWNLOAD_WINDOW_MINUTES) {
+                return res.status(410).json({
+                    error: 'Download window has expired. Please purchase the document again.',
+                    expired: true
+                });
+            }
 
-            const { data: signedData } = await supabase
-                .storage.from('documents').createSignedUrl(doc.file_path, 600);
-            if (!signedData) return res.status(500).json({ error: 'Failed to generate link' });
+            // Get document file path
+            const { data: doc, error: docErr } = await supabase
+                .from('documents')
+                .select('file_path')
+                .eq('id', document_id)
+                .single();
 
-            await supabase.from('payments').update({
-                downloaded: true, downloaded_at: new Date().toISOString()
-            }).eq('id', payment.id);
+            if (docErr || !doc) {
+                return res.status(404).json({ error: 'Document not found' });
+            }
+
+            // Generate signed URL (valid 10 minutes)
+            const { data: signedData, error: signedErr } = await supabase
+                .storage
+                .from('documents')
+                .createSignedUrl(doc.file_path, 600);
+
+            if (signedErr || !signedData) {
+                console.error('Signed URL error:', signedErr);
+                return res.status(500).json({ error: 'Failed to generate download link' });
+            }
+
+            // Mark as downloaded
+            const { error: dlUpdateErr } = await supabase
+                .from('payments')
+                .update({
+                    downloaded: true,
+                    downloaded_at: new Date().toISOString()
+                })
+                .eq('id', payment.id);
+
+            if (dlUpdateErr) {
+                console.error('Download update error:', dlUpdateErr);
+            }
+
+            const remainingMinutes = Math.max(0, Math.floor(DOWNLOAD_WINDOW_MINUTES - diffMinutes));
 
             return res.status(200).json({
                 url: signedData.signedUrl,
                 filename: doc.file_path.split('/').pop(),
-                expires_in_minutes: Math.max(0, Math.floor(DOWNLOAD_WINDOW_MINUTES - diffMinutes))
+                expires_in_minutes: remainingMinutes
             });
         }
 
@@ -376,124 +577,281 @@ export default async function handler(req, res) {
         // ═══════════════════════════════════════════
         if (path === '/api/user-payments' && method === 'POST') {
             const { device_fingerprint } = req.body;
-            if (!vf(device_fingerprint)) return res.status(400).json({ error: 'Invalid fingerprint' });
+
+            if (!vf(device_fingerprint)) {
+                return res.status(400).json({ error: 'Invalid fingerprint' });
+            }
 
             const { data, error } = await supabase
                 .from('payments')
-                .select('id, document_id, client_token, amount, currency, status, transaction_ref, payment_method, downloaded, created_at, downloaded_at')
+                .select(`
+                    id,
+                    document_id,
+                    client_token,
+                    amount,
+                    currency,
+                    status,
+                    transaction_ref,
+                    payment_method,
+                    downloaded,
+                    created_at,
+                    downloaded_at
+                `)
                 .eq('device_fingerprint', device_fingerprint)
-                .order('created_at', { ascending: false }).limit(50);
-            if (error) return res.status(500).json({ error: 'Failed to fetch' });
+                .order('created_at', { ascending: false })
+                .limit(50);
 
+            if (error) {
+                console.error('User payments error:', error);
+                return res.status(500).json({ error: 'Failed to fetch payments' });
+            }
+
+            // Enrich with document info
             const enriched = [];
             for (const p of (data || [])) {
                 const { data: doc } = await supabase
-                    .from('documents').select('title, image_url').eq('id', p.document_id).single();
-                enriched.push({ ...p, document_title: doc?.title || 'Unknown', document_image: doc?.image_url || '' });
+                    .from('documents')
+                    .select('title, image_url')
+                    .eq('id', p.document_id)
+                    .single();
+
+                enriched.push({
+                    ...p,
+                    document_title: doc?.title || 'Unknown Document',
+                    document_image: doc?.image_url || ''
+                });
             }
+
             return res.status(200).json(enriched);
         }
 
         // ═══════════════════════════════════════════
-        // PUBLIC: Verify with proof
+        // PUBLIC: Verify payment with proof (OCR)
         // ═══════════════════════════════════════════
         if (path === '/api/verify-with-proof' && method === 'POST') {
-            const { client_token, device_fingerprint, buyer_name, phone_number, ocr_text, match_percentage, is_suspicious } = req.body;
-            if (!client_token || !vt(client_token)) return res.status(400).json({ error: 'Invalid token' });
+            const {
+                client_token,
+                device_fingerprint,
+                buyer_name,
+                phone_number,
+                ocr_text,
+                match_percentage,
+                is_suspicious
+            } = req.body;
 
-            const { data: payment } = await supabase
-                .from('payments').select('id, document_id, amount, currency, status, documents!inner(title, price, currency)')
-                .eq('client_token', client_token).single();
-            if (!payment) return res.status(404).json({ error: 'Not found' });
-            if (payment.status === 'completed') return res.status(200).json({ verified: true, suspicious: false, document_id: payment.document_id });
+            if (!client_token || !vt(client_token)) {
+                return res.status(400).json({ error: 'Invalid token' });
+            }
 
-            await supabase.from('payment_verifications').insert({
-                payment_id: payment.id, client_token, device_fingerprint: device_fingerprint || '',
-                buyer_name: buyer_name || '', phone_number: phone_number || '',
-                ocr_text: ocr_text || '', match_percentage: match_percentage || 0,
-                is_suspicious: is_suspicious || false, verified_at: new Date().toISOString()
-            });
+            // Find the payment with document info
+            const { data: payment, error: fetchErr } = await supabase
+                .from('payments')
+                .select('id, document_id, amount, currency, status, documents!inner(title, price, currency)')
+                .eq('client_token', client_token)
+                .single();
 
-            if (is_suspicious) {
-                const newPrice = payment.amount * 2;
-                await supabase.from('payments').update({
-                    amount: newPrice, status: 'pending_verification',
-                    transaction_ref: 'suspicious_' + client_token.substring(0, 8)
-                }).eq('client_token', client_token);
+            if (fetchErr || !payment) {
+                return res.status(404).json({ error: 'Payment not found' });
+            }
+
+            if (payment.status === 'completed') {
                 return res.status(200).json({
-                    verified: false, suspicious: true,
-                    original_price: payment.amount, new_price: newPrice,
-                    currency: payment.currency, document_id: payment.document_id,
-                    document_title: payment.documents?.title || 'Document'
+                    verified: true,
+                    suspicious: false,
+                    document_id: payment.document_id,
+                    message: 'Already verified'
                 });
             }
 
-            await supabase.from('payments').update({
-                status: 'completed', payment_method: 'verified_manual',
-                transaction_ref: 'verified_' + client_token.substring(0, 8)
-            }).eq('client_token', client_token).eq('status', 'pending');
+            // Store verification proof
+            const { error: proofErr } = await supabase
+                .from('payment_verifications')
+                .insert({
+                    payment_id: payment.id,
+                    client_token: client_token,
+                    device_fingerprint: device_fingerprint || '',
+                    buyer_name: buyer_name || '',
+                    phone_number: phone_number || '',
+                    ocr_text: ocr_text || '',
+                    match_percentage: match_percentage || 0,
+                    is_suspicious: is_suspicious || false,
+                    verified_at: new Date().toISOString()
+                });
+
+            if (proofErr) {
+                console.error('Verification insert error:', proofErr);
+            }
+
+            // If suspicious, double the price for this device
+            if (is_suspicious) {
+                const newPrice = payment.amount * 2;
+
+                const { error: updateErr } = await supabase
+                    .from('payments')
+                    .update({
+                        amount: newPrice,
+                        status: 'pending_verification',
+                        transaction_ref: 'suspicious_' + client_token.substring(0, 8)
+                    })
+                    .eq('client_token', client_token);
+
+                if (updateErr) {
+                    console.error('Suspicious update error:', updateErr);
+                    return res.status(500).json({ error: 'Failed to update payment' });
+                }
+
+                console.log('[Verify] Suspicious - price doubled:', {
+                    token: client_token,
+                    original: payment.amount,
+                    new: newPrice
+                });
+
+                return res.status(200).json({
+                    verified: false,
+                    suspicious: true,
+                    original_price: payment.amount,
+                    new_price: newPrice,
+                    currency: payment.currency,
+                    document_id: payment.document_id,
+                    document_title: payment.documents?.title || 'Document',
+                    message: 'Amakuru yawe ntiyuzuye. Igiciro cyikubye kabiri.'
+                });
+            }
+
+            // Not suspicious — mark as completed
+            const { error: updateErr } = await supabase
+                .from('payments')
+                .update({
+                    status: 'completed',
+                    payment_method: 'verified_manual',
+                    transaction_ref: 'verified_' + client_token.substring(0, 8)
+                })
+                .eq('client_token', client_token)
+                .eq('status', 'pending');
+
+            if (updateErr) {
+                console.error('Verify update error:', updateErr);
+                return res.status(500).json({ error: 'Failed to confirm payment' });
+            }
+
+            console.log('[Verify] Payment confirmed via proof:', client_token);
 
             return res.status(200).json({
-                verified: true, suspicious: false,
+                verified: true,
+                suspicious: false,
                 document_id: payment.document_id,
-                document_title: payment.documents?.title || 'Document'
+                document_title: payment.documents?.title || 'Document',
+                message: 'Ubwishyu bwemejwe!'
             });
         }
 
         // ═══════════════════════════════════════════
-        // ADMIN: Verify
+        // ADMIN: Verify admin key
         // ═══════════════════════════════════════════
         if (path === '/api/admin/verify' && method === 'POST') {
-            return res.status(200).json({ authenticated: await isAdmin(req) });
+            const ok = await isAdmin(req);
+            return res.status(200).json({ authenticated: ok });
         }
 
         // ═══════════════════════════════════════════
-        // ADMIN: Upload file
+        // ADMIN: Upload file to storage
         // ═══════════════════════════════════════════
         if (path === '/api/admin/upload' && method === 'POST') {
-            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
+            if (!(await isAdmin(req))) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
             const ct = req.headers['content-type'] || '';
-            if (!ct.includes('multipart/form-data')) return res.status(400).json({ error: 'Expected file' });
+            if (!ct.includes('multipart/form-data')) {
+                return res.status(400).json({ error: 'Expected file upload' });
+            }
+
             const boundary = ct.split('boundary=')[1];
-            if (!boundary) return res.status(400).json({ error: 'No boundary' });
+            if (!boundary) return res.status(400).json({ error: 'No boundary found' });
+
             const chunks = [];
-            for await (const c of req) chunks.push(c);
+            for await (const chunk of req) chunks.push(chunk);
             const fullBuffer = Buffer.concat(chunks);
             const endBoundary = Buffer.from('--' + boundary + '--');
-            let fileName = null, fileType = 'application/octet-stream';
+
+            let fileName = null;
+            let fileType = 'application/octet-stream';
+            let fileBuffer = null;
+
             const headerStr = fullBuffer.toString('utf8', 0, Math.min(fullBuffer.length, 4096));
             const fnMatch = headerStr.match(/filename="(.+?)"/);
             if (fnMatch) fileName = fnMatch[1];
             const ctMatch = headerStr.match(/Content-Type: (.+?)\r\n/);
             if (ctMatch) fileType = ctMatch[1].trim();
+
             let contentStart = -1;
             for (let i = 0; i < fullBuffer.length - 4; i++) {
-                if (fullBuffer[i]===0x0d&&fullBuffer[i+1]===0x0a&&fullBuffer[i+2]===0x0d&&fullBuffer[i+3]===0x0a) {
-                    contentStart = i + 4; break;
+                if (fullBuffer[i] === 0x0d && fullBuffer[i+1] === 0x0a &&
+                    fullBuffer[i+2] === 0x0d && fullBuffer[i+3] === 0x0a) {
+                    contentStart = i + 4;
+                    break;
                 }
             }
-            if (contentStart === -1 || !fileName) return res.status(400).json({ error: 'Could not parse file' });
+
+            if (contentStart === -1 || !fileName) {
+                return res.status(400).json({ error: 'Could not parse file' });
+            }
+
             let contentEnd = fullBuffer.length;
             for (let i = fullBuffer.length - endBoundary.length; i >= 0; i--) {
-                if (fullBuffer.slice(i, i + endBoundary.length).equals(endBoundary)) { contentEnd = i - 2; break; }
+                if (fullBuffer.slice(i, i + endBoundary.length).equals(endBoundary)) {
+                    contentEnd = i - 2;
+                    break;
+                }
             }
-            const fileBuffer = fullBuffer.slice(contentStart, contentEnd);
-            if (!fileBuffer || fileBuffer.length === 0) return res.status(400).json({ error: 'File is empty' });
-            const safeName = Date.now() + '_' + fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const { error } = await supabase.storage.from('documents').upload(safeName, fileBuffer, {
-                contentType: fileType, cacheControl: '3600', upsert: false
+
+            fileBuffer = fullBuffer.slice(contentStart, contentEnd);
+
+            if (!fileBuffer || fileBuffer.length === 0) {
+                return res.status(400).json({ error: 'File is empty. Please try again.' });
+            }
+
+            const safeName = `${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+            const { error } = await supabase
+                .storage
+                .from('documents')
+                .upload(safeName, fileBuffer, {
+                    contentType: fileType,
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) {
+                console.error('[Upload] Error:', error);
+                return res.status(500).json({ error: 'Upload failed: ' + error.message });
+            }
+
+            return res.status(200).json({
+                file_path: safeName,
+                filename: fileName,
+                size: fileBuffer.length
             });
-            if (error) return res.status(500).json({ error: 'Upload failed: ' + error.message });
-            return res.status(200).json({ file_path: safeName, filename: fileName, size: fileBuffer.length });
         }
 
         // ═══════════════════════════════════════════
-        // ADMIN: List documents
+        // ADMIN: List all documents
         // ═══════════════════════════════════════════
         if (path === '/api/admin/documents' && method === 'GET') {
-            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
-            const { data, error } = await supabase.from('documents').select('*').order('created_at', { ascending: false });
-            if (error) return res.status(500).json({ error: 'Fetch failed' });
+            if (!(await isAdmin(req))) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            const { data, error } = await supabase
+                .from('documents')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('[Admin] List error:', error);
+                return res.status(500).json({ error: 'Failed to fetch documents' });
+            }
+
             return res.status(200).json(data || []);
         }
 
@@ -501,17 +859,41 @@ export default async function handler(req, res) {
         // ADMIN: Add document
         // ═══════════════════════════════════════════
         if (path === '/api/admin/documents' && method === 'POST') {
-            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
+            if (!(await isAdmin(req))) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
             const { title, description, image_url, file_path, price, currency } = req.body;
-            if (!title || title.length > 200) return res.status(400).json({ error: 'Title required' });
-            if (!file_path) return res.status(400).json({ error: 'File required' });
-            if (!price || isNaN(price) || parseInt(price) <= 0) return res.status(400).json({ error: 'Price required' });
-            const { data, error } = await supabase.from('documents').insert({
-                title: title.trim(), description: (description || '').trim(),
-                image_url: (image_url || '').trim(), file_path: file_path.trim(),
-                price: parseInt(price), currency: (currency || 'RWF').toUpperCase(), active: true
-            }).select().single();
-            if (error) return res.status(500).json({ error: 'Insert failed' });
+
+            if (!title || typeof title !== 'string' || title.trim().length === 0 || title.length > 200) {
+                return res.status(400).json({ error: 'Title is required (1-200 characters)' });
+            }
+            if (!file_path || typeof file_path !== 'string') {
+                return res.status(400).json({ error: 'File path is required' });
+            }
+            if (!price || isNaN(price) || parseInt(price) <= 0) {
+                return res.status(400).json({ error: 'Valid price is required' });
+            }
+
+            const { data, error } = await supabase
+                .from('documents')
+                .insert({
+                    title: title.trim(),
+                    description: (description || '').trim(),
+                    image_url: (image_url || '').trim(),
+                    file_path: file_path.trim(),
+                    price: parseInt(price),
+                    currency: (currency || 'RWF').toUpperCase(),
+                    active: true
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error('[Admin] Insert error:', error);
+                return res.status(500).json({ error: 'Failed to add document' });
+            }
+
             return res.status(201).json(data);
         }
 
@@ -519,42 +901,112 @@ export default async function handler(req, res) {
         // ADMIN: Delete document
         // ═══════════════════════════════════════════
         if (path.match(/^\/api\/admin\/documents\/[a-f0-9-]+$/) && method === 'DELETE') {
-            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
+            if (!(await isAdmin(req))) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
             const docId = path.split('/').pop();
-            const { data: doc } = await supabase.from('documents').select('file_path').eq('id', docId).single();
-            if (doc?.file_path) await supabase.storage.from('documents').remove([doc.file_path]);
-            const { error } = await supabase.from('documents').delete().eq('id', docId);
-            if (error) return res.status(500).json({ error: 'Delete failed' });
+            if (!vu(docId)) return res.status(400).json({ error: 'Invalid document ID' });
+
+            // Get file path before deleting
+            const { data: doc } = await supabase
+                .from('documents')
+                .select('file_path')
+                .eq('id', docId)
+                .single();
+
+            // Delete from storage
+            if (doc && doc.file_path) {
+                const { error: storageErr } = await supabase
+                    .storage
+                    .from('documents')
+                    .remove([doc.file_path]);
+
+                if (storageErr) {
+                    console.warn('[Admin] Storage delete warning:', storageErr);
+                }
+            }
+
+            // Delete from database
+            const { error } = await supabase
+                .from('documents')
+                .delete()
+                .eq('id', docId);
+
+            if (error) {
+                console.error('[Admin] Delete error:', error);
+                return res.status(500).json({ error: 'Failed to delete document' });
+            }
+
             return res.status(200).json({ success: true });
         }
 
         // ═══════════════════════════════════════════
-        // ADMIN: Toggle document
+        // ADMIN: Toggle document active status
         // ═══════════════════════════════════════════
         if (path.match(/^\/api\/admin\/documents\/[a-f0-9-]+\/toggle$/) && method === 'PUT') {
-            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
+            if (!(await isAdmin(req))) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
             const docId = path.split('/')[4];
-            const { data: doc } = await supabase.from('documents').select('active').eq('id', docId).single();
-            if (!doc) return res.status(404).json({ error: 'Not found' });
-            await supabase.from('documents').update({ active: !doc.active }).eq('id', docId);
+            if (!vu(docId)) return res.status(400).json({ error: 'Invalid document ID' });
+
+            const { data: doc, error: fetchErr } = await supabase
+                .from('documents')
+                .select('active')
+                .eq('id', docId)
+                .single();
+
+            if (fetchErr || !doc) {
+                return res.status(404).json({ error: 'Document not found' });
+            }
+
+            const { error } = await supabase
+                .from('documents')
+                .update({ active: !doc.active })
+                .eq('id', docId);
+
+            if (error) {
+                console.error('[Admin] Toggle error:', error);
+                return res.status(500).json({ error: 'Failed to toggle document' });
+            }
+
             return res.status(200).json({ active: !doc.active });
         }
 
         // ═══════════════════════════════════════════
-        // ADMIN: List verifications
+        // ADMIN: List payment verifications
         // ═══════════════════════════════════════════
         if (path === '/api/admin/verifications' && method === 'GET') {
-            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
+            if (!(await isAdmin(req))) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
             const { data, error } = await supabase
-                .from('payment_verifications').select('*').order('verified_at', { ascending: false }).limit(100);
-            if (error) return res.status(500).json({ error: 'Fetch failed' });
+                .from('payment_verifications')
+                .select('*')
+                .order('verified_at', { ascending: false })
+                .limit(100);
+
+            if (error) {
+                console.error('[Admin] Verifications error:', error);
+                return res.status(500).json({ error: 'Failed to fetch verifications' });
+            }
+
             return res.status(200).json(data || []);
         }
 
+        // ═══════════════════════════════════════════
+        // 404 - Endpoint not found
+        // ═══════════════════════════════════════════
         return res.status(404).json({ error: 'Endpoint not found' });
 
     } catch (err) {
-        console.error('[Handler]', err);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('[Handler] Unhandled error:', err);
+        return res.status(500).json({
+            error: 'Internal server error',
+            message: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 }
