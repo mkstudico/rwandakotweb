@@ -118,7 +118,6 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid parameters' });
             }
 
-            // Check if already paid on this device
             const { data: exist } = await supabase
                 .from('payments')
                 .select('id, created_at')
@@ -135,7 +134,6 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Check for duplicate token
             const { data: dupToken } = await supabase
                 .from('payments')
                 .select('id')
@@ -146,7 +144,6 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Duplicate token. Please try again.' });
             }
 
-            // Get document details
             const { data: doc, error: docErr } = await supabase
                 .from('documents')
                 .select('price,currency,title')
@@ -158,7 +155,6 @@ export default async function handler(req, res) {
                 return res.status(404).json({ error: 'Document not found' });
             }
 
-            // Create pending payment record
             const { error: insertErr } = await supabase
                 .from('payments')
                 .insert({
@@ -189,7 +185,6 @@ export default async function handler(req, res) {
         if (path === '/api/check-payment' && method === 'POST') {
             const { client_token, device_fingerprint, document_id } = req.body;
 
-            // Check by client token
             if (client_token) {
                 if (!vt(client_token)) return res.status(400).json({ error: 'Invalid token' });
 
@@ -213,7 +208,6 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Check by device fingerprint + document ID
             if (device_fingerprint && document_id) {
                 if (!vf(device_fingerprint) || !vu(document_id)) {
                     return res.status(400).json({ error: 'Invalid parameters' });
@@ -221,10 +215,9 @@ export default async function handler(req, res) {
 
                 const { data, error } = await supabase
                     .from('payments')
-                    .select('id, status, created_at')
+                    .select('id, status, amount, created_at')
                     .eq('device_fingerprint', device_fingerprint)
                     .eq('document_id', document_id)
-                    .eq('status', 'completed')
                     .order('created_at', { ascending: false })
                     .limit(1);
 
@@ -234,13 +227,13 @@ export default async function handler(req, res) {
                 const payment = found ? data[0] : null;
 
                 let withinWindow = false;
-                if (payment && payment.created_at) {
+                if (payment && payment.created_at && payment.status === 'completed') {
                     const diffMin = (Date.now() - new Date(payment.created_at).getTime()) / 60000;
                     withinWindow = diffMin <= DOWNLOAD_WINDOW_MINUTES;
                 }
 
                 return res.status(200).json({
-                    already_paid: found && withinWindow,
+                    already_paid: found && payment.status === 'completed' && withinWindow,
                     payment: payment,
                     within_window: withinWindow
                 });
@@ -259,7 +252,6 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid parameters' });
             }
 
-            // Find completed payment
             const { data: payment, error: payErr } = await supabase
                 .from('payments')
                 .select('*')
@@ -270,11 +262,24 @@ export default async function handler(req, res) {
                 .single();
 
             if (payErr || !payment) {
-                return res.status(403).json({ error: 'Payment not confirmed. Please complete payment first.' });
+                const { data: anyPayment } = await supabase
+                    .from('payments')
+                    .select('*')
+                    .eq('device_fingerprint', device_fingerprint)
+                    .eq('document_id', document_id)
+                    .eq('status', 'completed')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (!anyPayment) {
+                    return res.status(403).json({ error: 'Payment not confirmed. Please complete payment first.' });
+                }
             }
 
-            // Check 30-minute download window
-            const paidAt = new Date(payment.created_at);
+            const validPayment = payment || anyPayment;
+
+            const paidAt = new Date(validPayment.created_at);
             const diffMinutes = (Date.now() - paidAt.getTime()) / 60000;
 
             if (diffMinutes > DOWNLOAD_WINDOW_MINUTES) {
@@ -284,7 +289,6 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Get document file path
             const { data: doc, error: docErr } = await supabase
                 .from('documents')
                 .select('file_path')
@@ -295,7 +299,6 @@ export default async function handler(req, res) {
                 return res.status(404).json({ error: 'Document not found' });
             }
 
-            // Generate signed URL (valid 10 minutes)
             const { data: signedData, error: signedErr } = await supabase
                 .storage
                 .from('documents')
@@ -306,14 +309,13 @@ export default async function handler(req, res) {
                 return res.status(500).json({ error: 'Failed to generate download link' });
             }
 
-            // Mark as downloaded
             await supabase
                 .from('payments')
                 .update({
                     downloaded: true,
                     downloaded_at: new Date().toISOString()
                 })
-                .eq('id', payment.id);
+                .eq('id', validPayment.id);
 
             const remainingMinutes = Math.max(0, Math.floor(DOWNLOAD_WINDOW_MINUTES - diffMinutes));
 
@@ -358,7 +360,6 @@ export default async function handler(req, res) {
                 return res.status(500).json({ error: 'Failed to fetch payments' });
             }
 
-            // Enrich with document info
             const enriched = [];
             for (const p of (data || [])) {
                 const { data: doc } = await supabase
@@ -412,7 +413,7 @@ export default async function handler(req, res) {
                 amount: payment.amount,
                 currency: payment.currency,
                 document_title: payment.document_title || 'Document',
-                note: 'Payment requires verification. Redirecting to verification page.'
+                note: 'Payment requires verification.'
             });
         }
 
@@ -434,7 +435,6 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid token' });
             }
 
-            // Find the payment with document info
             const { data: payment, error: fetchErr } = await supabase
                 .from('payments')
                 .select('id, document_id, amount, currency, status, documents!inner(title, price, currency)')
@@ -454,7 +454,6 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Store verification proof
             const { error: proofErr } = await supabase
                 .from('payment_verifications')
                 .insert({
@@ -473,7 +472,6 @@ export default async function handler(req, res) {
                 console.error('Verification insert error:', proofErr);
             }
 
-            // If suspicious, double the price
             if (is_suspicious) {
                 const newPrice = payment.amount * 2;
 
@@ -509,7 +507,6 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Not suspicious — mark as completed
             const { error: updateErr } = await supabase
                 .from('payments')
                 .update({
@@ -543,12 +540,7 @@ export default async function handler(req, res) {
             const { status, transaction_ref, client_token, amount, currency, payment_method } = req.body;
 
             console.log('[Callback] Received:', JSON.stringify({
-                status,
-                transaction_ref,
-                client_token,
-                amount,
-                currency,
-                payment_method
+                status, transaction_ref, client_token, amount, currency, payment_method
             }));
 
             if (!client_token) {
@@ -618,10 +610,7 @@ export default async function handler(req, res) {
                     .eq('client_token', client_token)
                     .eq('status', 'pending');
 
-                if (failErr) {
-                    console.error('[Callback] Fail update error:', failErr);
-                }
-
+                if (failErr) console.error('[Callback] Fail update error:', failErr);
                 console.log('[Callback] Payment failed:', client_token);
             }
 
@@ -640,14 +629,10 @@ export default async function handler(req, res) {
         // ADMIN: Upload file to storage
         // ═══════════════════════════════════════════
         if (path === '/api/admin/upload' && method === 'POST') {
-            if (!(await isAdmin(req))) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
+            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
             const ct = req.headers['content-type'] || '';
-            if (!ct.includes('multipart/form-data')) {
-                return res.status(400).json({ error: 'Expected file upload' });
-            }
+            if (!ct.includes('multipart/form-data')) return res.status(400).json({ error: 'Expected file upload' });
 
             const boundary = ct.split('boundary=')[1];
             if (!boundary) return res.status(400).json({ error: 'No boundary found' });
@@ -657,76 +642,49 @@ export default async function handler(req, res) {
             const body = Buffer.concat(chunks).toString();
             const parts = body.split('--' + boundary);
 
-            let fileBuffer = null;
-            let fileName = null;
-            let fileType = null;
+            let fileBuffer = null, fileName = null, fileType = null;
 
             for (const part of parts) {
                 if (part.includes('filename=')) {
                     const headerEnd = part.indexOf('\r\n\r\n');
                     if (headerEnd === -1) continue;
-
                     const header = part.substring(0, headerEnd);
                     const content = part.substring(headerEnd + 4);
-
                     const fnMatch = header.match(/filename="(.+?)"/);
                     if (fnMatch) fileName = fnMatch[1];
-
                     const ctMatch = header.match(/Content-Type: (.+)/);
                     if (ctMatch) fileType = ctMatch[1].trim();
-
-                    fileBuffer = Buffer.from(
-                        content.replace(/\r\n--$/, '').replace(/--$/, ''),
-                        'binary'
-                    );
+                    fileBuffer = Buffer.from(content.replace(/\r\n--$/, '').replace(/--$/, ''), 'binary');
                 }
             }
 
-            if (!fileBuffer || !fileName) {
-                return res.status(400).json({ error: 'No file uploaded' });
-            }
+            if (!fileBuffer || !fileName) return res.status(400).json({ error: 'No file uploaded' });
 
             const safeName = `${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-            const { error } = await supabase
-                .storage
-                .from('documents')
-                .upload(safeName, fileBuffer, {
-                    contentType: fileType || 'application/octet-stream',
-                    cacheControl: '3600',
-                    upsert: false
-                });
-
-            if (error) {
-                console.error('[Upload] Error:', error);
-                return res.status(500).json({ error: 'Upload failed: ' + error.message });
-            }
-
-            return res.status(200).json({
-                file_path: safeName,
-                filename: fileName,
-                size: fileBuffer.length
+            const { error } = await supabase.storage.from('documents').upload(safeName, fileBuffer, {
+                contentType: fileType || 'application/octet-stream',
+                cacheControl: '3600',
+                upsert: false
             });
+
+            if (error) return res.status(500).json({ error: 'Upload failed: ' + error.message });
+
+            return res.status(200).json({ file_path: safeName, filename: fileName, size: fileBuffer.length });
         }
 
         // ═══════════════════════════════════════════
         // ADMIN: List all documents
         // ═══════════════════════════════════════════
         if (path === '/api/admin/documents' && method === 'GET') {
-            if (!(await isAdmin(req))) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
+            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
             const { data, error } = await supabase
                 .from('documents')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('[Admin] List error:', error);
-                return res.status(500).json({ error: 'Failed to fetch documents' });
-            }
-
+            if (error) return res.status(500).json({ error: 'Failed to fetch documents' });
             return res.status(200).json(data || []);
         }
 
@@ -734,41 +692,28 @@ export default async function handler(req, res) {
         // ADMIN: Add document
         // ═══════════════════════════════════════════
         if (path === '/api/admin/documents' && method === 'POST') {
-            if (!(await isAdmin(req))) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
+            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
             const { title, description, image_url, file_path, price, currency } = req.body;
 
-            if (!title || typeof title !== 'string' || title.trim().length === 0 || title.length > 200) {
+            if (!title || typeof title !== 'string' || title.trim().length === 0 || title.length > 200)
                 return res.status(400).json({ error: 'Title is required (1-200 characters)' });
-            }
-            if (!file_path || typeof file_path !== 'string') {
+            if (!file_path || typeof file_path !== 'string')
                 return res.status(400).json({ error: 'File path is required' });
-            }
-            if (!price || isNaN(price) || parseInt(price) <= 0) {
+            if (!price || isNaN(price) || parseInt(price) <= 0)
                 return res.status(400).json({ error: 'Valid price is required' });
-            }
 
-            const { data, error } = await supabase
-                .from('documents')
-                .insert({
-                    title: title.trim(),
-                    description: (description || '').trim(),
-                    image_url: (image_url || '').trim(),
-                    file_path: file_path.trim(),
-                    price: parseInt(price),
-                    currency: (currency || 'RWF').toUpperCase(),
-                    active: true
-                })
-                .select()
-                .single();
+            const { data, error } = await supabase.from('documents').insert({
+                title: title.trim(),
+                description: (description || '').trim(),
+                image_url: (image_url || '').trim(),
+                file_path: file_path.trim(),
+                price: parseInt(price),
+                currency: (currency || 'RWF').toUpperCase(),
+                active: true
+            }).select().single();
 
-            if (error) {
-                console.error('[Admin] Insert error:', error);
-                return res.status(500).json({ error: 'Failed to add document' });
-            }
-
+            if (error) return res.status(500).json({ error: 'Failed to add document' });
             return res.status(201).json(data);
         }
 
@@ -776,40 +721,19 @@ export default async function handler(req, res) {
         // ADMIN: Delete document
         // ═══════════════════════════════════════════
         if (path.match(/^\/api\/admin\/documents\/[a-f0-9-]+$/) && method === 'DELETE') {
-            if (!(await isAdmin(req))) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
+            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
             const docId = path.split('/').pop();
             if (!vu(docId)) return res.status(400).json({ error: 'Invalid document ID' });
 
-            const { data: doc } = await supabase
-                .from('documents')
-                .select('file_path')
-                .eq('id', docId)
-                .single();
-
+            const { data: doc } = await supabase.from('documents').select('file_path').eq('id', docId).single();
             if (doc && doc.file_path) {
-                const { error: storageErr } = await supabase
-                    .storage
-                    .from('documents')
-                    .remove([doc.file_path]);
-
-                if (storageErr) {
-                    console.warn('[Admin] Storage delete warning:', storageErr);
-                }
+                const { error: storageErr } = await supabase.storage.from('documents').remove([doc.file_path]);
+                if (storageErr) console.warn('[Admin] Storage delete warning:', storageErr);
             }
 
-            const { error } = await supabase
-                .from('documents')
-                .delete()
-                .eq('id', docId);
-
-            if (error) {
-                console.error('[Admin] Delete error:', error);
-                return res.status(500).json({ error: 'Failed to delete document' });
-            }
-
+            const { error } = await supabase.from('documents').delete().eq('id', docId);
+            if (error) return res.status(500).json({ error: 'Failed to delete document' });
             return res.status(200).json({ success: true });
         }
 
@@ -817,33 +741,18 @@ export default async function handler(req, res) {
         // ADMIN: Toggle document active status
         // ═══════════════════════════════════════════
         if (path.match(/^\/api\/admin\/documents\/[a-f0-9-]+\/toggle$/) && method === 'PUT') {
-            if (!(await isAdmin(req))) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
+            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
             const docId = path.split('/')[4];
             if (!vu(docId)) return res.status(400).json({ error: 'Invalid document ID' });
 
             const { data: doc, error: fetchErr } = await supabase
-                .from('documents')
-                .select('active')
-                .eq('id', docId)
-                .single();
+                .from('documents').select('active').eq('id', docId).single();
 
-            if (fetchErr || !doc) {
-                return res.status(404).json({ error: 'Document not found' });
-            }
+            if (fetchErr || !doc) return res.status(404).json({ error: 'Document not found' });
 
-            const { error } = await supabase
-                .from('documents')
-                .update({ active: !doc.active })
-                .eq('id', docId);
-
-            if (error) {
-                console.error('[Admin] Toggle error:', error);
-                return res.status(500).json({ error: 'Failed to toggle document' });
-            }
-
+            const { error } = await supabase.from('documents').update({ active: !doc.active }).eq('id', docId);
+            if (error) return res.status(500).json({ error: 'Failed to toggle document' });
             return res.status(200).json({ active: !doc.active });
         }
 
@@ -851,9 +760,7 @@ export default async function handler(req, res) {
         // ADMIN: List payment verifications
         // ═══════════════════════════════════════════
         if (path === '/api/admin/verifications' && method === 'GET') {
-            if (!(await isAdmin(req))) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
+            if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
             const { data, error } = await supabase
                 .from('payment_verifications')
@@ -861,17 +768,10 @@ export default async function handler(req, res) {
                 .order('verified_at', { ascending: false })
                 .limit(100);
 
-            if (error) {
-                console.error('[Admin] Verifications error:', error);
-                return res.status(500).json({ error: 'Failed to fetch' });
-            }
-
+            if (error) return res.status(500).json({ error: 'Failed to fetch' });
             return res.status(200).json(data || []);
         }
 
-        // ═══════════════════════════════════════════
-        // 404
-        // ═══════════════════════════════════════════
         return res.status(404).json({ error: 'Endpoint not found' });
 
     } catch (err) {
