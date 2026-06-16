@@ -2,495 +2,204 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>DocStore — Premium Documents</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>KotWeb — Smart Document Hub</title>
+    <meta name="description" content="KotWeb is the smart platform to discover and download premium documents.">
+    <meta name="theme-color" content="#6c47ff">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0f;
-            --surface: #16161a;
-            --surface2: #1e1e24;
-            --text: #f0f0f0;
-            --sub: #999;
-            --border: #2a2a32;
-            --accent: #e8c84c;
-            --accent2: #e8734a;
-            --green: #2ecc71;
-            --green-bg: #1a3a2a;
-            --green-text: #2ecc71;
-            --red: #e74c3c;
-            --red-bg: #3a1a1a;
-            --red-text: #e74c3c;
-            --purple: #9b59b6;
-            --purple-bg: #2a1a3a;
-            --blue: #3498db;
-            --blue-bg: #1a2a3a;
-            --radius: 18px;
-            --radius-sm: 12px;
-            --tr: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --bg-main: #f4f2ee;
+            --bg-surface: #ffffff;
+            --bg-hover: #f9fafb;
+            --bg-input: #eef3f8;
+            --border: #e5e7eb;
+            --text-primary: #191919;
+            --text-secondary: #595856;
+            --text-tertiary: #868482;
+            --primary: #6c47ff;
+            --primary-hover: #5835e8;
+            --primary-light: #f0ebff;
+            --success: #057642;
+            --success-bg: #e9f7ef;
+            --danger: #d11124;
+            --danger-bg: #fdecea;
+            --card-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+            --card-hover-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-full: 9999px;
         }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{-webkit-font-smoothing:antialiased;font-size:16px;scroll-behavior:smooth}
+        body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);line-height:1.5;min-height:100vh}
+        a{color:inherit;text-decoration:none}
+        button{cursor:pointer;font-family:inherit;border:none;background:transparent}
+        input{font-family:inherit;font-size:inherit}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+        @keyframes toastUp{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+        .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
 
-        *{margin:0;padding:0;box-sizing:border-box}
+        .navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center}
+        .navbar-inner{max-width:1128px;margin:0 auto;width:100%;display:flex;align-items:center;gap:.75rem}
+        .navbar-brand{display:flex;align-items:center;gap:.5rem;flex-shrink:0;cursor:pointer}
+        .navbar-logo{width:34px;height:34px;border-radius:8px 2px 8px 2px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.85rem;flex-shrink:0}
+        .navbar-title{font-size:1rem;font-weight:800;letter-spacing:-.4px;color:var(--text-primary)}
+        .navbar-search{flex:1;max-width:340px}
+        .search-wrap{display:flex;align-items:center;background:var(--bg-input);border-radius:var(--radius-full);padding:0 .7rem;height:34px;gap:.4rem;transition:all var(--transition-fast);border:1.5px solid transparent}
+        .search-wrap:focus-within{background:var(--bg-surface);border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1)}
+        .search-wrap input{flex:1;border:none;background:transparent;outline:none;font-size:.82rem;color:var(--text-primary)}
+        .search-wrap input::placeholder{color:var(--text-tertiary)}
+        .search-wrap i{color:var(--text-tertiary);font-size:15px;flex-shrink:0}
 
-        body{
-            font-family:'Poppins',sans-serif;
-            background:var(--bg);
-            color:var(--text);
-            min-height:100vh;
-            -webkit-font-smoothing:antialiased;
-        }
+        .main-layout{max-width:1128px;margin:0 auto;padding:.85rem;padding-bottom:3rem}
+        .section{margin-bottom:1.5rem}
+        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;gap:.5rem}
+        .section-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.4rem;color:var(--text-primary)}
+        .section-title i{color:var(--primary);font-size:1.1rem}
+        .section-badge{font-size:.65rem;font-weight:600;color:var(--text-tertiary);background:var(--bg-input);padding:3px 10px;border-radius:var(--radius-full)}
 
-        /* Header */
-        .topbar{
-            background:rgba(13,13,15,.94);
-            backdrop-filter:blur(20px);
-            border-bottom:1px solid var(--border);
-            padding:14px 20px;
-            position:sticky;
-            top:0;
-            z-index:50;
-        }
-        .topbar-inner{
-            max-width:1200px;
-            margin:0 auto;
-            display:flex;
-            align-items:center;
-            gap:16px;
-            flex-wrap:wrap;
-        }
-        .logo{
-            font-size:1.2rem;
-            font-weight:800;
-            display:flex;
-            align-items:center;
-            gap:8px;
-            letter-spacing:-.4px;
-            flex-shrink:0;
-            color:var(--accent);
-        }
-        .logo .material-icons{font-size:26px}
-        .search-wrap{
-            flex:1;
-            min-width:200px;
-            position:relative;
-        }
-        .search-wrap .material-icons{
-            position:absolute;
-            left:16px;
-            top:50%;
-            transform:translateY(-50%);
-            color:#666;
-            font-size:20px;
-            pointer-events:none;
-        }
-        .search-input{
-            width:100%;
-            padding:12px 16px 12px 46px;
-            border:1px solid var(--border);
-            border-radius:30px;
-            font-size:.85rem;
-            font-family:'Poppins',sans-serif;
-            background:var(--surface2);
-            color:var(--text);
-            outline:none;
-            transition:all var(--tr);
-            -webkit-appearance:none;
-        }
-        .search-input:focus{
-            border-color:var(--accent);
-            box-shadow:0 0 0 3px rgba(232,200,76,.1);
-        }
-        .search-input::placeholder{color:#555}
-        .nav-link{
-            padding:8px 16px;
-            border-radius:25px;
-            font-size:.78rem;
-            font-weight:500;
-            text-decoration:none;
-            color:var(--sub);
-            transition:all var(--tr);
-            background:var(--surface2);
-        }
-        .nav-link:hover{color:var(--text);background:var(--border)}
-        .nav-link.active{background:var(--accent);color:#0d0d0f;font-weight:600}
-
-        .container{max-width:1200px;margin:0 auto;padding:28px 16px 80px}
-
-        /* Section headers */
-        .section-header{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            margin-bottom:16px;
-            flex-wrap:wrap;
-            gap:8px;
-        }
-        .section-title{
-            font-size:1.1rem;
-            font-weight:700;
-            display:flex;
-            align-items:center;
-            gap:8px;
-            letter-spacing:-.2px;
-            color:var(--text);
-        }
-        .section-title .material-icons{font-size:22px;color:var(--accent)}
-        .section-badge{
-            font-size:.7rem;
-            color:var(--sub);
-            background:var(--surface2);
-            padding:5px 12px;
-            border-radius:20px;
-            font-weight:500;
-        }
-        .section{margin-bottom:36px}
-
-        /* Grid */
-        .grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-            gap:16px;
-        }
-
-        /* Card */
+        /* Small card grid */
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.65rem}
         .card{
-            background:var(--surface);
-            border-radius:var(--radius);
+            background:var(--bg-surface);
             border:1px solid var(--border);
-            overflow:hidden;
+            clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
+            padding:.85rem .7rem .7rem;
             cursor:pointer;
-            transition:all var(--tr);
+            transition:all var(--transition-fast);
+            display:flex;flex-direction:column;gap:.4rem;
+            position:relative;
+            animation:fadeIn .25s ease-out;
             text-decoration:none;
             color:inherit;
-            position:relative;
             -webkit-tap-highlight-color:transparent;
         }
-        .card:hover{
-            border-color:var(--accent);
-            transform:translateY(-3px);
-            box-shadow:0 12px 40px rgba(0,0,0,.4);
-        }
-        .card:active{transform:scale(.97)}
-        .card-img{
-            width:100%;
-            height:180px;
-            background:var(--surface2);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            overflow:hidden;
-            position:relative;
-        }
-        .card-img img{width:100%;height:100%;object-fit:cover}
-        .card-img .material-icons{font-size:52px;color:#444}
-        .card-badge{
-            position:absolute;
-            top:12px;
-            right:12px;
-            background:rgba(0,0,0,.7);
-            color:var(--accent);
-            font-size:.65rem;
-            padding:4px 10px;
-            border-radius:20px;
-            font-weight:600;
-            display:flex;
-            align-items:center;
-            gap:4px;
-            backdrop-filter:blur(8px);
-        }
-        .card-badge .material-icons{font-size:12px;color:var(--accent)}
-        .card-tag{
-            position:absolute;
-            top:12px;
-            left:12px;
-            background:var(--accent2);
-            color:#fff;
-            font-size:.62rem;
-            padding:3px 9px;
-            border-radius:12px;
-            font-weight:600;
-            text-transform:uppercase;
-            letter-spacing:.5px;
-        }
-        .card-body{padding:16px 14px}
-        .card-body h3{
-            font-size:.92rem;
-            font-weight:600;
-            margin-bottom:4px;
-            letter-spacing:-.2px;
-            line-height:1.3;
-        }
-        .card-body .desc{
-            font-size:.74rem;
-            color:var(--sub);
-            line-height:1.4;
-            margin-bottom:12px;
-            display:-webkit-box;
-            -webkit-line-clamp:2;
-            -webkit-box-orient:vertical;
-            overflow:hidden;
-        }
-        .card-footer{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-        }
-        .card-footer .price{
-            font-size:1.05rem;
-            font-weight:700;
-            color:var(--accent);
-        }
-        .card-footer .price small{font-size:.65rem;color:#666;font-weight:400}
-        .card-footer .meta{
-            font-size:.68rem;
-            color:var(--sub);
-            display:flex;
-            align-items:center;
-            gap:4px;
-        }
-        .card-footer .meta .material-icons{font-size:14px}
+        .card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--card-hover-shadow)}
+        .card:active{transform:scale(.96)}
+        .card-icon-wrap{width:38px;height:38px;border-radius:8px 2px 8px 2px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+        .card-icon-wrap.doc{background:#e3f2fd;color:#0d47a1}
+        .card-icon-wrap.pdf{background:#ffebee;color:#c62828}
+        .card-icon-wrap.image{background:#ede7f6;color:#311b92}
+        .card-icon-wrap.other{background:#eceff1;color:#37474f}
+        .card-icon-wrap i{font-size:1.3rem}
+        .card-tag{position:absolute;top:6px;right:6px;font-size:.55rem;font-weight:700;padding:2px 7px;border-radius:var(--radius-full);background:var(--primary-light);color:var(--primary);text-transform:uppercase}
+        .card-body{flex:1;min-width:0}
+        .card-body h4{font-size:.78rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+        .card-body .card-desc{font-size:.65rem;color:var(--text-tertiary);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+        .card-footer{display:flex;align-items:center;justify-content:space-between;gap:.3rem}
+        .card-footer .price{font-size:.78rem;font-weight:700;color:var(--primary)}
+        .card-footer .views{font-size:.62rem;color:var(--text-tertiary);display:flex;align-items:center;gap:3px}
 
-        /* Table */
-        .table-wrap{
-            overflow-x:auto;
-            -webkit-overflow-scrolling:touch;
-            border-radius:var(--radius);
-            border:1px solid var(--border);
-            background:var(--surface);
-        }
-        .table-wrap table{width:100%;border-collapse:collapse;font-size:.82rem}
-        .table-wrap th{
-            text-align:left;
-            padding:14px 16px;
-            font-weight:600;
-            font-size:.7rem;
-            color:var(--sub);
-            text-transform:uppercase;
-            letter-spacing:.4px;
-            background:var(--surface2);
-            border-bottom:1px solid var(--border);
-            white-space:nowrap;
-        }
-        .table-wrap td{
-            padding:13px 16px;
-            border-bottom:1px solid var(--border);
-            white-space:nowrap;
-        }
-        .table-wrap tr:last-child td{border-bottom:none}
-        .table-wrap tbody tr{cursor:pointer;transition:background var(--tr)}
-        .table-wrap tbody tr:hover{background:var(--surface2)}
-        .td-title{display:flex;align-items:center;gap:10px;font-weight:500}
-        .td-title img{width:34px;height:34px;border-radius:6px;object-fit:cover}
-        .td-status{font-size:.72rem;font-weight:500}
-        .td-status.paid{color:var(--green)}
-        .td-status.unpaid{color:var(--sub)}
+        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);border-radius:2px}
+        .table-wrap table{width:100%;border-collapse:collapse;font-size:.75rem;min-width:500px}
+        .table-wrap th{text-align:left;padding:10px 12px;font-weight:600;font-size:.65rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.3px;background:var(--bg-hover);border-bottom:1px solid var(--border);white-space:nowrap}
+        .table-wrap td{padding:9px 12px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
+        .table-wrap tbody tr{cursor:pointer;transition:background var(--transition-fast)}
+        .table-wrap tbody tr:hover{background:var(--bg-hover)}
+        .td-title{display:flex;align-items:center;gap:7px;font-weight:500}
+        .td-title img{width:28px;height:28px;border-radius:4px;object-fit:cover}
+        .td-status{font-size:.68rem;font-weight:500}
+        .td-status.paid{color:var(--success)}
+        .td-status.unpaid{color:var(--text-tertiary)}
+
+        .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-tertiary)}
+        .empty-state i{font-size:48px;display:block;margin-bottom:.5rem;color:#d1d5db}
+        .loading-wrap{text-align:center;padding:3rem 1rem;color:var(--text-tertiary)}
 
         /* Modal - Onboarding */
-        .modal-overlay{
-            display:none;
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,.8);
-            z-index:200;
-            align-items:center;
-            justify-content:center;
-            backdrop-filter:blur(4px);
-        }
-        .modal-overlay.active{display:flex}
-        .modal{
-            background:var(--surface);
-            border-radius:var(--radius);
-            border:1px solid var(--border);
-            padding:32px 24px;
-            max-width:500px;
-            width:92%;
-            text-align:center;
-            animation:fadeIn .3s ease;
-        }
-        @keyframes fadeIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
-        .modal .modal-icon{font-size:48px;margin-bottom:10px}
-        .modal h2{font-size:1.2rem;font-weight:700;margin-bottom:4px}
-        .modal .modal-sub{color:var(--sub);font-size:.8rem;margin-bottom:20px}
-        .chip-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px}
-        .chip{
-            padding:8px 16px;
-            border-radius:25px;
-            font-size:.78rem;
-            font-weight:500;
-            cursor:pointer;
-            border:1px solid var(--border);
-            background:var(--surface2);
-            color:var(--sub);
-            transition:all var(--tr);
-            font-family:'Poppins',sans-serif;
-            -webkit-tap-highlight-color:transparent;
-        }
-        .chip:hover{border-color:var(--accent);color:var(--text)}
-        .chip.selected{background:var(--accent);color:#0d0d0f;border-color:var(--accent);font-weight:600}
-        .chip-subject{font-size:.72rem;padding:6px 12px}
-        .modal .btn{width:100%;margin-top:8px}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all var(--transition-base)}
+        .modal-overlay.active{opacity:1;visibility:visible}
+        .modal{background:var(--bg-surface);border-radius:var(--radius-xl);width:100%;max-width:440px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.15);animation:fadeIn .25s ease-out;padding:1.5rem}
+        .modal h3{font-size:1rem;font-weight:700;margin-bottom:4px}
+        .modal .modal-sub{font-size:.76rem;color:var(--text-secondary);margin-bottom:1rem}
+        .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+        .chip{padding:7px 14px;border-radius:var(--radius-full);font-size:.74rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg-surface);color:var(--text-secondary);transition:all var(--transition-fast);font-family:var(--font-family)}
+        .chip:hover{border-color:var(--primary);color:var(--text-primary)}
+        .chip.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+        .chip-sm{padding:5px 10px;font-size:.68rem}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:.3rem;padding:.55rem 1.1rem;border-radius:var(--radius-full);font-weight:600;font-size:.82rem;transition:all var(--transition-fast);font-family:var(--font-family);width:100%}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
 
-        /* Popup - Unseen docs */
-        .popup-overlay{
-            display:none;
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,.75);
-            z-index:150;
-            align-items:flex-end;
-            justify-content:center;
-            backdrop-filter:blur(3px);
-        }
-        .popup-overlay.active{display:flex}
-        .popup{
-            background:var(--surface);
-            border-radius:22px 22px 0 0;
-            border:1px solid var(--border);
-            max-width:520px;
-            width:100%;
-            padding:24px 18px 32px;
-            animation:slideUp .35s ease;
-            max-height:70vh;
-            overflow-y:auto;
-        }
-        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-        @media(min-width:500px){
-            .popup-overlay{align-items:center}
-            .popup{border-radius:var(--radius)}
-        }
-        .popup h3{
-            font-size:1rem;
-            font-weight:700;
-            margin-bottom:4px;
-            display:flex;
-            align-items:center;
-            gap:7px;
-        }
-        .popup .popup-sub{font-size:.76rem;color:var(--sub);margin-bottom:16px}
-        .popup .mini-list{display:grid;gap:8px}
-        .popup .mini-card{
-            background:var(--surface2);
-            border-radius:var(--radius-sm);
-            padding:12px 14px;
-            display:flex;
-            align-items:center;
-            gap:10px;
-            cursor:pointer;
-            transition:all var(--tr);
-            text-decoration:none;
-            color:inherit;
-        }
-        .popup .mini-card:hover{background:var(--border)}
-        .popup .mini-card img{width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0}
-        .popup .mini-card .mc-icon{width:40px;height:40px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .popup .mini-card .mc-icon .material-icons{color:#555;font-size:20px}
-        .popup .mini-card .mc-info h4{font-size:.8rem;font-weight:600}
-        .popup .mini-card .mc-info span{font-size:.68rem;color:var(--sub)}
-        .popup .btn-close-popup{
-            margin-top:14px;
-            width:100%;
-            padding:10px;
-            border-radius:25px;
-            font-weight:600;
-            font-size:.8rem;
-            cursor:pointer;
-            border:1px solid var(--border);
-            background:transparent;
-            color:var(--sub);
-            font-family:'Poppins',sans-serif;
-            transition:all var(--tr);
-        }
-        .popup .btn-close-popup:hover{color:var(--text);border-color:#555}
+        /* Popup - Unseen */
+        .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all var(--transition-base)}
+        .popup-overlay.active{opacity:1;visibility:visible}
+        .popup{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;max-width:480px;width:100%;padding:1.25rem 1rem 1.5rem;animation:slideUp .3s ease;max-height:60vh;overflow-y:auto;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
+        @media(min-width:500px){.popup-overlay{align-items:center}.popup{border-radius:var(--radius-xl);animation:fadeIn .25s ease}}
+        .popup h4{font-size:.9rem;font-weight:700;margin-bottom:3px}
+        .popup .popup-sub{font-size:.72rem;color:var(--text-secondary);margin-bottom:12px}
+        .mini-list{display:grid;gap:7px}
+        .mini-card{display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--bg-hover);border-radius:var(--radius-lg);cursor:pointer;transition:all var(--transition-fast);text-decoration:none;color:inherit}
+        .mini-card:hover{background:var(--primary-light)}
+        .mini-card img{width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0}
+        .mini-card .mc-icon{width:34px;height:34px;border-radius:6px;background:var(--bg-surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-tertiary)}
+        .mini-card .mc-info h5{font-size:.76rem;font-weight:600}
+        .mini-card .mc-info span{font-size:.65rem;color:var(--text-tertiary)}
+        .btn-close-popup{width:100%;padding:8px;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-secondary);margin-top:10px;font-family:var(--font-family)}
 
-        .btn{
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            gap:7px;
-            padding:12px 26px;
-            border-radius:30px;
-            font-weight:600;
-            font-size:.84rem;
-            cursor:pointer;
-            border:none;
-            font-family:'Poppins',sans-serif;
-            transition:all var(--tr);
-            -webkit-tap-highlight-color:transparent;
-        }
-        .btn-accent{background:var(--accent);color:#0d0d0f}
-        .btn-accent:hover{background:#f0d45c}
-
-        .empty-state{text-align:center;padding:50px 20px;color:var(--sub)}
-        .empty-state .material-icons{font-size:52px;color:#444;margin-bottom:10px}
-        .empty-state p{font-size:.85rem}
-
-        .loader-wrap{text-align:center;padding:60px 20px;color:var(--sub)}
-        .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
-        @keyframes spin{to{transform:rotate(360deg)}}
-
-        .toast{
-            position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);
-            background:var(--surface2);color:var(--text);padding:12px 24px;
-            border-radius:40px;font-size:.78rem;font-weight:500;
-            font-family:'Poppins',sans-serif;z-index:300;
-            transition:transform .3s;pointer-events:none;white-space:nowrap;
-            border:1px solid var(--border);
-        }
-        .toast.show{transform:translateX(-50%) translateY(0)}
+        .toast-container{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none}
+        .toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:toastUp .3s ease-out;pointer-events:auto;white-space:nowrap}
 
         @media(max-width:500px){
-            .grid{grid-template-columns:1fr 1fr;gap:10px}
-            .card-img{height:140px}
-            .card-body{padding:12px 10px}
-            .card-body h3{font-size:.8rem}
-            .card-footer .price{font-size:.9rem}
-            .section-title{font-size:.95rem}
-            .chip-grid{gap:5px}
-            .chip{padding:6px 11px;font-size:.7rem}
+            .card-grid{grid-template-columns:repeat(2,1fr);gap:.45rem}
+            .card{padding:.65rem .5rem .55rem}
+            .card-body h4{font-size:.7rem}
+            .card-footer .price{font-size:.7rem}
+            .navbar-title{display:none}
+            .navbar-search{max-width:200px}
+            .section-title{font-size:.8rem}
         }
     </style>
 </head>
 <body>
 
-    <header class="topbar">
-        <div class="topbar-inner">
-            <div class="logo"><span class="material-icons">local_movies</span> DocFlix</div>
-            <div class="search-wrap">
-                <span class="material-icons">search</span>
-                <input type="text" class="search-input" id="searchInput" placeholder="Search documents by title or description..." autocomplete="off">
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-brand" onclick="location.reload()">
+                <div class="navbar-logo">K</div>
+                <span class="navbar-title">KotWeb</span>
             </div>
-            <a href="cart.html" class="nav-link"><span class="material-icons" style="font-size:16px;">receipt_long</span> Purchases</a>
+            <div class="navbar-search">
+                <div class="search-wrap">
+                    <i class="bx bx-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search documents..." autocomplete="off">
+                </div>
+            </div>
+            <span style="font-size:.7rem;font-weight:600;color:var(--text-tertiary);flex-shrink:0;" id="docCount">0 docs</span>
         </div>
-    </header>
+    </nav>
 
-    <div class="container" id="content">
-        <div class="loader-wrap"><div class="spinner"></div><p>Loading documents…</p></div>
+    <div class="main-layout" id="content">
+        <div class="loading-wrap"><div class="spinner"></div><p style="font-size:.8rem;margin-top:.5rem;">Loading documents…</p></div>
     </div>
 
     <!-- Onboarding Modal -->
     <div class="modal-overlay" id="onboardModal">
         <div class="modal">
-            <div class="modal-icon">🎯</div>
-            <h2>Personalize Your Experience</h2>
+            <h3>🎯 Personalize Your Experience</h3>
             <p class="modal-sub">Help us find the best documents for you</p>
-            <p style="font-size:.74rem;color:var(--sub);margin-bottom:8px;">Step 1: Select your class</p>
-            <div class="chip-grid" id="classChips"></div>
-            <p style="font-size:.74rem;color:var(--sub);margin-bottom:8px;margin-top:10px;">Step 2: Select your subjects</p>
-            <div class="chip-grid" id="subjectChips"></div>
-            <button class="btn btn-accent" onclick="savePreferences()">Continue</button>
+            <p style="font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Select your class</p>
+            <div class="chip-row" id="classChips"></div>
+            <p style="font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Select your subjects</p>
+            <div class="chip-row" id="subjectChips"></div>
+            <button class="btn btn-primary" onclick="savePreferences()">Continue</button>
         </div>
     </div>
 
-    <!-- Unseen Docs Popup -->
+    <!-- Unseen Popup -->
     <div class="popup-overlay" id="unseenPopup">
         <div class="popup" id="unseenContent"></div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         (function() {
@@ -504,12 +213,14 @@
             var userPrefs = null;
             var searchTerm = '';
             var debounceTimer = null;
+            var selectedClass = null;
+            var selectedSubjects = [];
 
             function $(id) { return document.getElementById(id); }
-            function toast(msg) { var t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tid); t._tid=setTimeout(function(){t.classList.remove('show')},2600); }
+            function toast(msg) { var t = document.createElement('div'); t.className='toast'; t.textContent=msg; $('toastContainer').appendChild(t); setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .25s'; setTimeout(function(){ t.remove(); },250); },2500); }
 
             async function apiCall(path, body) {
-                var opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+                var opts = { method: body?'POST':'GET', headers:{'Content-Type':'application/json'} };
                 if (body) opts.body = JSON.stringify(body);
                 var r = await fetch(path, opts);
                 var txt = await r.text();
@@ -517,66 +228,52 @@
             }
 
             function formatPrice(n,c) { return parseInt(n).toLocaleString() + ' ' + (c||'RWF'); }
+            function getPrefs() { try { return JSON.parse(localStorage.getItem('kw_prefs')); } catch(e) { return null; } }
+            function setPrefs(p) { localStorage.setItem('kw_prefs', JSON.stringify(p)); }
+            function getSeen() { try { return JSON.parse(localStorage.getItem('kw_seen')); } catch(e) { return []; } }
+            function addSeen(id) { var s = getSeen(); s.push({id:id,ts:Date.now()}); if(s.length>200)s=s.slice(-200); localStorage.setItem('kw_seen',JSON.stringify(s)); }
+            function isSeen(id) { return getSeen().some(function(d){ return d.id===id; }); }
 
-            function getPrefs() {
-                try { return JSON.parse(localStorage.getItem('docstore_prefs')); } catch(e) { return null; }
-            }
-            function setPrefs(p) { localStorage.setItem('docstore_prefs', JSON.stringify(p)); }
-            function getSeenDocs() { try { return JSON.parse(localStorage.getItem('docstore_seen')); } catch(e) { return []; } }
-            function addSeenDoc(id) {
-                var s = getSeenDocs();
-                s.push({ id: id, ts: Date.now() });
-                if (s.length > 200) s = s.slice(-200);
-                localStorage.setItem('docstore_seen', JSON.stringify(s));
-            }
-            function isSeen(id) { return getSeenDocs().some(function(d) { return d.id === id; }); }
-
-            function getKeywordMatches(doc) {
+            function getMatchScore(doc) {
                 if (!userPrefs) return 0;
                 var score = 0;
-                var txt = (doc.title + ' ' + (doc.description||'')).toLowerCase();
-                if (userPrefs.class && txt.indexOf(userPrefs.class.toLowerCase()) !== -1) score += 3;
+                var txt = (doc.title+' '+(doc.description||'')).toLowerCase();
+                if (userPrefs.class && txt.indexOf(userPrefs.class.toLowerCase())!==-1) score += 3;
                 if (userPrefs.subjects) {
                     userPrefs.subjects.forEach(function(s) {
-                        if (txt.indexOf(s.toLowerCase()) !== -1) score += 2;
-                        var parts = s.toLowerCase().split(/[\s-]+/);
-                        parts.forEach(function(p) { if (p.length > 2 && txt.indexOf(p) !== -1) score += 1; });
+                        if (txt.indexOf(s.toLowerCase())!==-1) score += 2;
+                        s.toLowerCase().split(/[\s-]+/).forEach(function(p) { if(p.length>2&&txt.indexOf(p)!==-1)score+=1; });
                     });
                 }
                 return score;
             }
 
             function filterDocs() {
-                var filtered = allDocs;
+                var docs = allDocs;
                 if (searchTerm.trim()) {
                     var q = searchTerm.toLowerCase().trim();
-                    filtered = filtered.filter(function(d) {
-                        return d.title.toLowerCase().indexOf(q) !== -1 || (d.description||'').toLowerCase().indexOf(q) !== -1;
-                    });
+                    docs = docs.filter(function(d) { return d.title.toLowerCase().indexOf(q)!==-1||(d.description||'').toLowerCase().indexOf(q)!==-1; });
                 }
-                return filtered;
+                return docs;
             }
 
             function getSuggested(docs) {
-                return docs.slice().sort(function(a,b) { return getKeywordMatches(b) - getKeywordMatches(a); }).slice(0,8);
+                return docs.slice().sort(function(a,b){ return getMatchScore(b)-getMatchScore(a); }).slice(0,8);
             }
 
-            function cardHTML(d, showTag) {
-                var score = getKeywordMatches(d);
+            function getCategory(fn) { var e=(fn||'').split('.').pop().toLowerCase(); if(['pdf','doc','docx','xls','xlsx','ppt','pptx','txt'].includes(e)) return e; if(['jpg','jpeg','png','gif','svg','webp'].includes(e)) return 'image'; return 'other'; }
+            function getIcon(fn) { var c=getCategory(fn); var m={pdf:'bxs-file-pdf',doc:'bxs-file-doc',docx:'bxs-file-doc',xls:'bx-spreadsheet',xlsx:'bx-spreadsheet',ppt:'bxs-slideshow',pptx:'bxs-slideshow',image:'bx-image-alt'}; return m[c]||'bx-file-blank'; }
+            function getIconClass(fn) { var c=getCategory(fn); var m={pdf:'pdf',doc:'doc',docx:'doc',xls:'other',xlsx:'other',image:'image'}; return m[c]||'other'; }
+
+            function cardHTML(d, tag) {
+                var score = getMatchScore(d);
+                var cat = getIconClass(d.image_url||'pdf');
+                var icon = getIcon(d.image_url||'pdf');
                 return '<a href="view.html?doc='+d.id+'" class="card" onclick="trackClick(\''+d.id+'\')">' +
-                    '<div class="card-img">' +
-                        (d.image_url ? '<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=material-icons>description</span>\'">' : '<span class="material-icons">description</span>') +
-                        ((d.clicks||0) > 3 ? '<span class="card-badge"><span class="material-icons">local_fire_department</span> '+(d.clicks||0)+'</span>' : '') +
-                        (showTag && score >= 3 ? '<span class="card-tag">For You</span>' : '') +
-                    '</div>' +
-                    '<div class="card-body">' +
-                        '<h3>'+d.title+'</h3>' +
-                        '<p class="desc">'+(d.description||'')+'</p>' +
-                        '<div class="card-footer">' +
-                            '<span class="price">'+formatPrice(d.price,d.currency)+'</span>' +
-                            '<span class="meta"><span class="material-icons">visibility</span> '+(d.clicks||0)+'</span>' +
-                        '</div>' +
-                    '</div>' +
+                    (tag && score>=3 ? '<span class="card-tag">For You</span>' : '') +
+                    '<div class="card-icon-wrap '+cat+'"><i class="bx '+icon+'"></i></div>' +
+                    '<div class="card-body"><h4>'+d.title+'</h4><p class="card-desc">'+(d.description||'')+'</p></div>' +
+                    '<div class="card-footer"><span class="price">'+formatPrice(d.price,d.currency)+'</span><span class="views"><i class="bx bx-show" style="font-size:10px;"></i> '+(d.clicks||0)+'</span></div>' +
                 '</a>';
             }
 
@@ -585,78 +282,68 @@
                     '<td><span class="td-title">'+(d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+' '+d.title+'</span></td>' +
                     '<td>'+(d.clicks||0)+'</td>' +
                     '<td>'+formatPrice(d.price,d.currency)+'</td>' +
-                    '<td class="td-status '+(paidSet.has(d.id)?'paid':'unpaid')+'">'+(paidSet.has(d.id)?'✅ Owned':'Available')+'</td>' +
+                    '<td class="td-status '+(paidSet.has(d.id)?'paid':'unpaid')+'">'+(paidSet.has(d.id)?'Owned':'Available')+'</td>' +
                 '</tr>';
             }
 
             function render() {
                 var docs = filterDocs();
+                var recent = docs.slice().sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); }).slice(0,8);
                 var suggested = getSuggested(docs);
-                var recent = docs.slice().sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); }).slice(0,8);
                 var content = $('content');
+                $('docCount').textContent = docs.length + ' docs';
 
                 if (!docs.length) {
-                    content.innerHTML = '<div class="empty-state"><span class="material-icons">search_off</span><p>'+(searchTerm?'No matches found':'No documents yet')+'</p></div>';
+                    content.innerHTML = '<div class="empty-state"><i class="bx bx-folder-open"></i><p>'+(searchTerm?'No matches found':'No documents yet')+'</p></div>';
                     return;
                 }
 
                 content.innerHTML =
                     '<div class="section">' +
-                        '<div class="section-header"><div class="section-title"><span class="material-icons">schedule</span> Recent</div><span class="section-badge">'+recent.length+' docs</span></div>' +
-                        '<div class="grid">'+recent.map(function(d){ return cardHTML(d,false); }).join('')+'</div>' +
+                        '<div class="section-header"><div class="section-title"><i class="bx bx-time-five"></i> Recent</div><span class="section-badge">'+recent.length+' docs</span></div>' +
+                        '<div class="card-grid">'+recent.map(function(d){ return cardHTML(d,false); }).join('')+'</div>' +
                     '</div>' +
                     '<div class="section">' +
-                        '<div class="section-header"><div class="section-title"><span class="material-icons">auto_awesome</span> Suggested For You</div><span class="section-badge">'+suggested.length+' docs</span></div>' +
-                        '<div class="grid">'+suggested.map(function(d){ return cardHTML(d,true); }).join('')+'</div>' +
+                        '<div class="section-header"><div class="section-title"><i class="bx bx-bulb"></i> Suggested For You</div><span class="section-badge">'+suggested.length+' docs</span></div>' +
+                        '<div class="card-grid">'+suggested.map(function(d){ return cardHTML(d,true); }).join('')+'</div>' +
                     '</div>' +
                     '<div class="section">' +
-                        '<div class="section-header"><div class="section-title"><span class="material-icons">apps</span> All Documents</div><span class="section-badge">'+docs.length+' docs</span></div>' +
-                        '<div class="grid">'+docs.map(function(d){ return cardHTML(d,false); }).join('')+'</div>' +
+                        '<div class="section-header"><div class="section-title"><i class="bx bx-grid-alt"></i> All Documents</div><span class="section-badge">'+docs.length+' docs</span></div>' +
+                        '<div class="card-grid">'+docs.map(function(d){ return cardHTML(d,false); }).join('')+'</div>' +
                     '</div>' +
                     '<div class="section">' +
-                        '<div class="section-header"><div class="section-title"><span class="material-icons">view_list</span> Full List</div></div>' +
+                        '<div class="section-header"><div class="section-title"><i class="bx bx-list-ul"></i> Full List</div></div>' +
                         '<div class="table-wrap"><table><thead><tr><th>Document</th><th>Views</th><th>Price</th><th>Status</th></tr></thead><tbody>'+docs.map(tableRow).join('')+'</tbody></table></div>' +
                     '</div>';
             }
 
-            window.trackClick = function(id) { addSeenDoc(id); fetch('/api/documents/'+id+'/click',{method:'POST'}).catch(function(){}); };
+            window.trackClick = function(id) { addSeen(id); fetch('/api/documents/'+id+'/click',{method:'POST'}).catch(function(){}); };
 
-            // Search with debounce
             $('searchInput').addEventListener('input', function() {
                 clearTimeout(debounceTimer);
                 var self = this;
                 debounceTimer = setTimeout(function() { searchTerm = self.value; render(); }, 300);
             });
 
-            // Onboarding
             function showOnboarding() {
-                var classChips = $('classChips');
-                var subjectChips = $('subjectChips');
-                var selectedClass = null;
-                var selectedSubjects = [];
-
-                classChips.innerHTML = CLASSES.map(function(c) {
+                $('classChips').innerHTML = CLASSES.map(function(c) {
                     return '<button class="chip" data-class="'+c+'">'+c+'</button>';
                 }).join('');
-                subjectChips.innerHTML = SUBJECTS.map(function(s) {
-                    return '<button class="chip chip-subject" data-subject="'+s+'">'+s+'</button>';
+                $('subjectChips').innerHTML = SUBJECTS.map(function(s) {
+                    return '<button class="chip chip-sm" data-subject="'+s+'">'+s+'</button>';
                 }).join('');
 
-                classChips.addEventListener('click', function(e) {
-                    var btn = e.target.closest('.chip');
-                    if (!btn || !btn.dataset.class) return;
-                    classChips.querySelectorAll('.chip').forEach(function(b) { b.classList.remove('selected'); });
-                    btn.classList.add('selected');
-                    selectedClass = btn.dataset.class;
+                $('classChips').addEventListener('click', function(e) {
+                    var b = e.target.closest('.chip'); if (!b||!b.dataset.class) return;
+                    $('classChips').querySelectorAll('.chip').forEach(function(x){ x.classList.remove('selected'); });
+                    b.classList.add('selected'); selectedClass = b.dataset.class;
                 });
-
-                subjectChips.addEventListener('click', function(e) {
-                    var btn = e.target.closest('.chip');
-                    if (!btn || !btn.dataset.subject) return;
-                    btn.classList.toggle('selected');
-                    var s = btn.dataset.subject;
-                    if (btn.classList.contains('selected')) { if (selectedSubjects.indexOf(s)===-1) selectedSubjects.push(s); }
-                    else { selectedSubjects = selectedSubjects.filter(function(x) { return x!==s; }); }
+                $('subjectChips').addEventListener('click', function(e) {
+                    var b = e.target.closest('.chip'); if (!b||!b.dataset.subject) return;
+                    b.classList.toggle('selected');
+                    var s = b.dataset.subject;
+                    if (b.classList.contains('selected')) { if (selectedSubjects.indexOf(s)===-1) selectedSubjects.push(s); }
+                    else { selectedSubjects = selectedSubjects.filter(function(x){ return x!==s; }); }
                 });
 
                 window.savePreferences = function() {
@@ -668,54 +355,38 @@
                     render();
                     toast('Preferences saved!');
                 };
-
                 $('onboardModal').classList.add('active');
             }
 
-            // Unseen popup
             function showUnseenPopup() {
                 var now = Date.now();
-                var twentyHours = 20 * 60 * 60 * 1000;
+                var twentyHours = 20*60*60*1000;
                 var unseen = allDocs.filter(function(d) {
                     if (isSeen(d.id)) return false;
-                    var created = new Date(d.created_at).getTime();
-                    return (now - created) <= twentyHours;
-                }).slice(0, 3);
-
+                    return (now - new Date(d.created_at).getTime()) <= twentyHours;
+                }).slice(0,3);
                 if (!unseen.length) return;
 
-                var popup = $('unseenContent');
-                popup.innerHTML =
-                    '<h3><span class="material-icons" style="color:var(--accent2);">explore</span> New For You</h3>' +
+                $('unseenContent').innerHTML =
+                    '<h4><i class="bx bx-sparkles" style="color:var(--primary);"></i> New For You</h4>' +
                     '<p class="popup-sub">Fresh documents you haven\'t seen yet</p>' +
-                    '<div class="mini-list">' +
-                        unseen.map(function(d) {
-                            return '<a href="view.html?doc='+d.id+'" class="mini-card" onclick="trackClick(\''+d.id+'\')">' +
-                                (d.image_url ? '<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' : '') +
-                                '<div class="mc-icon" style="'+(d.image_url?'display:none':'')+'"><span class="material-icons">description</span></div>' +
-                                '<div class="mc-info"><h4>'+d.title+'</h4><span>'+formatPrice(d.price,d.currency)+' · New</span></div>' +
-                            '</a>';
-                        }).join('') +
-                    '</div>' +
+                    '<div class="mini-list">'+unseen.map(function(d) {
+                        return '<a href="view.html?doc='+d.id+'" class="mini-card" onclick="trackClick(\''+d.id+'\')">' +
+                            (d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'') +
+                            '<div class="mc-icon" style="'+(d.image_url?'display:none':'')+'"><i class="bx bx-file"></i></div>' +
+                            '<div class="mc-info"><h5>'+d.title+'</h5><span>'+formatPrice(d.price,d.currency)+' · New</span></div>' +
+                        '</a>';
+                    }).join('')+'</div>' +
                     '<button class="btn-close-popup" onclick="$(\'unseenPopup\').classList.remove(\'active\')">Close</button>';
 
                 $('unseenPopup').classList.add('active');
             }
 
             (async function() {
-                try {
-                    allDocs = await apiCall('/api/documents');
-                } catch(e) { allDocs = []; }
-
+                try { allDocs = await apiCall('/api/documents'); } catch(e) { allDocs = []; }
                 userPrefs = getPrefs();
-
-                if (!userPrefs) {
-                    showOnboarding();
-                } else {
-                    // Show unseen popup
-                    setTimeout(function() { showUnseenPopup(); }, 1500);
-                }
-
+                if (!userPrefs) { showOnboarding(); }
+                else { setTimeout(function(){ showUnseenPopup(); }, 1500); }
                 render();
             })();
         })();
