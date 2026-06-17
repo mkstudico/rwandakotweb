@@ -31,6 +31,13 @@ export default async function handler(req, res) {
         if (path === '/api/rwandapay-init' && method === 'POST') {
             const { document_id, device_fingerprint, phone, client_token, customer_name } = req.body;
             if (!vu(document_id) || !vf(device_fingerprint) || !vphone(phone) || !vt(client_token)) return res.status(400).json({ error: 'Invalid params' });
+            
+            // Check env vars
+            if (!RWANDAPAY_PUBLIC_KEY || !RWANDAPAY_SECRET_KEY) {
+                console.error('Missing RwandaPay keys');
+                return res.status(500).json({ error: 'Payment configuration error' });
+            }
+
             const { data: exist } = await supabase.from('payments').select('id, created_at').eq('device_fingerprint', device_fingerprint).eq('document_id', document_id).eq('status', 'completed').limit(1);
             if (exist?.length && (Date.now() - new Date(exist[0].created_at).getTime()) / 60000 <= DOWNLOAD_WINDOW_MINUTES) return res.status(200).json({ already_paid: true });
             const { data: doc, error: docErr } = await supabase.from('documents').select('price,currency,title').eq('id', document_id).eq('active', true).single();
@@ -42,27 +49,29 @@ export default async function handler(req, res) {
             try {
                 const rpRes = await fetch(`${RWANDAPAY_BASE}/checkout/initialize`, { method: 'POST', headers: { 'X-Public-Key': RWANDAPAY_PUBLIC_KEY, 'X-Secret-Key': RWANDAPAY_SECRET_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(rpBody) });
                 const rpData = await rpRes.json();
-                if (rpData.success && rpData.data?.payment_url) { await supabase.from('payments').update({ transaction_ref: rpData.data.reference || client_token }).eq('client_token', client_token); return res.status(200).json({ success: true, payment_url: rpData.data.payment_url, reference: rpData.data.reference || client_token }); }
-                return res.status(500).json({ error: rpData.message || 'Init failed' });
-            } catch (err) { return res.status(500).json({ error: 'Service unavailable' }); }
+                if (!rpData.success) {
+                    console.error('RwandaPay error:', rpData);
+                    return res.status(500).json({ error: rpData.message || 'Payment service error' });
+                }
+                await supabase.from('payments').update({ transaction_ref: rpData.data.reference || client_token }).eq('client_token', client_token);
+                return res.status(200).json({ success: true, payment_url: rpData.data.payment_url, reference: rpData.data.reference || client_token });
+            } catch (err) { console.error('RwandaPay fetch error:', err); return res.status(500).json({ error: 'Payment service unavailable' }); }
         }
 
-        // RwandaPay Verify — FIXED: updates by BOTH client_token AND transaction_ref
+        // RwandaPay Verify
         if (path === '/api/rwandapay-verify' && method === 'POST') {
-            const { reference, client_token, document_id } = req.body;
+            const { reference, client_token, document_id, device_fingerprint } = req.body;
             const ref = reference || client_token;
-            if (!ref) return res.status(400).json({ error: 'Missing reference' });
             try {
                 const rpRes = await fetch(`${RWANDAPAY_BASE}/checkout/${ref}/verify`, { headers: { 'Accept': 'application/json' } });
                 const rpData = await rpRes.json();
                 if (rpData.completed && rpData.success && rpData.status === 'successful') {
-                    // Update by client_token
                     await supabase.from('payments').update({ status: 'completed', payment_method: 'rwandapay' }).eq('client_token', ref).eq('status', 'pending');
-                    // Also update by transaction_ref
                     await supabase.from('payments').update({ status: 'completed', payment_method: 'rwandapay' }).eq('transaction_ref', ref).eq('status', 'pending');
-                    // Find the payment to get document_id for the response
-                    const { data: found } = await supabase.from('payments').select('document_id').or(`client_token.eq.${ref},transaction_ref.eq.${ref}`).eq('status', 'completed').limit(1).single();
-                    return res.status(200).json({ verified: true, status: 'completed', document_id: found?.document_id || document_id });
+                    if (device_fingerprint && document_id) {
+                        await supabase.from('payments').update({ status: 'completed', payment_method: 'rwandapay' }).eq('device_fingerprint', device_fingerprint).eq('document_id', document_id).eq('status', 'pending');
+                    }
+                    return res.status(200).json({ verified: true, status: 'completed', document_id });
                 }
                 if (rpData.completed && !rpData.success) { await supabase.from('payments').update({ status: 'failed' }).eq('client_token', ref).eq('status', 'pending'); await supabase.from('payments').update({ status: 'failed' }).eq('transaction_ref', ref).eq('status', 'pending'); return res.status(200).json({ verified: false, status: 'failed' }); }
                 return res.status(200).json({ verified: false, status: rpData.status || 'pending' });
@@ -87,7 +96,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing params' });
         }
 
-        // Download — FIXED: finds ANY completed payment for this device+document
+        // Download
         if (path === '/api/download' && method === 'POST') {
             const { device_fingerprint, document_id } = req.body;
             if (!vf(device_fingerprint) || !vu(document_id)) return res.status(400).json({ error: 'Invalid parameters' });
@@ -109,7 +118,7 @@ export default async function handler(req, res) {
         // Verify with proof
         if (path === '/api/verify-with-proof' && method === 'POST') { const { client_token, device_fingerprint, buyer_name, phone_number, ocr_text, match_percentage, is_suspicious } = req.body; if (!client_token || !vt(client_token)) return res.status(400).json({ error: 'Invalid token' }); const { data: payment } = await supabase.from('payments').select('id, document_id, amount, currency, status, documents!inner(title)').eq('client_token', client_token).single(); if (!payment) return res.status(404).json({ error: 'Not found' }); if (payment.status === 'completed') return res.status(200).json({ verified: true, suspicious: false, document_id: payment.document_id }); await supabase.from('payment_verifications').insert({ payment_id: payment.id, client_token, device_fingerprint: device_fingerprint || '', buyer_name: buyer_name || '', phone_number: phone_number || '', ocr_text: ocr_text || '', match_percentage: match_percentage || 0, is_suspicious: is_suspicious || false, verified_at: new Date().toISOString() }); if (is_suspicious) { const np = payment.amount * 2; await supabase.from('payments').update({ amount: np, status: 'pending_verification' }).eq('client_token', client_token); return res.status(200).json({ verified: false, suspicious: true, original_price: payment.amount, new_price: np, currency: payment.currency, document_id: payment.document_id }); } await supabase.from('payments').update({ status: 'completed', payment_method: 'verified_manual' }).eq('client_token', client_token).eq('status', 'pending'); return res.status(200).json({ verified: true, suspicious: false, document_id: payment.document_id }); }
 
-        // Admin
+        // Admin endpoints
         if (path === '/api/admin/verify' && method === 'POST') return res.status(200).json({ authenticated: await isAdmin(req) });
         if (path === '/api/admin/upload' && method === 'POST') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const ct = req.headers['content-type'] || ''; if (!ct.includes('multipart/form-data')) return res.status(400).json({ error: 'Expected file' }); const boundary = ct.split('boundary=')[1]; if (!boundary) return res.status(400).json({ error: 'No boundary' }); const chunks = []; for await (const c of req) chunks.push(c); const fb = Buffer.concat(chunks), eb = Buffer.from('--' + boundary + '--'); let fn = null, ft = 'application/octet-stream'; const hs = fb.toString('utf8', 0, Math.min(fb.length, 4096)); const fm = hs.match(/filename="(.+?)"/); if (fm) fn = fm[1]; const cm = hs.match(/Content-Type: (.+?)\r\n/); if (cm) ft = cm[1].trim(); let cs = -1; for (let i = 0; i < fb.length - 4; i++) { if (fb[i]===0x0d&&fb[i+1]===0x0a&&fb[i+2]===0x0d&&fb[i+3]===0x0a) { cs = i + 4; break; } } if (cs === -1 || !fn) return res.status(400).json({ error: 'Parse failed' }); let ce = fb.length; for (let i = fb.length - eb.length; i >= 0; i--) { if (fb.slice(i, i + eb.length).equals(eb)) { ce = i - 2; break; } } const bf = fb.slice(cs, ce); if (!bf || bf.length === 0) return res.status(400).json({ error: 'Empty file' }); const sn = Date.now() + '_' + fn.replace(/[^a-zA-Z0-9._-]/g, '_'); const { error } = await supabase.storage.from('documents').upload(sn, bf, { contentType: ft, cacheControl: '3600', upsert: false }); if (error) return res.status(500).json({ error: 'Upload failed' }); return res.status(200).json({ file_path: sn, filename: fn, size: bf.length }); }
         if (path === '/api/admin/documents' && method === 'GET') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('documents').select('*').order('created_at', { ascending: false }); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
@@ -119,5 +128,5 @@ export default async function handler(req, res) {
         if (path === '/api/admin/verifications' && method === 'GET') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('payment_verifications').select('*').order('verified_at', { ascending: false }).limit(100); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
 
         return res.status(404).json({ error: 'Endpoint not found' });
-    } catch (err) { console.error('[Handler]', err); return res.status(500).json({ error: 'Internal error' }); }
+    } catch (err) { console.error('[Handler]', err); return res.status(500).json({ error: 'Internal server error' }); }
 }
