@@ -10,9 +10,9 @@
     <style>
         :root{--font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,'Helvetica Neue',Arial,sans-serif;--bg-main:#f4f2ee;--bg-surface:#ffffff;--bg-hover:#f9fafb;--bg-input:#eef3f8;--border:#e5e7eb;--text-primary:#191919;--text-secondary:#595856;--text-tertiary:#868482;--primary:#6c47ff;--primary-hover:#5835e8;--primary-light:#f0ebff;--success:#057642;--success-bg:#e9f7ef;--danger:#d11124;--danger-bg:#fdecea;--warning:#b85c00;--warning-bg:#fff8f0;--gold:#e8a838;--gold-bg:#fffdf5;--radius-xl:1rem;--radius-full:9999px;--transition-fast:150ms cubic-bezier(0.4,0,0.2,1)}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        html{font-size:16px}body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);min-height:100vh}
+        html{font-size:16px;scroll-behavior:smooth}body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);min-height:100vh}
         button{cursor:pointer;font-family:inherit;border:none;background:transparent}input,textarea{font-family:inherit;font-size:inherit}
-        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
         .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
         .topbar{background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 1rem;height:50px;display:flex;align-items:center;position:sticky;top:0;z-index:50}
         .topbar-inner{max-width:960px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -59,13 +59,24 @@
         .cashout-box{background:var(--gold-bg);border:1px solid var(--gold);border-radius:var(--radius-xl);padding:1rem 1.2rem;margin-bottom:1rem}
         .cashout-box h4{font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:6px}.cashout-box p{font-size:.7rem;color:var(--text-secondary);margin-bottom:8px}
         .cashout-box .min-badge{display:inline-block;background:var(--gold);color:#fff;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:600;margin-bottom:8px}
-        .step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
-        .step-dot{width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}.step-dot.active{background:var(--primary);color:#fff}.step-dot.done{background:var(--success);color:#fff}
-        .step-line{flex:1;height:2px;background:var(--border);min-width:20px}.step-line.done{background:var(--success)}
-        .nav-btns{display:flex;gap:8px;margin-top:10px}
+        .step-nav{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:8px}
+        .step-nav .btn{width:auto;padding:10px 20px;font-size:.78rem}
+        .step-nav .btn-next{background:var(--primary);color:#fff}.step-nav .btn-prev{background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border)}
+        .step-counter{font-size:.68rem;color:var(--text-tertiary);text-align:center;margin-bottom:10px}
         .toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--text-primary);color:#fff;padding:10px 20px;border-radius:30px;font-size:.74rem;z-index:400;animation:slideUp .3s ease;display:none;white-space:nowrap}
-        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all .25s}.modal-overlay.active{opacity:1;visibility:visible}
-        .modal{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;width:100%;max-width:460px;max-height:85vh;overflow-y:auto;padding:1.5rem 1.25rem 2rem;animation:slideUp .3s ease}@media(min-width:500px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius-xl)}}
+        .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all .3s}
+        .overlay.active{opacity:1;visibility:visible}
+        .overlay-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-align:center;max-width:400px;width:100%;animation:popIn .4s ease}
+        .overlay-card .w-icon{font-size:52px;margin-bottom:10px}
+        .overlay-card h2{font-size:1.2rem;font-weight:800;margin-bottom:4px}
+        .overlay-card .w-amount{font-size:1.8rem;font-weight:800;color:var(--primary);margin:10px 0}
+        .overlay-card .w-link{font-size:.72rem;color:var(--primary);word-break:break-all;margin:10px 0;background:var(--primary-light);padding:8px 14px;border-radius:var(--radius-full)}
+        .overlay-card p{font-size:.76rem;color:var(--text-secondary);margin-bottom:6px}
+        .tutorial-spotlight{position:fixed;z-index:280;pointer-events:none;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.6);transition:all .4s ease}
+        .tutorial-tooltip{position:fixed;z-index:290;background:var(--bg-surface);border-radius:var(--radius-xl);padding:14px 16px;max-width:260px;box-shadow:0 8px 30px rgba(0,0,0,.2);animation:popIn .3s ease;font-size:.74rem}
+        .tutorial-tooltip h5{font-size:.78rem;font-weight:700;margin-bottom:3px}
+        .tutorial-tooltip p{font-size:.68rem;color:var(--text-secondary);margin-bottom:8px}
+        .tutorial-tooltip .btn{width:auto;padding:6px 14px;font-size:.68rem}
         @media(max-width:500px){.stats-row{grid-template-columns:1fr 1fr}.doc-row{flex-direction:column;align-items:flex-start}.doc-actions{width:100%;justify-content:flex-end}.revenue-card .rev-amount{font-size:1.7rem}.tab-btn{font-size:.68rem;padding:6px 10px}}
     </style>
 </head>
@@ -73,7 +84,8 @@
     <header class="topbar"><div class="topbar-inner"><a href="index.html" class="logo"><span>K</span> KotWeb Publisher</a><div class="user-badge" id="userBadge" style="display:none"><i class="bx bx-user-circle"></i> <span id="pubEmail"></span></div><button class="btn btn-outline btn-sm" id="logoutBtn" style="display:none">Logout</button></div></header>
     <div class="container" id="content"><div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">Loading…</p></div></div>
     <div class="toast" id="toast"></div>
-    <div class="modal-overlay" id="editModal"><div class="modal" id="editModalContent"></div></div>
+    <div class="overlay" id="welcomeOverlay"><div class="overlay-card" id="welcomeCard"></div></div>
+    <div class="overlay" id="editOverlay"><div class="overlay-card" id="editContent" style="text-align:left;max-width:440px"></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
@@ -89,6 +101,8 @@
         var firebaseUID = '';
         var addStep = 1;
         var dashLoaded = false;
+        var tutorialActive = false;
+        var tutorialStep = 0;
 
         function el(id) { return document.getElementById(id); }
         function toast(m) { var t = el('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(function() { t.style.display = 'none'; }, 2500); }
@@ -108,9 +122,7 @@
 
         async function registerWithServer(username) {
             if (!firebaseUID || !userEmail) return;
-            try {
-                await apiCall(API + '/firebase-register', { uid: firebaseUID, email: userEmail, username: username || userEmail.split('@')[0] });
-            } catch (e) { /* ignore */ }
+            try { await apiCall(API + '/firebase-register', { uid: firebaseUID, email: userEmail, username: username || userEmail.split('@')[0] }); } catch (e) {}
         }
 
         function showLogin() {
@@ -123,14 +135,12 @@
                 '<div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password" autocomplete="off"></div>' +
                 '<button class="btn btn-primary" id="loginBtn">Sign In</button>' +
                 '<p class="link-text">New publisher? <a id="showRegister">Create an account</a></p></div>';
-
             el('loginBtn').addEventListener('click', async function() {
                 var btn = this; btn.disabled = true; btn.innerHTML = 'Signing in…';
                 try {
                     var e = el('loginEmail').value.trim(), p = el('loginPass').value;
                     if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Sign In'; return; }
-                    var cred = await signInWithEmailAndPassword(auth, e, p);
-                    // onAuthStateChanged will fire
+                    await signInWithEmailAndPassword(auth, e, p);
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Sign In'; }
             });
             el('showRegister').addEventListener('click', function(e) { e.preventDefault(); showRegister(); });
@@ -147,7 +157,6 @@
                 '<div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 characters" autocomplete="off"></div>' +
                 '<button class="btn btn-primary" id="regBtn">Create Account & Claim 1,000 RWF</button>' +
                 '<p class="link-text">Already have an account? <a id="showLoginLink">Sign In</a></p></div>';
-
             el('regBtn').addEventListener('click', async function() {
                 var btn = this; btn.disabled = true; btn.innerHTML = 'Creating…';
                 try {
@@ -157,10 +166,72 @@
                     if (p.length < 6) { toast('Password: min 6 chars'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
                     var cred = await createUserWithEmailAndPassword(auth, e, p);
                     await registerWithServer(user);
-                    // onAuthStateChanged will handle the rest
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Create Account'; }
             });
             el('showLoginLink').addEventListener('click', function(e) { e.preventDefault(); showLogin(); });
+        }
+
+        function showWelcomePopup() {
+            var slug = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '');
+            var pubUrl = window.location.origin + '/pub-page.html?p=' + slug;
+            el('welcomeCard').innerHTML = 
+                '<div class="w-icon">🎉</div><h2>Congratulations!</h2><div class="w-amount">+1,000 RWF Bonus</div>' +
+                '<p>Your startup bonus has been added to your account!</p>' +
+                '<p style="font-size:.68rem;color:var(--text-secondary)">This is your page — share it to start earning:</p>' +
+                '<div class="w-link"><i class="bx bx-link"></i> ' + pubUrl + '</div>' +
+                '<button class="btn btn-primary" style="margin-top:8px" id="welcomeClose">Got It!</button>';
+            el('welcomeOverlay').classList.add('active');
+            el('welcomeClose').addEventListener('click', function() { el('welcomeOverlay').classList.remove('active'); });
+            localStorage.setItem('pub_welcomed', '1');
+        }
+
+        function startTutorial() {
+            if (localStorage.getItem('pub_tutorial_done')) return;
+            tutorialActive = true;
+            tutorialStep = 0;
+            showTutorialStep(0);
+        }
+
+        function showTutorialStep(step) {
+            // Remove old tooltip
+            var old = document.querySelector('.tutorial-tooltip');
+            if (old) old.remove();
+
+            tutorialStep = step;
+            var steps = [
+                { target: '.revenue-card', title: 'Your Revenue', text: 'This shows your total earnings from document sales. The more you sell, the more you earn!', pos: 'bottom' },
+                { target: '.pub-link-box', title: 'Your Page Link', text: 'Share this link anywhere — WhatsApp, Instagram, or with friends. Customers visit this page to see and buy your documents.', pos: 'bottom' },
+                { target: '.tab-nav', title: 'Navigation Tabs', text: 'Switch between Documents, Add New, Sales, and Cash Out. Everything you need is right here.', pos: 'bottom' },
+                { target: '#tab-docs', title: 'Your Documents', text: 'All your uploaded documents appear here. You can share, edit, or delete them anytime.', pos: 'top' }
+            ];
+
+            if (step >= steps.length) { tutorialActive = false; localStorage.setItem('pub_tutorial_done', '1'); return; }
+
+            var s = steps[step];
+            var target = document.querySelector(s.target);
+            if (!target) { showTutorialStep(step + 1); return; }
+
+            var rect = target.getBoundingClientRect();
+            var tooltip = document.createElement('div');
+            tooltip.className = 'tutorial-tooltip';
+            tooltip.innerHTML = '<h5>' + s.title + '</h5><p>' + s.text + '</p><div style="display:flex;gap:8px;justify-content:flex-end"><span style="font-size:.62rem;color:var(--text-tertiary)">' + (step + 1) + '/' + steps.length + '</span><button class="btn btn-primary" id="tutNext">' + (step === steps.length - 1 ? 'Finish' : 'Next →') + '</button></div>';
+
+            document.body.appendChild(tooltip);
+            var tr = tooltip.getBoundingClientRect();
+
+            var top, left;
+            if (s.pos === 'bottom') { top = rect.bottom + 10; left = rect.left + (rect.width / 2) - (tr.width / 2); }
+            else { top = rect.top - tr.height - 10; left = rect.left + (rect.width / 2) - (tr.width / 2); }
+
+            if (left < 10) left = 10;
+            if (left + tr.width > window.innerWidth - 10) left = window.innerWidth - tr.width - 10;
+            if (top < 60) top = rect.bottom + 10;
+            if (top + tr.height > window.innerHeight - 20) top = rect.top - tr.height - 10;
+
+            tooltip.style.top = top + 'px';
+            tooltip.style.left = left + 'px';
+
+            document.getElementById('tutNext').addEventListener('click', function() { tooltip.remove(); showTutorialStep(step + 1); });
         }
 
         async function showDash() {
@@ -171,56 +242,48 @@
             el('userBadge').style.display = 'flex';
             el('pubEmail').textContent = userEmail;
 
+            await registerWithServer(userEmail.split('@')[0]);
+
             var earnings, docs;
-            try { 
-                earnings = await apiCall(API + '/earnings'); 
-                docs = await apiCall(API + '/documents'); 
-            } catch (e) { 
-                toast('Error loading data.'); 
-                dashLoaded = false;
-                return; 
-            }
+            try { earnings = await apiCall(API + '/earnings'); docs = await apiCall(API + '/documents'); } catch (e) { toast('Error loading data.'); dashLoaded = false; return; }
 
             var slug = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '');
             var pubUrl = window.location.origin + '/pub-page.html?p=' + slug;
             var totalRev = earnings.your_earnings || 0;
 
             el('content').innerHTML =
-                '<div class="revenue-card"><div class="rev-label">Total Revenue</div><div class="rev-amount">' + fmtPrice(totalRev, 'RWF') + '</div><div class="rev-sub">' + earnings.total_transactions + ' sales</div>' + (earnings.bonus_claimed ? '<div class="bonus-badge">🎉 +1,000 RWF Bonus</div>' : '') + '</div>' +
-                '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> ' + pubUrl + '</div><button class="btn btn-primary btn-sm" id="copyLinkBtn"><i class="bx bx-copy"></i> Copy</button></div>' +
-                '<div class="stats-row"><div class="stat-card"><div class="stat-val">' + earnings.total_documents + '</div><div class="stat-label">Documents</div></div><div class="stat-card"><div class="stat-val">' + earnings.total_transactions + '</div><div class="stat-label">Sales</div></div></div>' +
-                '<div class="tab-nav"><button class="tab-btn active" data-tab="guide"><i class="bx bx-book"></i> Guide</button><button class="tab-btn" data-tab="docs"><i class="bx bx-file"></i> Docs</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>' +
-                '<div class="tab-content active" id="tab-guide">' + renderGuide() + '</div>' +
-                '<div class="tab-content" id="tab-docs"><div class="section-title">My Documents</div><div class="doc-list" id="docList"></div></div>' +
+                '<div class="revenue-card"><div class="rev-label"><i class="bx bx-wallet"></i> Your Revenue</div><div class="rev-amount">' + fmtPrice(totalRev, 'RWF') + '</div><div class="rev-sub">' + earnings.total_transactions + ' sales · ' + earnings.total_documents + ' documents</div>' + (earnings.bonus_claimed ? '<div class="bonus-badge">🎉 +1,000 RWF Startup Bonus Included</div>' : '') + '</div>' +
+                '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> ' + pubUrl + '</div><button class="btn btn-primary btn-sm" id="copyLinkBtn"><i class="bx bx-copy"></i> Copy Link</button></div>' +
+                '<div class="stats-row"><div class="stat-card"><div class="stat-val">' + earnings.total_documents + '</div><div class="stat-label"><i class="bx bx-file"></i> Documents</div></div><div class="stat-card"><div class="stat-val">' + earnings.total_transactions + '</div><div class="stat-label"><i class="bx bx-cart"></i> Sales</div></div></div>' +
+                '<div class="tab-nav"><button class="tab-btn active" data-tab="docs"><i class="bx bx-file"></i> Documents</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add New</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>' +
+                '<div class="tab-content active" id="tab-docs"><div class="section-title"><i class="bx bx-library"></i> My Documents</div><div class="doc-list" id="docList"></div></div>' +
                 '<div class="tab-content" id="tab-add">' + renderAddForm() + '</div>' +
-                '<div class="tab-content" id="tab-txns"><div class="section-title">Sales History</div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Paid</th><th>Earn (88%)</th><th>Fee (12%)</th></tr></thead><tbody id="txnBody"></tbody></table></div></div>' +
-                '<div class="tab-content" id="tab-cashout"><div class="section-title">Cash Out</div><div class="cashout-box"><h4><i class="bx bx-money-withdraw"></i> Request Cash Out</h4><p>Balance: <strong>' + fmtPrice(totalRev, 'RWF') + '</strong></p><div class="min-badge">Min: 15,000 RWF</div>' + (totalRev >= 15000 ? '<button class="btn btn-gold" id="cashoutBtn">Request Cash Out</button>' : '<p style="font-size:.7rem;color:var(--danger)">Need 15,000 RWF minimum.</p>') + '</div></div>';
+                '<div class="tab-content" id="tab-txns"><div class="section-title"><i class="bx bx-history"></i> Sales History</div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Amount</th><th>Earnings</th></tr></thead><tbody id="txnBody"></tbody></table></div></div>' +
+                '<div class="tab-content" id="tab-cashout"><div class="section-title"><i class="bx bx-wallet"></i> Cash Out</div><div class="cashout-box"><h4><i class="bx bx-money-withdraw"></i> Request Cash Out</h4><p>Available balance: <strong>' + fmtPrice(totalRev, 'RWF') + '</strong></p><div class="min-badge">Minimum: 15,000 RWF</div>' + (totalRev >= 15000 ? '<button class="btn btn-gold" id="cashoutBtn"><i class="bx bx-send"></i> Request Cash Out</button>' : '<p style="font-size:.7rem;color:var(--danger)">You need at least 15,000 RWF to cash out.</p>') + '</div></div>';
 
             renderDocList(docs || []);
             renderTxns(earnings.recent || []);
             initAddForm();
             initTabs();
 
-            el('copyLinkBtn').addEventListener('click', function() { navigator.clipboard.writeText(pubUrl).then(function() { toast('Copied!'); }); });
+            el('copyLinkBtn').addEventListener('click', function() { navigator.clipboard.writeText(pubUrl).then(function() { toast('Link copied!'); }); });
             var cb = el('cashoutBtn');
             if (cb) cb.addEventListener('click', function() { if (confirm('Request cash out?')) { toast('Request sent!'); cb.disabled = true; } });
-        }
 
-        function renderGuide() {
-            return '<div class="guide-card"><h4><i class="bx bx-rocket"></i> Welcome!</h4><ul><li><i class="bx bx-user-plus"></i> Your account is ready. Share your page link.</li><li><i class="bx bx-upload"></i> Upload documents in the <strong>Add</strong> tab.</li><li><i class="bx bx-share-alt"></i> Customers pay via MTN/Airtel, you earn 88%.</li><li><i class="bx bx-wallet"></i> Cash out when you reach 15,000 RWF.</li></ul></div>';
+            // Show tutorial on first visit
+            setTimeout(function() { startTutorial(); }, 600);
         }
 
         function renderAddForm() {
-            return '<div class="auth-card" style="text-align:left;max-width:100%"><div class="step-indicator"><div class="step-dot active" id="sd1">1</div><div class="step-line" id="sl1"></div><div class="step-dot" id="sd2">2</div><div class="step-line" id="sl2"></div><div class="step-dot" id="sd3">3</div><div class="step-line" id="sl3"></div><div class="step-dot" id="sd4">4</div></div>' +
-                '<div id="step1"><h3>📝 Title & Description</h3><div class="field"><label>Title *</label><input type="text" id="dTitle"></div><div class="field"><label>Description</label><textarea id="dDesc"></textarea></div><div class="nav-btns"><button class="btn btn-primary" id="nextStep2">Next →</button></div></div>' +
-                '<div id="step2" style="display:none"><h3>💰 Price</h3><div class="field"><label>Price (RWF) *</label><input type="number" id="dPrice" min="1000" max="500000" value="1000"><span class="hint">You earn: <strong id="earnCalc">880 RWF</strong> (88%)</span></div><div class="nav-btns"><button class="btn btn-outline" id="backStep1">← Back</button><button class="btn btn-primary" id="nextStep3">Next →</button></div></div>' +
-                '<div id="step3" style="display:none"><h3>📁 File</h3><div class="file-upload-area" id="fileArea"><i class="bx bx-upload"></i><div class="up-text" id="fileText">Click to select file</div><input type="file" id="dFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"></div><div class="nav-btns"><button class="btn btn-outline" id="backStep2">← Back</button><button class="btn btn-primary" id="nextStep4">Next →</button></div></div>' +
-                '<div id="step4" style="display:none"><h3>📸 Screenshot</h3><div class="file-upload-area" id="imgArea"><i class="bx bx-image-add"></i><div class="up-text" id="imgText">Click to upload</div><input type="file" id="dImage" accept="image/*"></div><img id="imgPreview" style="width:100%;max-height:120px;object-fit:cover;border-radius:10px;margin-top:6px;display:none"><div class="nav-btns"><button class="btn btn-outline" id="backStep3">← Back</button><button class="btn btn-primary" id="saveDoc"><i class="bx bx-save"></i> Publish</button></div></div></div>';
+            return '<div class="auth-card" style="text-align:left;max-width:100%"><h2><i class="bx bx-plus-circle"></i> Add Document — Step <span id="stepLabel">1</span> of 4</h2>' +
+                '<div id="step1"><div class="field"><label><i class="bx bx-edit"></i> Document Title</label><input type="text" id="dTitle" placeholder="e.g. Complete Physics Notes S4"></div><div class="field"><label><i class="bx bx-text"></i> Description</label><textarea id="dDesc" placeholder="Describe what customers will get…"></textarea></div><div class="step-nav"><span></span><button class="btn btn-next" id="nextStep2"><i class="bx bx-right-arrow-alt"></i> Next: Price</button></div></div>' +
+                '<div id="step2" style="display:none"><div class="field"><label><i class="bx bx-purchase-tag"></i> Price (RWF)</label><input type="number" id="dPrice" min="1000" max="500000" placeholder="min: 1,000 RWF"><span class="hint" style="font-size:.62rem;color:var(--text-tertiary)">Enter any amount between 1,000 and 500,000 RWF</span></div><div class="step-nav"><button class="btn btn-prev" id="backStep1"><i class="bx bx-left-arrow-alt"></i> Back</button><button class="btn btn-next" id="nextStep3"><i class="bx bx-right-arrow-alt"></i> Next: File</button></div></div>' +
+                '<div id="step3" style="display:none"><div class="field"><label><i class="bx bx-upload"></i> Document File</label><div class="file-upload-area" id="fileArea"><i class="bx bx-file"></i><div class="up-text" id="fileText">Click to select file</div><div class="up-detail" style="font-size:.62rem;color:var(--text-tertiary)">PDF, DOC, PPT, XLS files supported</div><input type="file" id="dFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"></div></div><div class="step-nav"><button class="btn btn-prev" id="backStep2"><i class="bx bx-left-arrow-alt"></i> Back</button><button class="btn btn-next" id="nextStep4"><i class="bx bx-right-arrow-alt"></i> Next: Screenshot</button></div></div>' +
+                '<div id="step4" style="display:none"><div class="field"><label><i class="bx bx-image"></i> Screenshot / Preview</label><div class="file-upload-area" id="imgArea"><i class="bx bx-image-add"></i><div class="up-text" id="imgText">Click to upload preview</div><input type="file" id="dImage" accept="image/*"></div><img id="imgPreview" style="width:100%;max-height:120px;object-fit:cover;border-radius:10px;margin-top:6px;display:none"></div><div class="step-nav"><button class="btn btn-prev" id="backStep3"><i class="bx bx-left-arrow-alt"></i> Back</button><button class="btn btn-next" id="saveDoc"><i class="bx bx-rocket"></i> Publish Document</button></div></div></div>';
         }
 
         function initAddForm() {
             addStep = 1; goStep(1);
-            el('dPrice').addEventListener('input', function() { var p = parseInt(this.value) || 0; var ec = el('earnCalc'); if (ec) ec.textContent = fmtPrice(Math.floor(p * 0.88), 'RWF') + ' (88%)'; });
             el('fileArea').addEventListener('click', function(e) { if (e.target !== el('dFile')) el('dFile').click(); });
             el('dFile').addEventListener('change', function(e) { var f = e.target.files[0]; if (f) { el('fileText').textContent = '✅ ' + f.name; el('fileArea').classList.add('has-file'); } });
             el('imgArea').addEventListener('click', function(e) { if (e.target !== el('dImage')) el('dImage').click(); });
@@ -235,29 +298,26 @@
                 var btn = this;
                 try {
                     var t = el('dTitle').value.trim(), d = el('dDesc').value.trim(), p = parseInt(el('dPrice').value), im = el('dImage').files[0], fl = el('dFile').files[0];
-                    if (!t || !p || !fl) { toast('Title, price, file required'); return; }
-                    if (p < 1000 || p > 500000) { toast('Price: 1,000-500,000'); return; }
-                    btn.disabled = true; btn.innerHTML = 'Uploading…';
+                    if (!t || !p || !fl) { toast('Title, price, and file are required'); return; }
+                    if (p < 1000 || p > 500000) { toast('Price must be between 1,000 and 500,000 RWF'); return; }
+                    btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Uploading…';
                     var fd = new FormData(); fd.append('file', fl);
                     var up = await fetch(API + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken }, body: fd });
                     var ud = await up.json();
-                    if (!ud.file_path) { toast('Upload failed'); btn.disabled = false; btn.innerHTML = 'Publish'; return; }
+                    if (!ud.file_path) { toast('Upload failed'); btn.disabled = false; btn.innerHTML = '<i class="bx bx-rocket"></i> Publish Document'; return; }
                     var imgUrl = '';
                     if (im) { var ifd = new FormData(); ifd.append('image', im); var iu = await fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a', { method: 'POST', body: ifd }); var id = await iu.json(); if (id.success) imgUrl = id.data.url; }
                     await apiCall(API + '/documents', { title: t, description: d, price: p, image_url: imgUrl, file_path: ud.file_path });
                     toast('Published!'); dashLoaded = false; showDash();
-                } catch (e) { toast(e.message); btn.disabled = false; btn.innerHTML = 'Publish'; }
+                } catch (e) { toast(e.message); btn.disabled = false; btn.innerHTML = '<i class="bx bx-rocket"></i> Publish Document'; }
             });
         }
 
         function goStep(s) {
             addStep = s;
-            for (var i = 1; i <= 4; i++) {
-                var step = el('step' + i); if (step) step.style.display = i === s ? 'block' : 'none';
-                var sd = el('sd' + i); if (sd) { sd.classList.remove('active', 'done'); if (i < s) sd.classList.add('done'); if (i === s) sd.classList.add('active'); }
-                var sl = el('sl' + (i - 1)); if (sl) { sl.classList.remove('done'); if (i - 1 < s) sl.classList.add('done'); }
-            }
-            if (s === 4) { var p = parseInt((el('dPrice').value) || 0); var btn = el('saveDoc'); if (btn) btn.innerHTML = 'Publish for ' + fmtPrice(p, 'RWF') + ' (Earn ' + fmtPrice(Math.floor(p * 0.88), 'RWF') + ')'; }
+            var label = el('stepLabel'); if (label) label.textContent = s;
+            for (var i = 1; i <= 4; i++) { var step = el('step' + i); if (step) step.style.display = i === s ? 'block' : 'none'; }
+            if (s === 4) { var btn = el('saveDoc'); if (btn) btn.innerHTML = '<i class="bx bx-rocket"></i> Publish Document'; }
         }
 
         function initTabs() {
@@ -274,16 +334,16 @@
 
         function renderDocList(docs) {
             var l = el('docList'); if (!l) return;
-            if (!docs.length) { l.innerHTML = '<div class="empty">No documents yet.</div>'; return; }
+            if (!docs.length) { l.innerHTML = '<div class="empty"><i class="bx bx-file" style="font-size:36px;display:block;margin-bottom:6px;color:#d1d5db"></i><p>No documents yet.</p><p style="font-size:.7rem">Go to <strong>Add New</strong> to upload your first document.</p></div>'; return; }
             l.innerHTML = docs.map(function(d) {
-                return '<div class="doc-row">' + (d.image_url ? '<img src="' + d.image_url + '" alt="">' : '<div class="doc-thumb"><i class="bx bx-file"></i></div>') + '<div class="doc-info"><h4>' + d.title + '</h4><span>' + fmtPrice(d.price, d.currency) + ' · ' + (d.clicks || 0) + ' views</span></div><div class="doc-actions"><button class="btn btn-outline btn-xs" data-action="share" data-id="' + d.id + '"><i class="bx bx-share-alt"></i></button><button class="btn btn-outline btn-xs" data-action="toggle" data-id="' + d.id + '"><i class="bx bx-hide"></i></button><button class="btn btn-danger btn-xs" data-action="delete" data-id="' + d.id + '" data-title="' + d.title + '"><i class="bx bx-trash"></i></button></div></div>';
+                return '<div class="doc-row">' + (d.image_url ? '<img src="' + d.image_url + '" alt="">' : '<div class="doc-thumb"><i class="bx bx-file"></i></div>') + '<div class="doc-info"><h4>' + d.title + ' <span class="badge ' + (d.active ? 'badge-active' : 'badge-hidden') + '">' + (d.active ? 'Active' : 'Hidden') + '</span></h4><span>' + fmtPrice(d.price, d.currency) + ' · ' + (d.clicks || 0) + ' views</span></div><div class="doc-actions"><button class="btn btn-outline btn-xs" data-action="share" data-id="' + d.id + '"><i class="bx bx-share-alt"></i></button><button class="btn btn-outline btn-xs" data-action="toggle" data-id="' + d.id + '"><i class="bx bx-hide"></i></button><button class="btn btn-danger btn-xs" data-action="delete" data-id="' + d.id + '" data-title="' + d.title + '"><i class="bx bx-trash"></i></button></div></div>';
             }).join('');
             l.querySelectorAll('button').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var action = this.dataset.action, id = this.dataset.id;
-                    if (action === 'share') { var link = window.location.origin + '/pub-view.html?doc=' + id; navigator.clipboard.writeText(link).then(function() { toast('Copied!'); }); }
+                    if (action === 'share') { var link = window.location.origin + '/pub-view.html?doc=' + id; navigator.clipboard.writeText(link).then(function() { toast('Link copied!'); }); }
                     if (action === 'toggle') { apiCall(API + '/documents/' + id + '/toggle', {}, 'PUT').then(function() { dashLoaded = false; showDash(); }).catch(function(e) { toast(e.message); }); }
-                    if (action === 'delete') { if (!confirm('Delete?')) return; apiCall(API + '/documents/' + id, {}, 'DELETE').then(function() { toast('Deleted!'); dashLoaded = false; showDash(); }).catch(function(e) { toast(e.message); }); }
+                    if (action === 'delete') { if (!confirm('Delete this document permanently?')) return; apiCall(API + '/documents/' + id, {}, 'DELETE').then(function() { toast('Deleted!'); dashLoaded = false; showDash(); }).catch(function(e) { toast(e.message); }); }
                 });
             });
         }
@@ -291,8 +351,8 @@
         function renderTxns(txns) {
             var l = el('txnBody'); if (!l) return;
             var real = (txns || []).filter(function(t) { return t.payment_method !== 'bonus'; });
-            if (!real.length) { l.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem">No sales yet.</td></tr>'; return; }
-            l.innerHTML = real.map(function(t) { var earn = Math.floor((t.amount || 0) * 0.88); return '<tr><td>' + (t.customer_name || 'Customer') + '</td><td>' + (t.customer_phone || '') + '</td><td>' + fmtPrice(t.amount) + '</td><td class="earn-positive">+' + fmtPrice(earn) + '</td><td class="fee-text">-' + fmtPrice((t.amount || 0) - earn) + '</td></tr>'; }).join('');
+            if (!real.length) { l.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-tertiary)">No sales yet. Share your page link to start earning!</td></tr>'; return; }
+            l.innerHTML = real.map(function(t) { return '<tr><td>' + (t.customer_name || 'Customer') + '</td><td>' + (t.customer_phone || '') + '</td><td>' + fmtPrice(t.amount) + '</td><td class="earn-positive">+' + fmtPrice(t.publisher_earnings || 0) + '</td></tr>'; }).join('');
         }
 
         el('logoutBtn').addEventListener('click', async function() { await signOut(auth); });
@@ -303,6 +363,8 @@
                     idToken = t;
                     userEmail = fbUser.email || '';
                     firebaseUID = fbUser.uid;
+                    var welcomed = localStorage.getItem('pub_welcomed');
+                    if (!welcomed) { showWelcomePopup(); }
                     showDash();
                 });
             } else {
