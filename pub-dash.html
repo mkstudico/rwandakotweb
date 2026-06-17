@@ -37,6 +37,7 @@
         .stat-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:.9rem;border:1px solid var(--border)}.stat-val{font-size:1.1rem;font-weight:700}.stat-label{font-size:.64rem;color:var(--text-secondary)}
         .pub-link-box{background:var(--bg-surface);border:1px solid var(--primary);border-radius:var(--radius-xl);padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
         .pub-link-box .pub-link{font-size:.72rem;color:var(--primary);word-break:break-all;flex:1;min-width:120px}
+        .link-desc{font-size:.7rem;color:var(--text-secondary);margin-bottom:0.5rem;line-height:1.4}
         .section-title{font-size:.88rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
         .tab-nav{display:flex;gap:3px;background:#e5e7eb;border-radius:30px;padding:3px;margin-bottom:1rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
         .tab-nav::-webkit-scrollbar{display:none}
@@ -71,6 +72,7 @@
         .overlay-card .w-link{font-size:.72rem;color:var(--primary);word-break:break-all;margin:10px 0;background:var(--primary-light);padding:8px 14px;border-radius:var(--radius-full)}
         .overlay-card .w-desc{font-size:.7rem;color:var(--text-secondary);margin-bottom:6px}
         .overlay-card p{font-size:.76rem;color:var(--text-secondary);margin-bottom:6px}
+        .edit-modal-content{text-align:left;padding:1rem}.edit-modal-content .field{margin-bottom:12px}
         @media(max-width:500px){.stats-row{grid-template-columns:1fr 1fr}.doc-row{flex-direction:column;align-items:flex-start}.doc-actions{width:100%;justify-content:flex-end}.revenue-card .rev-amount{font-size:1.7rem}.tab-btn{font-size:.68rem;padding:6px 10px}}
     </style>
 </head>
@@ -79,7 +81,7 @@
     <div class="container" id="content"><div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">Loading…</p></div></div>
     <div class="toast" id="toast"></div>
     <div class="overlay" id="welcomeOverlay"><div class="overlay-card" id="welcomeCard"></div></div>
-    <div class="overlay" id="editOverlay"><div class="overlay-card" id="editContent" style="text-align:left;max-width:440px"></div></div>
+    <div class="overlay" id="editOverlay"><div class="overlay-card edit-modal-content" id="editContent"></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
@@ -95,6 +97,7 @@
         var firebaseUID = '';
         var addStep = 1;
         var dashLoaded = false;
+        var formListenersInitialized = false; // prevent duplicate listeners
 
         function el(id) { return document.getElementById(id); }
         function toast(m) { var t = el('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(function() { t.style.display = 'none'; }, 2500); }
@@ -197,6 +200,7 @@
 
             el('content').innerHTML =
                 '<div class="revenue-card"><div class="rev-label"><i class="bx bx-wallet"></i> Your Revenue</div><div class="rev-amount">' + fmtPrice(totalRev, 'RWF') + '</div><div class="rev-sub">' + earnings.total_transactions + ' sales · ' + earnings.total_documents + ' documents</div></div>' +
+                '<div class="link-desc"><i class="bx bx-info-circle"></i> This is your personal store link. Share it anywhere — WhatsApp, Instagram, Facebook, or with friends. Customers visit this link to browse and purchase your documents.</div>' +
                 '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> ' + pubUrl + '</div><button class="btn btn-primary btn-sm" id="copyLinkBtn"><i class="bx bx-copy"></i> Copy Link</button></div>' +
                 '<div class="stats-row"><div class="stat-card"><div class="stat-val">' + earnings.total_documents + '</div><div class="stat-label"><i class="bx bx-file"></i> Documents</div></div><div class="stat-card"><div class="stat-val">' + earnings.total_transactions + '</div><div class="stat-label"><i class="bx bx-cart"></i> Sales</div></div></div>' +
                 '<div class="tab-nav"><button class="tab-btn active" data-tab="docs"><i class="bx bx-file"></i> Documents</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add New</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>' +
@@ -224,6 +228,9 @@
         }
 
         function initAddForm() {
+            if (formListenersInitialized) return;
+            formListenersInitialized = true;
+
             addStep = 1; goStep(1);
             el('fileArea').addEventListener('click', function(e) { if (e.target !== el('dFile')) el('dFile').click(); });
             el('dFile').addEventListener('change', function(e) { var f = e.target.files[0]; if (f) { el('fileText').textContent = '✅ ' + f.name; el('fileArea').classList.add('has-file'); } });
@@ -237,6 +244,7 @@
             el('backStep3').addEventListener('click', function() { goStep(3); });
             el('saveDoc').addEventListener('click', async function() {
                 var btn = this;
+                if (btn.disabled) return; // prevent double submission
                 try {
                     var t = el('dTitle').value.trim(), d = el('dDesc').value.trim(), p = parseInt(el('dPrice').value), im = el('dImage').files[0], fl = el('dFile').files[0];
                     if (!t || !p || !fl) { toast('Title, price, and file are required'); return; }
@@ -249,7 +257,7 @@
                     var imgUrl = '';
                     if (im) { var ifd = new FormData(); ifd.append('image', im); var iu = await fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a', { method: 'POST', body: ifd }); var id = await iu.json(); if (id.success) imgUrl = id.data.url; }
                     await apiCall(API + '/documents', { title: t, description: d, price: p, image_url: imgUrl, file_path: ud.file_path });
-                    toast('Published!'); dashLoaded = false; showDash();
+                    toast('Published!'); dashLoaded = false; formListenersInitialized = false; showDash();
                 } catch (e) { toast(e.message); btn.disabled = false; btn.innerHTML = '<i class="bx bx-rocket"></i> Publish Document'; }
             });
         }
@@ -268,15 +276,15 @@
                     b.classList.add('active');
                     document.querySelectorAll('.tab-content').forEach(function(x) { x.classList.remove('active'); });
                     var t = el('tab-' + b.dataset.tab);
-                    if (t) { t.classList.add('active'); if (b.dataset.tab === 'add') initAddForm(); }
+                    if (t) { t.classList.add('active'); if (b.dataset.tab === 'add') { formListenersInitialized = false; initAddForm(); } }
                 });
             });
         }
 
         function renderDocList(docs) {
             var l = el('docList'); if (!l) return;
-            if (!docs.length) { l.innerHTML = '<div class="empty"><i class="bx bx-file" style="font-size:36px;display:block;margin-bottom:6px;color:#d1d5db"></i><p>No documents yet.</p><p style="font-size:.7rem">Go to <strong>Add New</strong> to upload your first document.</p></div>'; return; }
             l.innerHTML = '';
+            if (!docs.length) { l.innerHTML = '<div class="empty"><i class="bx bx-file" style="font-size:36px;display:block;margin-bottom:6px;color:#d1d5db"></i><p>No documents yet.</p><p style="font-size:.7rem">Go to <strong>Add New</strong> to upload your first document.</p></div>'; return; }
             docs.forEach(function(d) {
                 var row = document.createElement('div');
                 row.className = 'doc-row';
@@ -284,14 +292,25 @@
                     (d.image_url ? '<img src="' + d.image_url + '" alt="">' : '<div class="doc-thumb"><i class="bx bx-file"></i></div>') +
                     '<div class="doc-info"><h4>' + d.title + ' <span class="badge ' + (d.active ? 'badge-active' : 'badge-hidden') + '">' + (d.active ? 'Active' : 'Hidden') + '</span></h4><span>' + fmtPrice(d.price, d.currency) + ' · ' + (d.clicks || 0) + ' views</span></div>' +
                     '<div class="doc-actions">' +
+                        '<button class="btn btn-outline btn-xs edit-btn" data-id="' + d.id + '" data-title="' + d.title.replace(/"/g, '&quot;') + '" data-desc="' + (d.description || '').replace(/"/g, '&quot;') + '" data-price="' + d.price + '" data-img="' + (d.image_url || '') + '"><i class="bx bx-edit"></i></button>' +
                         '<button class="btn btn-outline btn-xs share-btn" data-id="' + d.id + '"><i class="bx bx-share-alt"></i></button>' +
                         '<button class="btn btn-outline btn-xs toggle-btn" data-id="' + d.id + '"><i class="bx bx-hide"></i></button>' +
-                        '<button class="btn btn-danger btn-xs delete-btn" data-id="' + d.id + '" data-title="' + d.title + '"><i class="bx bx-trash"></i></button>' +
+                        '<button class="btn btn-danger btn-xs delete-btn" data-id="' + d.id + '" data-title="' + d.title.replace(/"/g, '&quot;') + '"><i class="bx bx-trash"></i></button>' +
                     '</div>';
                 l.appendChild(row);
             });
 
             // Attach event listeners
+            l.querySelectorAll('.edit-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var id = this.dataset.id;
+                    var title = this.dataset.title;
+                    var desc = this.dataset.desc;
+                    var price = this.dataset.price;
+                    var img = this.dataset.img;
+                    openEditModal(id, title, desc, price, img);
+                });
+            });
             l.querySelectorAll('.share-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var id = this.dataset.id;
@@ -312,6 +331,31 @@
                     apiCall(API + '/documents/' + id, {}, 'DELETE').then(function() { toast('Deleted!'); dashLoaded = false; showDash(); }).catch(function(e) { toast(e.message); });
                 });
             });
+        }
+
+        function openEditModal(id, title, desc, price, img) {
+            el('editContent').innerHTML = 
+                '<h3 style="margin-bottom:1rem"><i class="bx bx-edit"></i> Edit Document</h3>' +
+                '<div class="field"><label>Title</label><input type="text" id="eTitle" value="' + title + '"></div>' +
+                '<div class="field"><label>Description</label><textarea id="eDesc">' + desc + '</textarea></div>' +
+                '<div class="field"><label>Price (RWF)</label><input type="number" id="ePrice" value="' + price + '" min="1000" max="500000"></div>' +
+                '<button class="btn btn-primary" id="saveEditBtn">Save Changes</button>' +
+                '<button class="btn btn-outline" style="margin-top:6px" id="cancelEditBtn">Cancel</button>';
+            el('editOverlay').classList.add('active');
+            el('saveEditBtn').addEventListener('click', async function() {
+                var nt = el('eTitle').value.trim(), nd = el('eDesc').value.trim(), np = parseInt(el('ePrice').value);
+                if (!nt || !np) { toast('Title and price are required'); return; }
+                if (np < 1000 || np > 500000) { toast('Price must be 1,000-500,000 RWF'); return; }
+                try {
+                    await apiCall(API + '/documents/' + id, { title: nt, description: nd, price: np, image_url: img, file_path: 'keep' }, 'POST');
+                    el('editOverlay').classList.remove('active');
+                    toast('Document updated!');
+                    dashLoaded = false;
+                    showDash();
+                } catch (e) { toast(e.message); }
+            });
+            el('cancelEditBtn').addEventListener('click', function() { el('editOverlay').classList.remove('active'); });
+            el('editOverlay').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
         }
 
         function renderTxns(txns) {
