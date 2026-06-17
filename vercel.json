@@ -1,9 +1,9 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/handler"
-    }
+    { "source": "/api/pub/(.*)", "destination": "/api/publisher" },
+    { "source": "/api/admin/publishers", "destination": "/api/publisher" },
+    { "source": "/api/admin/pub-transactions", "destination": "/api/publisher" },
+    { "source": "/api/(.*)", "destination": "/api/handler" }
   ]
 }
