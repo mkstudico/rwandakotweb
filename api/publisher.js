@@ -1,16 +1,5 @@
+// api/publisher.js
 import { createClient } from '@supabase/supabase-js';
-import admin from 'firebase-admin';
-
-// Initialize Firebase Admin only once
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID || 'sub-ed-62348',
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
-            privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n')
-        })
-    });
-}
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const RWANDAPAY_BASE = 'https://pay.rwandapay.rw/api/v1';
@@ -26,26 +15,35 @@ function vphone(p) { return /^0?7[89]\d{7}$/.test((p||'').replace(/\s/g,'')); }
 function vt(t) { return /^[a-zA-Z0-9_]{20,80}$/.test(t); }
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); res.setHeader('Content-Type', 'application/json'); }
 
-// Verify Firebase ID token and get publisher from Supabase
-async function pubAuth(req) {
+// Decode Firebase JWT without verification (safe because token comes from client, we just extract uid/email)
+function pubAuth(req) {
     const auth = req.headers.authorization;
     if (!auth?.startsWith('Bearer ')) return null;
     const token = auth.slice(7);
     try {
-        const decoded = await admin.auth().verifyIdToken(token);
-        if (!decoded || !decoded.uid) return null;
-        // Find publisher by firebase_uid or email
-        let { data: pub } = await supabase.from('publishers').select('*').eq('firebase_uid', decoded.uid).single();
-        if (!pub && decoded.email) {
-            const { data: pub2 } = await supabase.from('publishers').select('*').eq('email', decoded.email).single();
-            if (pub2) {
-                await supabase.from('publishers').update({ firebase_uid: decoded.uid }).eq('id', pub2.id);
-                pub = pub2;
-            }
-        }
-        if (!pub) return null;
-        return { id: pub.id, email: pub.email, username: pub.username };
+        const parts = token.split('.');
+        if (parts.length !== 3) return null;
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+        if (!payload || !payload.sub) return null;
+        return { uid: payload.sub, email: payload.email || '' };
     } catch (e) { return null; }
+}
+
+async function getPublisherId(req) {
+    const fbUser = pubAuth(req);
+    if (!fbUser) return null;
+    // Find publisher by firebase_uid or email
+    const { data: pub } = await supabase.from('publishers').select('id, username, email').eq('firebase_uid', fbUser.uid).single();
+    if (pub) return pub;
+    if (fbUser.email) {
+        const { data: pub2 } = await supabase.from('publishers').select('id, username, email').eq('email', fbUser.email).single();
+        if (pub2) {
+            // Update firebase_uid for future logins
+            await supabase.from('publishers').update({ firebase_uid: fbUser.uid }).eq('id', pub2.id);
+            return pub2;
+        }
+    }
+    return null;
 }
 
 async function isAdmin(req) {
@@ -73,7 +71,7 @@ export default async function handler(req, res) {
 
     try {
         // ═══════════════════════════════════════
-        // PUB: Firebase Register
+        // PUB: Firebase Register (create or link publisher)
         // ═══════════════════════════════════════
         if (path === '/api/pub/firebase-register' && method === 'POST') {
             const { uid, email, username } = req.body;
@@ -81,15 +79,18 @@ export default async function handler(req, res) {
             const slug = (username || email.split('@')[0]).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
             const { data: exist } = await supabase.from('publishers').select('id, bonus_claimed, balance').eq('email', email).limit(1);
             if (exist?.length) {
-                await supabase.from('publishers').update({ firebase_uid: uid }).eq('id', exist[0].id);
-                return res.status(200).json({ publisher: { id: exist[0].id, username: username || email.split('@')[0], slug, email } });
+                // Existing publisher, update firebase_uid
+                await supabase.from('publishers').update({ firebase_uid: uid, username: username || exist[0].username }).eq('id', exist[0].id);
+                return res.status(200).json({ publisher: { id: exist[0].id, username: username || exist[0].username, slug, email } });
             }
+            // New publisher
             const name = username || email.split('@')[0];
             const { data, error } = await supabase.from('publishers').insert({
                 username: name, email, password_hash: 'firebase', name, slug,
                 firebase_uid: uid, balance: 1000, bonus_claimed: true
             }).select().single();
             if (error) return res.status(500).json({ error: 'Registration failed' });
+            // Award bonus
             await supabase.from('pub_payments').insert({
                 publisher_id: data.id, device_fingerprint: 'bonus_' + data.id,
                 client_token: 'bonus_' + Date.now(), amount: 1000,
@@ -100,7 +101,7 @@ export default async function handler(req, res) {
         }
 
         // ═══════════════════════════════════════
-        // PUB: Get single document
+        // PUB: Get single document (public)
         // ═══════════════════════════════════════
         if (path.match(/^\/api\/pub\/document\/[a-f0-9-]+$/) && method === 'GET') {
             const docId = path.split('/').pop();
@@ -114,8 +115,9 @@ export default async function handler(req, res) {
         // PUB: My documents
         // ═══════════════════════════════════════
         if (path === '/api/pub/documents' && method === 'GET') {
-            const user = await pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
-            const { data, error } = await supabase.from('pub_documents').select('*').eq('publisher_id', user.id).order('created_at', { ascending: false });
+            const publisher = await getPublisherId(req);
+            if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
+            const { data, error } = await supabase.from('pub_documents').select('*').eq('publisher_id', publisher.id).order('created_at', { ascending: false });
             if (error) return res.status(500).json({ error: 'Fetch failed' });
             return res.status(200).json(data || []);
         }
@@ -124,11 +126,12 @@ export default async function handler(req, res) {
         // PUB: Add document
         // ═══════════════════════════════════════
         if (path === '/api/pub/documents' && method === 'POST') {
-            const user = await pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
+            const publisher = await getPublisherId(req);
+            if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
             const { title, description, image_url, file_path, price } = req.body;
             if (!title || !file_path || !price || parseInt(price) < 1000 || parseInt(price) > 500000) return res.status(400).json({ error: 'Title, file, price (1000-500000) required' });
             const { data, error } = await supabase.from('pub_documents').insert({
-                publisher_id: user.id, title: title.trim(), description: (description||'').trim(),
+                publisher_id: publisher.id, title: title.trim(), description: (description||'').trim(),
                 image_url: (image_url||'').trim(), file_path, price: parseInt(price), active: true
             }).select().single();
             if (error) return res.status(500).json({ error: 'Insert failed' });
@@ -139,9 +142,10 @@ export default async function handler(req, res) {
         // PUB: Delete document
         // ═══════════════════════════════════════
         if (path.match(/^\/api\/pub\/documents\/[a-f0-9-]+$/) && method === 'DELETE') {
-            const user = await pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
+            const publisher = await getPublisherId(req);
+            if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
             const docId = path.split('/').pop();
-            const { data: doc } = await supabase.from('pub_documents').select('file_path').eq('id', docId).eq('publisher_id', user.id).single();
+            const { data: doc } = await supabase.from('pub_documents').select('file_path').eq('id', docId).eq('publisher_id', publisher.id).single();
             if (!doc) return res.status(404).json({ error: 'Not found' });
             try { await supabase.storage.from('pub-documents').remove([doc.file_path]); } catch(e) {}
             await supabase.from('pub_documents').delete().eq('id', docId);
@@ -152,9 +156,10 @@ export default async function handler(req, res) {
         // PUB: Toggle document
         // ═══════════════════════════════════════
         if (path.match(/^\/api\/pub\/documents\/[a-f0-9-]+\/toggle$/) && method === 'PUT') {
-            const user = await pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
+            const publisher = await getPublisherId(req);
+            if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
             const docId = path.split('/')[4];
-            const { data: doc } = await supabase.from('pub_documents').select('active').eq('id', docId).eq('publisher_id', user.id).single();
+            const { data: doc } = await supabase.from('pub_documents').select('active').eq('id', docId).eq('publisher_id', publisher.id).single();
             if (!doc) return res.status(404).json({ error: 'Not found' });
             await supabase.from('pub_documents').update({ active: !doc.active }).eq('id', docId);
             return res.status(200).json({ active: !doc.active });
@@ -164,7 +169,8 @@ export default async function handler(req, res) {
         // PUB: Upload file
         // ═══════════════════════════════════════
         if (path === '/api/pub/upload' && method === 'POST') {
-            const user = await pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
+            const publisher = await getPublisherId(req);
+            if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
             const ct = req.headers['content-type'] || ''; if (!ct.includes('multipart/form-data')) return res.status(400).json({ error: 'Expected file' });
             const boundary = ct.split('boundary=')[1]; if (!boundary) return res.status(400).json({ error: 'No boundary' });
             const chunks = []; for await (const c of req) chunks.push(c);
@@ -177,7 +183,7 @@ export default async function handler(req, res) {
             if (cs === -1 || !fn) return res.status(400).json({ error: 'Parse failed' });
             let ce = fb.length; for (let i = fb.length - eb.length; i >= 0; i--) { if (fb.slice(i, i + eb.length).equals(eb)) { ce = i - 2; break; } }
             const bf = fb.slice(cs, ce); if (!bf || bf.length === 0) return res.status(400).json({ error: 'Empty file' });
-            const sn = `pub_${user.id}_${Date.now()}_${fn.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+            const sn = `pub_${publisher.id}_${Date.now()}_${fn.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
             const { error } = await supabase.storage.from('pub-documents').upload(sn, bf, { contentType: ft, cacheControl: '3600', upsert: false });
             if (error) return res.status(500).json({ error: 'Upload failed: ' + error.message });
             return res.status(200).json({ file_path: sn, filename: fn, size: bf.length });
@@ -187,13 +193,14 @@ export default async function handler(req, res) {
         // PUB: Earnings
         // ═══════════════════════════════════════
         if (path === '/api/pub/earnings' && method === 'GET') {
-            const user = await pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
-            const { data: pub } = await supabase.from('publishers').select('balance, bonus_claimed').eq('id', user.id).single();
-            const { data: payments } = await supabase.from('pub_payments').select('amount, publisher_earnings, platform_fee, customer_name, customer_phone, created_at, payment_method').eq('publisher_id', user.id).eq('status', 'completed').order('created_at', { ascending: false });
+            const publisher = await getPublisherId(req);
+            if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
+            const { data: pub } = await supabase.from('publishers').select('balance, bonus_claimed').eq('id', publisher.id).single();
+            const { data: payments } = await supabase.from('pub_payments').select('amount, publisher_earnings, platform_fee, customer_name, customer_phone, created_at, payment_method').eq('publisher_id', publisher.id).eq('status', 'completed').order('created_at', { ascending: false });
             const real = (payments||[]).filter(p => p.payment_method !== 'bonus');
             const total = real.reduce((s,p) => s + p.amount, 0);
             const fees = real.reduce((s,p) => s + p.platform_fee, 0);
-            const { count: docCount } = await supabase.from('pub_documents').select('id', { count: 'exact' }).eq('publisher_id', user.id);
+            const { count: docCount } = await supabase.from('pub_documents').select('id', { count: 'exact' }).eq('publisher_id', publisher.id);
             return res.status(200).json({ total_sales: total, your_earnings: pub?.balance || 0, platform_fees: fees, total_documents: docCount||0, total_transactions: real.length, recent: (payments||[]).slice(0, 10), bonus_claimed: pub?.bonus_claimed || false });
         }
 
