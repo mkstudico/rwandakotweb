@@ -11,7 +11,7 @@
         :root{--font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,'Helvetica Neue',Arial,sans-serif;--bg-main:#f4f2ee;--bg-surface:#ffffff;--bg-hover:#f9fafb;--bg-input:#eef3f8;--border:#e5e7eb;--text-primary:#191919;--text-secondary:#595856;--text-tertiary:#868482;--primary:#6c47ff;--primary-hover:#5835e8;--primary-light:#f0ebff;--success:#057642;--success-bg:#e9f7ef;--danger:#d11124;--danger-bg:#fdecea;--warning:#b85c00;--warning-bg:#fff8f0;--gold:#e8a838;--gold-bg:#fffdf5;--radius-xl:1.2rem;--radius-full:9999px;--transition-fast:150ms cubic-bezier(0.4,0,0.2,1)}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{font-size:16px;scroll-behavior:smooth}body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);min-height:100vh}
-        button{cursor:pointer;font-family:inherit;border:none;background:transparent}input,textarea,select{font-family:inherit;font-size:inherit}
+        button{cursor:pointer;font-family:inherit;border:none;background:transparent}input,textarea{font-family:inherit;font-size:inherit}
         @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}@keyframes confetti{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(-120px) rotate(720deg);opacity:0}}
         .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
         .topbar{background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center;position:sticky;top:0;z-index:50}
@@ -78,7 +78,6 @@
         .step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
         .step-dot{width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;transition:all var(--transition-fast)}.step-dot.active{background:var(--primary);color:#fff}.step-dot.done{background:var(--success);color:#fff}
         .step-line{flex:1;height:2px;background:var(--border);min-width:20px}.step-line.done{background:var(--success)}
-        .step-label{font-size:.62rem;color:var(--text-tertiary);text-align:center;margin-top:3px}
         .nav-btns{display:flex;gap:8px;margin-top:10px}
         .welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all .3s}
         .welcome-overlay.active{opacity:1;visibility:visible}
@@ -144,7 +143,7 @@ async function showDash(){if(!publisher)return;showLoader('Loading Creator Studi
     var pubUrl=window.location.origin+'/pub-page.html?p='+publisher.slug;
     var totalRev=earnings.your_earnings||0;
     c.innerHTML=
-    '<div class="revenue-card"><div class="rev-label">Total Revenue</div><div class="rev-amount">'+fmtPrice(totalRev,'RWF')+'</div><div class="rev-sub">'+earnings.total_transactions+' sales</div>'+(totalRev>=1000?'<div class="bonus-badge">🎉 +1,000 RWF Startup Bonus Included</div>':'')+'</div>'+
+    '<div class="revenue-card"><div class="rev-label">Total Revenue</div><div class="rev-amount">'+fmtPrice(totalRev,'RWF')+'</div><div class="rev-sub">'+earnings.total_transactions+' sales</div>'+(earnings.bonus_claimed?'<div class="bonus-badge">🎉 +1,000 RWF Startup Bonus Included</div>':'')+'</div>'+
     '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> '+pubUrl+'</div><button class="btn btn-primary btn-sm" onclick="copyLink(\''+pubUrl+'\')"><i class="bx bx-copy"></i> Copy Link</button><button class="btn btn-outline btn-sm" onclick="shareLink(\''+pubUrl+'\')"><i class="bx bx-share-alt"></i> Share</button></div>'+
     '<div class="stats-row"><div class="stat-card"><div class="stat-val">'+earnings.total_documents+'</div><div class="stat-label">Documents</div></div><div class="stat-card"><div class="stat-val">'+earnings.total_transactions+'</div><div class="stat-label">Sales</div></div></div>'+
     '<div class="tab-nav"><button class="tab-btn active" data-tab="guide"><i class="bx bx-book"></i> Guide</button><button class="tab-btn" data-tab="docs"><i class="bx bx-file"></i> Documents</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Upload</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>'+
@@ -189,7 +188,7 @@ function renderDocList(docs){var l=$('docList');if(!l)return;if(!docs.length){l.
     l.innerHTML=docs.map(function(d){var link=window.location.origin+'/pub-view.html?doc='+d.id;return'<div class="doc-row">'+(d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'')+'<div class="doc-thumb" style="'+(d.image_url?'display:none':'')+'"><i class="bx bx-file"></i></div><div class="doc-info"><h4>'+d.title+' <span class="badge '+(d.active?'badge-active':'badge-hidden')+'"><i class="bx '+(d.active?'bx-check':'bx-hide')+'"></i> '+(d.active?'Active':'Hidden')+'</span></h4><span>'+fmtPrice(d.price,d.currency)+' · '+(d.clicks||0)+' views</span></div><div class="doc-actions"><button class="btn btn-outline btn-xs" onclick="shareLink(\''+link+'\')"><i class="bx bx-share-alt"></i></button><button class="btn btn-outline btn-xs" onclick="editDoc(\''+d.id+'\',\''+d.title.replace(/'/g,"\\'")+'\',\''+(d.description||'').replace(/'/g,"\\'")+'\','+d.price+',\''+(d.image_url||'')+'\')"><i class="bx bx-edit"></i></button><button class="btn btn-outline btn-xs" onclick="toggleDoc(\''+d.id+'\')"><i class="bx '+(d.active?'bx-hide':'bx-show')+'"></i></button><button class="btn btn-danger btn-xs" onclick="deleteDoc(\''+d.id+'\',\''+d.title.replace(/'/g,"\\'")+'\')"><i class="bx bx-trash"></i></button></div></div>'}).join('')}
 
 function renderTxns(txns){var l=$('txnBody');if(!l)return;if(!txns.length){l.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-tertiary);padding:2rem">No sales yet. Share your page link to start earning!</td></tr>';return}
-    l.innerHTML=txns.map(function(t){var earn=Math.floor((t.amount||0)*0.88);var fee=(t.amount||0)-earn;return'<tr><td>'+(t.customer_name||'Customer')+'</td><td>Document</td><td>'+(t.customer_phone||'')+'</td><td>'+fmtPrice(t.amount,t.currency)+'</td><td class="earn-positive">+'+fmtPrice(earn,t.currency)+'</td><td class="fee-text">-'+fmtPrice(fee,t.currency)+'</td></tr>'}).join('')}
+    l.innerHTML=txns.filter(function(t){return t.payment_method!=='bonus'}).map(function(t){var earn=Math.floor((t.amount||0)*0.88);var fee=(t.amount||0)-earn;return'<tr><td>'+(t.customer_name||'Customer')+'</td><td>Document</td><td>'+(t.customer_phone||'')+'</td><td>'+fmtPrice(t.amount,t.currency)+'</td><td class="earn-positive">+'+fmtPrice(earn,t.currency)+'</td><td class="fee-text">-'+fmtPrice(fee,t.currency)+'</td></tr>'}).join('')}
 
 window.copyLink=function(url){navigator.clipboard.writeText(url).then(function(){toast('Link copied!')}).catch(function(){toast('Copy failed')})};
 window.shareLink=function(url){if(navigator.share){navigator.share({url:url}).catch(function(){})}else{navigator.clipboard.writeText(url).then(function(){toast('Link copied! Share it anywhere!')})}};
@@ -200,7 +199,7 @@ window.editDoc=function(id,title,desc,price,img){$('editModalContent').innerHTML
     $('saveEdit').addEventListener('click',async function(){try{var nt=$('eTitle').value.trim(),nd=$('eDesc').value.trim(),np=parseInt($('ePrice').value);if(!nt||!np){toast('Title and price required');return}if(np<1000||np>500000){toast('Price must be 1,000-500,000 RWF');return}await apiCall(API+'/documents/'+id,{title:nt,description:nd,price:np,file_path:'keep',image_url:img},'POST');$('editModal').classList.remove('active');toast('Updated!');showDash()}catch(e){toast(e.message)}})};
 $('editModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});
 
-$('logoutBtn').addEventListener('click',function(){clearAuth();showLogin()});
+$('logoutBtn').addEventListener('click',async function(){try{await apiCall(API+'/logout',{},'POST');}catch(e){}clearAuth();showLogin()});
 if(loadAuth()){showDash()}else{showLogin()}
 })();
 </script>
