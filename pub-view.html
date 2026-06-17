@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title id="ogTitle">Document — KotWeb</title>
+    <meta name="title" content="Document — KotWeb">
+    <meta name="description" content="Purchase and download this document securely via MTN or Airtel Money.">
+    <meta property="og:type" content="product">
+    <meta property="og:url" id="ogUrl" content="">
+    <meta property="og:title" id="ogTitle2" content="Document — KotWeb">
+    <meta property="og:description" id="ogDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
+    <meta property="og:image" id="ogImage" content="">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="KotWeb">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twTitle" content="Document — KotWeb">
+    <meta name="twitter:description" id="twDesc" content="Purchase and download this document securely via MTN or Airtel Money.">
+    <meta name="twitter:image" id="twImage" content="">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+    <style>
+        :root{--font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,'Helvetica Neue',Arial,sans-serif;--bg-main:#f4f2ee;--bg-surface:#ffffff;--bg-hover:#f9fafb;--bg-input:#eef3f8;--border:#e5e7eb;--text-primary:#191919;--text-secondary:#595856;--text-tertiary:#868482;--primary:#6c47ff;--primary-hover:#5835e8;--primary-light:#f0ebff;--success:#057642;--success-bg:#e9f7ef;--danger:#d11124;--danger-bg:#fdecea;--warning:#b85c00;--warning-bg:#fff8f0;--transition-fast:150ms cubic-bezier(0.4,0,0.2,1);--radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;--radius-full:9999px}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{-webkit-font-smoothing:antialiased;font-size:16px;scroll-behavior:smooth}
+        body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);line-height:1.5;min-height:100vh}
+        a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:inherit;border:none;background:transparent}input{font-family:inherit;font-size:inherit}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}@keyframes spin{to{transform:rotate(360deg)}}
+        .skeleton{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}.sk-img{width:100%;height:240px}.sk-title{height:24px;width:55%;margin-bottom:8px;border-radius:4px}.sk-text{height:14px;width:90%;margin-bottom:5px;border-radius:4px}.sk-text.short{width:40%}.sk-price{height:32px;width:30%;margin-bottom:12px;border-radius:4px}.sk-btn{height:48px;width:100%;border-radius:var(--radius-full)}
+        .container{max-width:640px;margin:0 auto;padding:1rem .85rem 5rem}
+        .back-link{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:500;color:var(--text-secondary);padding:8px 14px;margin-bottom:1rem;border-radius:var(--radius-full);transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;background:var(--bg-surface);border:1px solid var(--border)}.back-link:hover{background:var(--bg-hover);color:var(--text-primary)}.back-link i{font-size:16px}
+        .hero{background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.03)}.hero-img-wrap{position:relative;background:var(--bg-input);min-height:200px;display:flex;align-items:center;justify-content:center}.hero-img-wrap img{width:100%;max-height:340px;object-fit:cover;display:block}.hero-img-wrap .img-fallback{font-size:72px;color:#d1d5db}.hero-body{padding:1.5rem 1.25rem}.hero-body .doc-title{font-size:1.3rem;font-weight:800;margin-bottom:6px;letter-spacing:-.4px;line-height:1.3}.hero-body .doc-desc{font-size:.82rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem}.hero-body .price-display{display:flex;align-items:baseline;gap:5px;margin-bottom:1rem}.hero-body .price-display .val{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;color:var(--primary)}.hero-body .price-display .cur{font-size:.72rem;color:var(--text-tertiary);font-weight:500}
+        .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}.timer-badge{display:inline-flex;align-items:center;gap:5px;background:var(--warning-bg);color:var(--warning);padding:7px 12px;border-radius:var(--radius-full);font-size:.72rem;font-weight:600}.timer-badge.expired{background:var(--danger-bg);color:var(--danger)}.suspicious-badge{display:inline-flex;align-items:center;gap:5px;background:var(--danger-bg);color:var(--danger);padding:7px 12px;border-radius:var(--radius-full);font-size:.72rem;font-weight:600}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:13px 24px;border-radius:var(--radius-full);font-weight:600;font-size:.84rem;cursor:pointer;border:none;font-family:var(--font-family);transition:all var(--transition-fast);-webkit-tap-highlight-color:transparent;width:100%;letter-spacing:-.2px;box-shadow:0 2px 8px rgba(0,0,0,.06)}.btn i{font-size:18px}.btn:active{transform:scale(.97)}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover);box-shadow:0 4px 16px rgba(108,71,255,.3)}.btn-primary:disabled{opacity:.5;pointer-events:none;transform:none}.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#046b38}.btn-danger{background:var(--danger);color:#fff;width:auto;display:inline-flex}.btn-danger:hover{background:#b91c1c}.btn-outline{background:var(--bg-surface);color:var(--text-primary);border:1.5px solid var(--border);box-shadow:none}
+        .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem}.info-card{background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);padding:1rem .9rem;display:flex;align-items:center;gap:10px}.info-card .ic-icon{width:38px;height:38px;border-radius:8px 2px 8px 2px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.info-card .ic-icon.views{background:#e3f2fd;color:#0d47a1}.info-card .ic-icon.payments{background:var(--warning-bg);color:var(--warning)}.info-card .ic-val{font-size:1rem;font-weight:700}.info-card .ic-label{font-size:.65rem;color:var(--text-tertiary);font-weight:500}
+        .state-wrap{text-align:center;padding:3rem 1.5rem}.state-wrap i{font-size:52px;color:#d1d5db;display:block;margin-bottom:10px}.state-wrap h2{font-size:1.1rem;font-weight:700;margin-bottom:6px}.state-wrap p{color:var(--text-secondary);font-size:.82rem;margin-bottom:1rem}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all .25s}.modal-overlay.active{opacity:1;visibility:visible}.modal{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;padding:1.5rem 1.25rem 2rem;animation:slideUp .3s ease;box-shadow:0 -4px 20px rgba(0,0,0,.12)}@media(min-width:500px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius-xl);animation:modalIn .25s ease}}.modal .modal-icon-wrap{width:52px;height:52px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}.modal .modal-icon-wrap i{font-size:26px;color:var(--primary)}.modal h3{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:2px}.modal .modal-sub{font-size:.78rem;color:var(--text-secondary);text-align:center;margin-bottom:1rem}.modal .field-group{margin-bottom:12px;text-align:left}.modal .field-group label{display:block;font-size:.72rem;font-weight:600;color:var(--text-primary);margin-bottom:3px}.modal .field-group input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-full);font-size:.82rem;font-family:var(--font-family);outline:none;background:var(--bg-input);color:var(--text-primary);transition:all var(--transition-fast);-webkit-appearance:none}.modal .field-group input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1);background:var(--bg-surface)}.modal .phone-input-group{display:flex;align-items:center;background:var(--bg-input);border-radius:var(--radius-full);overflow:hidden;border:1.5px solid var(--border);margin-bottom:.75rem;transition:all var(--transition-fast)}.modal .phone-input-group:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1)}.modal .phone-input-group .prefix{background:var(--bg-hover);padding:10px 14px;font-size:.76rem;font-weight:600;color:var(--text-secondary);border-right:1px solid var(--border);white-space:nowrap}.modal .phone-input-group input{flex:1;border:none;background:transparent;padding:10px 12px;font-size:.82rem;font-family:var(--font-family);outline:none;color:var(--text-primary);-webkit-appearance:none}.modal .btn-close-modal{width:100%;padding:9px;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-secondary);margin-top:6px;font-family:var(--font-family)}
+        .processing-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:210;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .25s}.processing-overlay.active{opacity:1;visibility:visible}.processing-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-align:center;max-width:340px;width:90%;animation:modalIn .25s ease}.processing-card .big-spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}.processing-card h4{font-size:.9rem;font-weight:700;margin-bottom:4px}.processing-card p{font-size:.74rem;color:var(--text-secondary)}
+        .toast-container{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:400;pointer-events:none}.toast{padding:.6rem 1rem;border-radius:var(--radius-full);font-size:.75rem;font-weight:500;background:var(--text-primary);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:slideUp .3s ease-out;pointer-events:auto;white-space:nowrap;text-align:center}.toast.err{background:var(--danger)}
+        @media(max-width:500px){.hero-body{padding:1.1rem .9rem}.hero-body .doc-title{font-size:1.1rem}.hero-body .price-display .val{font-size:1.25rem}.info-grid{grid-template-columns:1fr}.hero-img-wrap{min-height:160px}}
+    </style>
+</head>
+<body>
+    <div class="container" id="pageContent"><a href="index.html" class="back-link"><i class="bx bx-arrow-back"></i> Back</a><div class="hero"><div class="hero-img-wrap"><div class="skeleton sk-img"></div></div><div class="hero-body"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text short"></div><div class="skeleton sk-price"></div><div class="skeleton sk-btn"></div></div></div></div>
+    <div class="modal-overlay" id="payModal">
+        <div class="modal"><div class="modal-icon-wrap"><i class="bx bx-credit-card"></i></div><h3>Pay with RwandaPay</h3><p class="modal-sub">Enter your details to receive a payment prompt</p><div class="field-group"><label>Full Name</label><input type="text" id="payName" placeholder="e.g. Niyonzima Patrick" autocomplete="off"></div><div class="field-group"><label>Phone Number</label></div><div class="phone-input-group"><span class="prefix">🇷🇼</span><input type="tel" id="payPhone" placeholder="0788123456" maxlength="10" autocomplete="off"></div><button class="btn btn-primary" id="paySubmit"><i class="bx bx-check-shield"></i> Pay Now</button><button class="btn-close-modal" id="payCancel">Cancel</button></div></div>
+    <div class="processing-overlay" id="procOverlay"><div class="processing-card"><div class="big-spinner"></div><h4>Processing Payment</h4><p>Please wait...</p></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+    <script>
+(function(){'use strict';
+var SUPABASE_URL='https://wuswjdmshzzxnlsugukm.supabase.co';
+var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1c3dqZG1zaHp6eG5sc3VndWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjM3NDcsImV4cCI6MjA5NzAzOTc0N30.p92FyfHtBiEC0CEeFEjcV5kz0ZJiSLFtIWUg0EhEO10';
+var DL_WINDOW=30;
+var doc=null,fp=null,paid=false,inWindow=false,doubled=false,doublePrice=null;
+var payToken=null,paidAt=null,completedToken=null,rpRef=null,pollTimer=null;
+
+function gid(id){return document.getElementById(id)}
+function toast(m,e){var t=document.createElement('div');t.className='toast'+(e?' err':'');t.textContent=m;gid('toastContainer').appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .25s';setTimeout(function(){t.remove()},250)},2800)}
+function gToken(){var c='abcdefghijklmnopqrstuvwxyz0123456789',r='';for(var i=0;i<28;i++)r+=c[Math.floor(Math.random()*c.length)];return'tk_'+r+'_'+Date.now().toString(36)}
+function isUUID(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)}
+function fmtP(n,c){return parseInt(n).toLocaleString()+' '+(c||'RWF')}
+function vPhone(p){return /^0?7[89]\d{7}$/.test((p||'').replace(/\s/g,''))}
+
+function sHash(str){var h=0;for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0}return h.toString(36)}
+function saveLocal(docId,token,ts){try{var d={d:docId,h:sHash(fp+token),p:ts,e:ts+(DL_WINDOW*60*1000)};localStorage.setItem('kw_pub_sec',btoa(JSON.stringify(d)))}catch(e){}}
+function checkLocal(){try{var r=localStorage.getItem('kw_pub_sec');if(!r)return false;var d=JSON.parse(atob(r));if(d.d===docId&&d.h===sHash(fp+payToken)&&Date.now()<d.e)return true}catch(e){}return false}
+
+async function api(path,body){var ctrl=new AbortController();var t=setTimeout(function(){ctrl.abort()},25000);try{var opts={method:body?'POST':'GET',headers:{'Content-Type':'application/json'},signal:ctrl.signal};if(body)opts.body=JSON.stringify(body);var r=await fetch(path,opts);clearTimeout(t);var txt=await r.text();if(!r.ok){var msg='Request failed';try{msg=JSON.parse(txt).error||msg}catch(e){}throw new Error(msg)}try{return JSON.parse(txt)}catch(e){throw new Error('Invalid response')}}catch(err){clearTimeout(t);if(err.name==='AbortError')throw new Error('Timed out');throw err}}
+async function getFp(){try{var f=await FingerprintJS.load();return(await f.get()).visitorId}catch(e){var c=[navigator.userAgent,screen.width+'x'+screen.height,navigator.language,new Date().getTimezoneOffset(),navigator.hardwareConcurrency||''];return'fb_'+btoa(c.join('|')).replace(/[=+/]/g,'').slice(0,48)}}
+
+var pr=new URLSearchParams(window.location.search);
+var docId=pr.get('doc');
+rpRef=pr.get('rp_ref')||pr.get('reference')||pr.get('tx_ref')||null;
+
+if(!docId||!isUUID(docId)){gid('pageContent').innerHTML='<div class="state-wrap"><i class="bx bx-error-circle"></i><h2>Invalid Document</h2><p>No valid document specified.</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Browse</a></div>';return}
+
+async function loadDoc(){
+    try{
+        // Fetch from pub documents endpoint
+        var r=await fetch('/api/pub/page/_all_?doc='+docId);
+        // We need a dedicated endpoint — use the pub page API to find the doc
+        var allPubs=await api('/api/documents'); // fallback
+        // Actually we need to fetch pub_documents directly
+        doc=await api('/api/documents/'+docId); // This won't work — need a new endpoint
+    }catch(err){}
+    // Use a direct Supabase query for pub_documents
+    try{
+        var raw=await fetch('https://wuswjdmshzzxnlsugukm.supabase.co/rest/v1/pub_documents?id=eq.'+docId+'&active=eq.true&select=*',{
+            headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}
+        });
+        var data=await raw.json();
+        if(data&&data.length>0){doc=data[0];}
+        else{gid('pageContent').innerHTML='<div class="state-wrap"><i class="bx bx-folder-open"></i><h2>Not Found</h2><p>Document not found.</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Back to Store</a></div>';return}
+    }catch(err){gid('pageContent').innerHTML='<div class="state-wrap"><i class="bx bx-folder-open"></i><h2>Not Found</h2><p>'+err.message+'</p><a href="index.html" class="btn btn-primary" style="width:auto;padding:12px 24px;">Back to Store</a></div>';return}
+}
+
+async function checkPaid(){
+    try{
+        var r=await api('/api/check-payment',{device_fingerprint:fp,document_id:docId});
+        paid=r.already_paid===true;inWindow=r.within_window===true;
+        if(r.payment){if(r.payment.created_at)paidAt=new Date(r.payment.created_at)}
+    }catch(e){paid=false;inWindow=false}
+    var sp=pr.get('status');if(sp==='successful'||sp==='success'){paid=true;inWindow=true}
+}
+
+function timeLeft(){if(!paidAt)return-1;return Math.max(0,Math.floor(DL_WINDOW-((Date.now()-paidAt.getTime())/60000)))}
+function updateMeta(){if(!doc)return;var t=doc.title+' — KotWeb';var d=doc.description||'Purchase securely via MTN or Airtel Money.';var i=doc.image_url||'';var u=window.location.origin+'/pub-view.html?doc='+docId;document.title=t;['title','description','og:title','og:description','og:image','og:url','twitter:title','twitter:description','twitter:image','twitter:url'].forEach(function(k){var v=k==='og:url'||k==='twitter:url'?u:k==='og:image'||k==='twitter:image'?i:k==='title'||k==='og:title'||k==='twitter:title'?t:d;var el=document.querySelector('meta[property="'+k+'"]')||document.querySelector('meta[name="'+k+'"]');if(el&&v)el.setAttribute('content',v)})}
+
+function render(){if(!doc)return;var hi=doc.image_url&&doc.image_url.trim().length>0;var tl=timeLeft(),ex=paid&&!inWindow,ok=paid&&inWindow||checkLocal();var th='',ps=doc.price;
+    if(ok)th='<div class="timer-badge"><i class="bx bx-time-five"></i> Download ready</div>';else if(ex)th='<div class="timer-badge expired"><i class="bx bx-timer-off"></i> Expired</div>';
+    gid('pageContent').innerHTML='<a href="index.html" class="back-link"><i class="bx bx-arrow-back"></i> Back</a><div class="hero"><div class="hero-img-wrap">'+(hi?'<img src="'+doc.image_url+'" alt="'+doc.title+'" loading="eager" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'')+'<span class="img-fallback" style="'+(hi?'display:none':'display:flex')+';align-items:center;justify-content:center;width:100%;height:200px;"><i class="bx bx-file" style="font-size:64px;color:#d1d5db;"></i></span></div><div class="hero-body"><h1 class="doc-title">'+doc.title+'</h1><p class="doc-desc">'+(doc.description||'No description.')+'</p><div class="price-display"><span class="val">'+parseInt(ps).toLocaleString()+'</span><span class="cur">'+(doc.currency||'RWF')+'</span></div><div class="badge-row">'+th+'</div>'+(ok?'<button class="btn btn-success" id="dlBtn"><i class="bx bx-download"></i> Download Document</button>':'<button class="btn '+(ex?'btn-outline':'btn-primary')+'" id="payBtn"><i class="bx bx-'+(ex?'refresh':'lock')+'"></i> '+(ex?'Purchase Again':'Pay to Download')+'</button>')+'</div></div><div class="info-grid"><div class="info-card"><div class="ic-icon views"><i class="bx bx-show"></i></div><div><div class="ic-val">'+(doc.clicks||0).toLocaleString()+'</div><div class="ic-label">Views</div></div></div><div class="info-card"><div class="ic-icon payments"><i class="bx bx-credit-card"></i></div><div><div class="ic-val">'+(ok?'Paid':'Pending')+'</div><div class="ic-label">Status</div></div></div></div>';
+    var db=gid('dlBtn'),pb=gid('payBtn');if(db)db.addEventListener('click',download);if(pb)pb.addEventListener('click',openPay);updateMeta()}
+
+function openPay(){gid('payModal').classList.add('active');var ni=gid('payName');if(ni)ni.focus();var nb=gid('paySubmit'),nn=nb.cloneNode(true);nb.parentNode.replaceChild(nn,nb);nn.addEventListener('click',execPay)}
+function closePay(){gid('payModal').classList.remove('active')}
+gid('payCancel').addEventListener('click',closePay);
+gid('payModal').addEventListener('click',function(e){if(e.target===this)closePay()});
+
+async function execPay(){var name=(gid('payName').value||'').trim(),phone=(gid('payPhone').value||'').replace(/\s/g,'');if(!name||name.length<2){toast('Enter your full name',true);return}if(!vPhone(phone)){toast('Enter valid phone (078...)',true);return}if(!doc||!fp){toast('Loading...',true);return}closePay();var btn=gid('payBtn');if(btn){btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Processing...'}payToken=gToken();
+    try{var r=await api('/api/pub/init-payment',{document_id:docId,device_fingerprint:fp,phone:phone,client_token:payToken,customer_name:name});
+        if(r.error){toast(r.error,true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'}return}
+        if(r.payment_url){rpRef=r.reference||payToken;gid('procOverlay').classList.add('active');startPoll(rpRef);window.location.href=r.payment_url}
+    }catch(err){toast(err.message,true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'}}}
+
+function startPoll(ref){clearInterval(pollTimer);var at=0;rpRef=ref;payToken=ref;pollTimer=setInterval(async function(){at++;try{var r=await api('/api/pub/verify-payment',{reference:ref,client_token:ref,document_id:docId,device_fingerprint:fp});if(r.verified&&r.status==='completed'){clearInterval(pollTimer);gid('procOverlay').classList.remove('active');paid=true;inWindow=true;completedToken=ref;saveLocal(docId,ref,Date.now());render();toast('Payment confirmed!');return}if(r.status==='failed'){clearInterval(pollTimer);gid('procOverlay').classList.remove('active');toast('Payment failed. Try again.',true);var btn=gid('payBtn');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-lock"></i> Pay to Download'}return}}catch(e){}if(at>=90){clearInterval(pollTimer);gid('procOverlay').classList.remove('active');toast('Timeout. Refresh page.',true)}},3000)}
+
+function download(){var btn=gid('dlBtn');if(btn){btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Downloading...'}
+    api('/api/pub/download',{client_token:'download',device_fingerprint:fp,document_id:docId}).then(function(r){if(r.url){if(btn)btn.innerHTML='<i class="bx bx-cloud-download"></i> Fetching...';fetch(r.url).then(function(res){if(!res.ok)throw new Error('Failed');return res.blob()}).then(function(b){var fn=r.filename||'document',u=window.URL.createObjectURL(b),a=document.createElement('a');a.style.display='none';a.href=u;a.download=fn;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);window.URL.revokeObjectURL(u)},200);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download Again'}toast('Download started!')}).catch(function(){window.open(r.url,'_blank');if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download'}})}else{toast(r.error||'Failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download'}}}).catch(function(err){toast(err.message||'Failed',true);if(btn){btn.disabled=false;btn.innerHTML='<i class="bx bx-download"></i> Download'}})}
+
+function checkRet(){var sp=pr.get('status');if(sp==='successful'||sp==='success'){paid=true;inWindow=true;gid('procOverlay').classList.remove('active');saveLocal(docId,rpRef||payToken,Date.now());render();toast('Payment successful!');if(rpRef){payToken=rpRef;api('/api/pub/verify-payment',{reference:rpRef,client_token:rpRef,document_id:docId,device_fingerprint:fp}).catch(function(){})}}if(sp==='failed'){toast('Payment not successful. Try again.',true)}}
+
+(async function(){try{var fpP=getFp();await loadDoc();fp=await fpP;updateMeta();await checkPaid();render();checkRet()}catch(e){}})()
+})();
+</script>
+</body>
+</html>
