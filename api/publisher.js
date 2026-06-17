@@ -1,4 +1,3 @@
-// api/publisher.js
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -15,7 +14,6 @@ function vphone(p) { return /^0?7[89]\d{7}$/.test((p||'').replace(/\s/g,'')); }
 function vt(t) { return /^[a-zA-Z0-9_]{20,80}$/.test(t); }
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); res.setHeader('Content-Type', 'application/json'); }
 
-// Decode Firebase JWT without verification (safe because token comes from client, we just extract uid/email)
 function pubAuth(req) {
     const auth = req.headers.authorization;
     if (!auth?.startsWith('Bearer ')) return null;
@@ -32,13 +30,11 @@ function pubAuth(req) {
 async function getPublisherId(req) {
     const fbUser = pubAuth(req);
     if (!fbUser) return null;
-    // Find publisher by firebase_uid or email
     const { data: pub } = await supabase.from('publishers').select('id, username, email').eq('firebase_uid', fbUser.uid).single();
     if (pub) return pub;
     if (fbUser.email) {
         const { data: pub2 } = await supabase.from('publishers').select('id, username, email').eq('email', fbUser.email).single();
         if (pub2) {
-            // Update firebase_uid for future logins
             await supabase.from('publishers').update({ firebase_uid: fbUser.uid }).eq('id', pub2.id);
             return pub2;
         }
@@ -79,18 +75,15 @@ export default async function handler(req, res) {
             const slug = (username || email.split('@')[0]).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
             const { data: exist } = await supabase.from('publishers').select('id, bonus_claimed, balance').eq('email', email).limit(1);
             if (exist?.length) {
-                // Existing publisher, update firebase_uid
                 await supabase.from('publishers').update({ firebase_uid: uid, username: username || exist[0].username }).eq('id', exist[0].id);
                 return res.status(200).json({ publisher: { id: exist[0].id, username: username || exist[0].username, slug, email } });
             }
-            // New publisher
             const name = username || email.split('@')[0];
             const { data, error } = await supabase.from('publishers').insert({
                 username: name, email, password_hash: 'firebase', name, slug,
                 firebase_uid: uid, balance: 1000, bonus_claimed: true
             }).select().single();
             if (error) return res.status(500).json({ error: 'Registration failed' });
-            // Award bonus
             await supabase.from('pub_payments').insert({
                 publisher_id: data.id, device_fingerprint: 'bonus_' + data.id,
                 client_token: 'bonus_' + Date.now(), amount: 1000,
@@ -302,6 +295,51 @@ export default async function handler(req, res) {
             const { data, error } = await supabase.from('pub_payments').select('*, publishers!inner(username, name), pub_documents!inner(title)').order('created_at', { ascending: false }).limit(200);
             if (error) return res.status(500).json({ error: 'Fetch failed' });
             return res.status(200).json(data || []);
+        }
+
+        // ═══════════════════════════════════════
+        // NEW: PUBLIC – Discover all active publisher documents
+        // ═══════════════════════════════════════
+        if (path === '/api/pub/discover' && method === 'GET') {
+            const { data, error } = await supabase
+                .from('pub_documents')
+                .select('id, title, description, image_url, price, currency, clicks, created_at, publisher_id, publishers!inner(username)')
+                .eq('active', true)
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) return res.status(500).json({ error: 'Fetch failed' });
+            const docs = (data || []).map(d => ({
+                ...d,
+                username: d.publishers?.username || 'unknown',
+                publishers: undefined,
+                isPublisher: true
+            }));
+            return res.status(200).json(docs);
+        }
+
+        // ═══════════════════════════════════════
+        // NEW: PUBLIC – Top Publishers by total views
+        // ═══════════════════════════════════════
+        if (path === '/api/pub/top-publishers' && method === 'GET') {
+            const { data, error } = await supabase
+                .from('pub_documents')
+                .select('clicks, publisher_id, publishers!inner(username, name)')
+                .eq('active', true);
+
+            if (error) return res.status(500).json({ error: 'Fetch failed' });
+
+            const map = {};
+            (data || []).forEach(d => {
+                const pid = d.publisher_id;
+                if (!map[pid]) {
+                    map[pid] = { id: pid, username: d.publishers?.username || 'unknown', name: d.publishers?.name || '', totalViews: 0 };
+                }
+                map[pid].totalViews += (d.clicks || 0);
+            });
+
+            const sorted = Object.values(map).sort((a, b) => b.totalViews - a.totalViews).slice(0, 5);
+            return res.status(200).json(sorted);
         }
 
         return res.status(404).json({ error: 'Endpoint not found' });
