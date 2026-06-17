@@ -106,11 +106,10 @@
             return d;
         }
 
-        async function registerWithServer() {
+        async function registerWithServer(username) {
             if (!firebaseUID || !userEmail) return;
             try {
-                var username = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '').substring(0, 20);
-                await apiCall(API + '/firebase-register', { uid: firebaseUID, email: userEmail, username: username });
+                await apiCall(API + '/firebase-register', { uid: firebaseUID, email: userEmail, username: username || userEmail.split('@')[0] });
             } catch (e) { /* ignore */ }
         }
 
@@ -130,7 +129,8 @@
                 try {
                     var e = el('loginEmail').value.trim(), p = el('loginPass').value;
                     if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Sign In'; return; }
-                    await signInWithEmailAndPassword(auth, e, p);
+                    var cred = await signInWithEmailAndPassword(auth, e, p);
+                    // onAuthStateChanged will fire
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Sign In'; }
             });
             el('showRegister').addEventListener('click', function(e) { e.preventDefault(); showRegister(); });
@@ -142,6 +142,7 @@
             el('userBadge').style.display = 'none';
             el('content').innerHTML = 
                 '<div class="auth-card"><div class="icon-circle"><i class="bx bx-user-plus"></i></div><h2>Join KotWeb Publisher</h2><p class="sub">Get <strong>1,000 RWF bonus</strong> on signup!</p>' +
+                '<div class="field"><label>Username</label><input type="text" id="regUser" placeholder="choose a username" autocomplete="off"></div>' +
                 '<div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="off"></div>' +
                 '<div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 characters" autocomplete="off"></div>' +
                 '<button class="btn btn-primary" id="regBtn">Create Account & Claim 1,000 RWF</button>' +
@@ -150,10 +151,13 @@
             el('regBtn').addEventListener('click', async function() {
                 var btn = this; btn.disabled = true; btn.innerHTML = 'Creating…';
                 try {
-                    var e = el('regEmail').value.trim(), p = el('regPass').value;
-                    if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
+                    var user = el('regUser').value.trim(), e = el('regEmail').value.trim(), p = el('regPass').value;
+                    if (!user || !e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
+                    if (user.length < 3) { toast('Username: min 3 chars'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
                     if (p.length < 6) { toast('Password: min 6 chars'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
-                    await createUserWithEmailAndPassword(auth, e, p);
+                    var cred = await createUserWithEmailAndPassword(auth, e, p);
+                    await registerWithServer(user);
+                    // onAuthStateChanged will handle the rest
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Create Account'; }
             });
             el('showLoginLink').addEventListener('click', function(e) { e.preventDefault(); showLogin(); });
@@ -166,8 +170,6 @@
             el('logoutBtn').style.display = 'inline-flex';
             el('userBadge').style.display = 'flex';
             el('pubEmail').textContent = userEmail;
-
-            await registerWithServer();
 
             var earnings, docs;
             try { 
