@@ -7,53 +7,32 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-        const firebaseConfig = { apiKey: "AIzaSyDANYS44qmTxUZb40SK50di8XHwaeOiPkM", authDomain: "sub-ed-62348.firebaseapp.com", projectId: "sub-ed-62348", storageBucket: "sub-ed-62348.firebasestorage.app", messagingSenderId: "133365566054", appId: "1:133365566054:web:966a40fe8443d29aabfba7" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        window.FB_AUTH = auth;
-        window.FB_createUser = createUserWithEmailAndPassword;
-        window.FB_signIn = signInWithEmailAndPassword;
-        window.FB_signOut = signOut;
-        window.FB_onAuth = onAuthStateChanged;
-    </script>
     <style>
         :root{--font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,'Helvetica Neue',Arial,sans-serif;--bg-main:#f4f2ee;--bg-surface:#ffffff;--bg-hover:#f9fafb;--bg-input:#eef3f8;--border:#e5e7eb;--text-primary:#191919;--text-secondary:#595856;--text-tertiary:#868482;--primary:#6c47ff;--primary-hover:#5835e8;--primary-light:#f0ebff;--success:#057642;--success-bg:#e9f7ef;--danger:#d11124;--danger-bg:#fdecea;--warning:#b85c00;--warning-bg:#fff8f0;--gold:#e8a838;--gold-bg:#fffdf5;--radius-xl:1rem;--radius-full:9999px;--transition-fast:150ms cubic-bezier(0.4,0,0.2,1)}
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         html{font-size:16px}body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);min-height:100vh}
         button{cursor:pointer;font-family:inherit;border:none;background:transparent}input,textarea{font-family:inherit;font-size:inherit}
-        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
         .topbar{background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 1rem;height:50px;display:flex;align-items:center;position:sticky;top:0;z-index:50}
         .topbar-inner{max-width:960px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
         .logo{font-size:.9rem;font-weight:800;display:flex;align-items:center;gap:6px;color:var(--text-primary);text-decoration:none}
         .logo span{width:28px;height:28px;clip-path:polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%);background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.65rem}
-        .user-badge{font-size:.72rem;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
-        .user-badge span{color:var(--primary)}
+        .user-badge{font-size:.72rem;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:8px}.user-badge span{color:var(--primary)}
         .container{max-width:960px;margin:0 auto;padding:1rem .85rem 4rem}
         .auth-card{max-width:420px;margin:3rem auto;background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;border:1px solid var(--border);text-align:center}
-        .auth-card .icon-circle{width:52px;height:52px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-        .auth-card .icon-circle i{font-size:24px;color:var(--primary)}
-        .auth-card h2{font-size:1.1rem;font-weight:700;margin-bottom:4px}
-        .auth-card .sub{font-size:.74rem;color:var(--text-secondary);margin-bottom:1.25rem}
-        .field{margin-bottom:11px;text-align:left}
-        .field label{display:block;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:3px}
+        .auth-card .icon-circle{width:52px;height:52px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}.auth-card .icon-circle i{font-size:24px;color:var(--primary)}
+        .auth-card h2{font-size:1.1rem;font-weight:700;margin-bottom:4px}.auth-card .sub{font-size:.74rem;color:var(--text-secondary);margin-bottom:1.25rem}
+        .field{margin-bottom:11px;text-align:left}.field label{display:block;font-size:.7rem;font-weight:600;color:var(--text-secondary);margin-bottom:3px}
         .field input,.field textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-full);font-size:.82rem;outline:none;background:var(--bg-input);transition:all var(--transition-fast)}
         .field textarea{border-radius:14px;resize:vertical;min-height:60px}.field input:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1);background:var(--bg-surface)}
-        .field .err{font-size:.64rem;color:var(--danger);margin-top:2px;display:none}.field .err.show{display:block}
-        .field .hint{font-size:.62rem;color:var(--text-tertiary);margin-top:2px}
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 22px;border-radius:var(--radius-full);font-weight:600;font-size:.82rem;transition:all var(--transition-fast);width:100%}
-        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}.btn-primary:disabled{opacity:.5;pointer-events:none}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}.btn-primary:disabled{opacity:.5}
         .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-primary);width:auto}.btn-outline:hover{background:var(--bg-hover)}
-        .btn-sm{padding:6px 12px;font-size:.7rem;width:auto}.btn-danger{background:var(--danger);color:#fff;width:auto}.btn-danger:hover{background:#b91c1c}
-        .btn-xs{padding:4px 8px;font-size:.65rem;width:auto;border-radius:20px}.btn-gold{background:var(--gold);color:#fff;width:auto}
-        .link-text{font-size:.7rem;color:var(--text-secondary);margin-top:10px}.link-text a{color:var(--primary);font-weight:600;cursor:pointer}
+        .btn-sm{padding:6px 12px;font-size:.7rem;width:auto}.btn-danger{background:var(--danger);color:#fff;width:auto}.btn-xs{padding:4px 8px;font-size:.65rem;width:auto;border-radius:20px}
+        .btn-gold{background:var(--gold);color:#fff;width:auto}.link-text{font-size:.7rem;color:var(--text-secondary);margin-top:10px}.link-text a{color:var(--primary);font-weight:600;cursor:pointer}
         .revenue-card{background:linear-gradient(135deg,#6c47ff,#8b6cff);border-radius:var(--radius-xl);padding:1.5rem;color:#fff;margin-bottom:1rem;text-align:center}
-        .revenue-card .rev-amount{font-size:2.2rem;font-weight:800;letter-spacing:-1px}
-        .revenue-card .rev-label{font-size:.72rem;opacity:.85;margin-bottom:4px}
-        .revenue-card .rev-sub{font-size:.68rem;opacity:.7;margin-top:4px}
+        .revenue-card .rev-label{font-size:.72rem;opacity:.85;margin-bottom:4px}.revenue-card .rev-amount{font-size:2.2rem;font-weight:800;letter-spacing:-1px}.revenue-card .rev-sub{font-size:.68rem;opacity:.7;margin-top:4px}
         .bonus-badge{display:inline-block;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;font-size:.65rem;margin-top:6px}
         .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:1rem}
         .stat-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:.9rem;border:1px solid var(--border)}.stat-val{font-size:1.1rem;font-weight:700}.stat-label{font-size:.64rem;color:var(--text-secondary)}
@@ -66,20 +45,17 @@
         .tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .25s ease}
         .doc-list{display:grid;gap:8px}
         .doc-row{background:var(--bg-surface);border-radius:var(--radius-xl);padding:12px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-        .doc-row img{width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0}
-        .doc-thumb{width:40px;height:40px;border-radius:6px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#d1d5db;font-size:1.1rem}
-        .doc-info{flex:1;min-width:120px}.doc-info h4{font-size:.78rem;font-weight:600}.doc-info span{font-size:.66rem;color:var(--text-secondary)}
-        .doc-actions{display:flex;gap:4px;flex-wrap:wrap}
-        .badge{font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:20px;display:inline-flex;align-items:center;gap:3px}.badge i{font-size:10px}.badge-active{background:var(--success-bg);color:var(--success)}.badge-hidden{background:var(--danger-bg);color:var(--danger)}
+        .doc-row img{width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0}.doc-thumb{width:40px;height:40px;border-radius:6px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#d1d5db;font-size:1.1rem}
+        .doc-info{flex:1;min-width:120px}.doc-info h4{font-size:.78rem;font-weight:600}.doc-info span{font-size:.66rem;color:var(--text-secondary)}.doc-actions{display:flex;gap:4px;flex-wrap:wrap}
+        .badge{font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:20px}.badge-active{background:var(--success-bg);color:var(--success)}.badge-hidden{background:var(--danger-bg);color:var(--danger)}
         .table-wrap{overflow-x:auto;background:var(--bg-surface);border-radius:var(--radius-xl);border:1px solid var(--border)}
         .table-wrap table{width:100%;border-collapse:collapse;font-size:.72rem;min-width:500px}
         .table-wrap th{text-align:left;padding:10px 12px;font-weight:600;font-size:.65rem;color:var(--text-secondary);text-transform:uppercase;background:var(--bg-hover);border-bottom:1px solid var(--border);white-space:nowrap}
-        .table-wrap td{padding:9px 12px;border-bottom:1px solid #f5f5f5;white-space:nowrap}.table-wrap tbody tr:hover{background:var(--bg-hover)}
+        .table-wrap td{padding:9px 12px;border-bottom:1px solid #f5f5f5;white-space:nowrap}
         .earn-positive{color:var(--success);font-weight:600}.fee-text{color:var(--text-tertiary);font-size:.65rem}
         .empty{text-align:center;padding:2rem;color:var(--text-tertiary);font-size:.78rem}
         .file-upload-area{width:100%;padding:16px;border:2px dashed var(--border);border-radius:14px;text-align:center;cursor:pointer;background:var(--bg-input);margin-bottom:8px;position:relative}
-        .file-upload-area i{font-size:26px;color:#d1d5db;display:block;margin-bottom:4px}.file-upload-area .up-text{font-size:.7rem;color:var(--text-tertiary)}.file-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer}
-        .file-upload-area.has-file{border-color:var(--success);background:var(--success-bg)}
+        .file-upload-area i{font-size:26px;color:#d1d5db;display:block;margin-bottom:4px}.file-upload-area .up-text{font-size:.7rem;color:var(--text-tertiary)}.file-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer}.file-upload-area.has-file{border-color:var(--success);background:var(--success-bg)}
         .cashout-box{background:var(--gold-bg);border:1px solid var(--gold);border-radius:var(--radius-xl);padding:1rem 1.2rem;margin-bottom:1rem}
         .cashout-box h4{font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:6px}.cashout-box p{font-size:.7rem;color:var(--text-secondary);margin-bottom:8px}
         .cashout-box .min-badge{display:inline-block;background:var(--gold);color:#fff;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:600;margin-bottom:8px}
@@ -87,15 +63,9 @@
         .step-dot{width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}.step-dot.active{background:var(--primary);color:#fff}.step-dot.done{background:var(--success);color:#fff}
         .step-line{flex:1;height:2px;background:var(--border);min-width:20px}.step-line.done{background:var(--success)}
         .nav-btns{display:flex;gap:8px;margin-top:10px}
-        .welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden;transition:all .3s}
-        .welcome-overlay.active{opacity:1;visibility:visible}
-        .welcome-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;text-align:center;max-width:380px;width:100%;animation:popIn .4s ease}
-        .welcome-card .w-icon{font-size:48px;margin-bottom:8px}.welcome-card h2{font-size:1.2rem;font-weight:800;margin-bottom:4px}
-        .welcome-card .w-amount{font-size:1.8rem;font-weight:800;color:var(--primary);margin:8px 0}
-        .welcome-card .w-link{font-size:.7rem;color:var(--primary);word-break:break-all;margin:8px 0}
         .toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--text-primary);color:#fff;padding:10px 20px;border-radius:30px;font-size:.74rem;z-index:400;animation:slideUp .3s ease;display:none;white-space:nowrap}
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all .25s}.modal-overlay.active{opacity:1;visibility:visible}
-        .modal{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;width:100%;max-width:460px;max-height:85vh;overflow-y:auto;padding:1.5rem 1.25rem 2rem;animation:slideUp .3s ease}@media(min-width:500px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius-xl);animation:popIn .25s ease}}
+        .modal{background:var(--bg-surface);border-radius:1.2rem 1.2rem 0 0;width:100%;max-width:460px;max-height:85vh;overflow-y:auto;padding:1.5rem 1.25rem 2rem;animation:slideUp .3s ease}@media(min-width:500px){.modal-overlay{align-items:center}.modal{border-radius:var(--radius-xl)}}
         @media(max-width:500px){.stats-row{grid-template-columns:1fr 1fr}.doc-row{flex-direction:column;align-items:flex-start}.doc-actions{width:100%;justify-content:flex-end}.revenue-card .rev-amount{font-size:1.7rem}.tab-btn{font-size:.68rem;padding:6px 10px}}
     </style>
 </head>
@@ -104,106 +74,203 @@
     <div class="container" id="content"><div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">Loading...</p></div></div>
     <div class="toast" id="toast"></div>
     <div class="modal-overlay" id="editModal"><div class="modal" id="editModalContent"></div></div>
-    <div class="welcome-overlay" id="welcomeOverlay"><div class="welcome-card" id="welcomeCard"></div></div>
-    <script>
-(function(){'use strict';
-var API='/api/pub';var user=null;var idToken=null;var addStep=1;
-function el(id){return document.getElementById(id)}
-function toast(m){var t=el('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},2500)}
-async function apiCall(path,body,method){var opts={method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'}};if(idToken)opts.headers['Authorization']='Bearer '+idToken;if(body)opts.body=JSON.stringify(body);var r=await fetch(path,opts);var txt=await r.text();try{var d=JSON.parse(txt)}catch(e){throw new Error('Invalid server response')}if(!r.ok)throw new Error(d.error||'Request failed');return d}
-function fmtPrice(n,c){return parseInt(n).toLocaleString()+' '+(c||'RWF')}
-function showLoader(msg){el('content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">'+msg+'</p></div>'}
 
-function showWelcome(pub){
-    var link=window.location.origin+'/pub-page.html?p='+pub.slug||pub.username;
-    el('welcomeCard').innerHTML='<div class="w-icon">🎉</div><h2>Welcome to KotWeb Publisher!</h2><div class="w-amount">+1,000 RWF Bonus</div><p>Your startup bonus has been added!</p><p style="font-size:.65rem;color:var(--text-secondary)">Your page:</p><div class="w-link">'+link+'</div><button class="btn btn-primary" style="margin-top:10px" id="welcomeClose">Get Started!</button>';
-    el('welcomeOverlay').classList.add('active');
-    el('welcomeClose').addEventListener('click',function(){el('welcomeOverlay').classList.remove('active')});
-}
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
-function showLogin(){
-    el('content').innerHTML='<div class="auth-card"><div class="icon-circle"><i class="bx bx-log-in"></i></div><h2>Publisher Sign In</h2><p class="sub">Login to your publisher account</p><div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="off"></div><div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password" autocomplete="off"></div><button class="btn btn-primary" id="loginBtn">Sign In</button><p class="link-text">New publisher? <a id="showRegister">Create an account</a></p></div>';
-    el('loginBtn').addEventListener('click',async function(){var btn=this;btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Signing in...';try{var e=el('loginEmail').value.trim(),p=el('loginPass').value;if(!e||!p){toast('Fill all fields');btn.disabled=false;btn.innerHTML='Sign In';return}var cred=await window.FB_signIn(window.FB_AUTH,e,p);idToken=await cred.user.getIdToken();user=cred.user;saveSession();showDash()}catch(err){toast(err.message);btn.disabled=false;btn.innerHTML='Sign In'}});
-    el('showRegister').addEventListener('click',function(e){e.preventDefault();showRegister()});
-    el('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')el('loginBtn').click()});
-}
+        const firebaseConfig = { apiKey: "AIzaSyDANYS44qmTxUZb40SK50di8XHwaeOiPkM", authDomain: "sub-ed-62348.firebaseapp.com", projectId: "sub-ed-62348", storageBucket: "sub-ed-62348.firebasestorage.app", messagingSenderId: "133365566054", appId: "1:133365566054:web:966a40fe8443d29aabfba7" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-function showRegister(){
-    el('content').innerHTML='<div class="auth-card"><div class="icon-circle"><i class="bx bx-user-plus"></i></div><h2>Join KotWeb Publisher</h2><p class="sub">Get <strong>1,000 RWF bonus</strong> on signup!</p><div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="off"></div><div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 characters" autocomplete="off"></div><button class="btn btn-primary" id="regBtn">Create Account & Claim 1,000 RWF</button><p class="link-text">Already have an account? <a id="showLoginLink">Sign In</a></p></div>';
-    el('regBtn').addEventListener('click',async function(){var btn=this;btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Creating...';try{var e=el('regEmail').value.trim(),p=el('regPass').value;if(!e||!p){toast('Fill all fields');btn.disabled=false;btn.innerHTML='Create Account';return}if(p.length<6){toast('Password: min 6 chars');btn.disabled=false;btn.innerHTML='Create Account';return}var cred=await window.FB_createUser(window.FB_AUTH,e,p);idToken=await cred.user.getIdToken();user=cred.user;saveSession();var pub=await registerPublisher(user);showWelcome(pub);setTimeout(function(){showDash()},500)}catch(err){toast(err.message);btn.disabled=false;btn.innerHTML='Create Account'}});
-    el('showLoginLink').addEventListener('click',function(e){e.preventDefault();showLogin()});
-}
+        var API = '/api/pub';
+        var idToken = null;
+        var userEmail = '';
+        var addStep = 1;
 
-async function registerPublisher(fbUser){
-    var username=fbUser.email.split('@')[0].replace(/[^a-z0-9]/g,'').substring(0,20);
-    try{var r=await apiCall(API+'/firebase-register',{uid:fbUser.uid,email:fbUser.email,username:username});return r.publisher}catch(e){return {slug:username,username:username}}
-}
+        function el(id) { return document.getElementById(id); }
+        function toast(m) { var t = el('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(function() { t.style.display = 'none'; }, 2500); }
+        function fmtPrice(n, c) { return parseInt(n).toLocaleString() + ' ' + (c || 'RWF'); }
+        function showLoader(msg) { el('content').innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">' + msg + '</p></div>'; }
 
-function saveSession(){if(user&&idToken){localStorage.setItem('pub_fb',JSON.stringify({uid:user.uid,email:user.email,token:idToken}))}}
-function loadSession(){try{var d=JSON.parse(localStorage.getItem('pub_fb'));if(d){idToken=d.token;return d}}catch(e){}return null}
-function clearSession(){user=null;idToken=null;localStorage.removeItem('pub_fb');el('logoutBtn').style.display='none';el('userBadge').style.display='none'}
+        async function apiCall(path, body, method) {
+            var opts = { method: method || (body ? 'POST' : 'GET'), headers: { 'Content-Type': 'application/json' } };
+            if (idToken) opts.headers['Authorization'] = 'Bearer ' + idToken;
+            if (body) opts.body = JSON.stringify(body);
+            var r = await fetch(path, opts);
+            var txt = await r.text();
+            try { var d = JSON.parse(txt); } catch (e) { throw new Error('Invalid server response'); }
+            if (!r.ok) throw new Error(d.error || 'Request failed');
+            return d;
+        }
 
-async function showDash(){
-    showLoader('Loading...');el('logoutBtn').style.display='inline-flex';el('userBadge').style.display='flex';
-    var sess=loadSession();if(!sess){clearSession();showLogin();return}
-    el('pubEmail').textContent=sess.email;idToken=sess.token;
-    var earnings,docs;
-    try{earnings=await apiCall(API+'/earnings');docs=await apiCall(API+'/documents')}catch(e){toast('Session expired. Login again.');clearSession();showLogin();return}
-    var pubUrl=window.location.origin+'/pub-page.html?p='+(sess.email.split('@')[0].replace(/[^a-z0-9]/g,''));
-    var totalRev=earnings.your_earnings||0;
-    el('content').innerHTML=
-    '<div class="revenue-card"><div class="rev-label">Total Revenue</div><div class="rev-amount">'+fmtPrice(totalRev,'RWF')+'</div><div class="rev-sub">'+earnings.total_transactions+' sales</div>'+(earnings.bonus_claimed?'<div class="bonus-badge">🎉 +1,000 RWF Bonus Included</div>':'')+'</div>'+
-    '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> '+pubUrl+'</div><button class="btn btn-primary btn-sm" id="copyLinkBtn"><i class="bx bx-copy"></i> Copy</button></div>'+
-    '<div class="stats-row"><div class="stat-card"><div class="stat-val">'+earnings.total_documents+'</div><div class="stat-label">Documents</div></div><div class="stat-card"><div class="stat-val">'+earnings.total_transactions+'</div><div class="stat-label">Sales</div></div></div>'+
-    '<div class="tab-nav"><button class="tab-btn active" data-tab="docs"><i class="bx bx-file"></i> Documents</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add New</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>'+
-    '<div class="tab-content active" id="tab-docs"><div class="section-title"><i class="bx bx-library"></i> My Documents</div><div class="doc-list" id="docList"></div></div>'+
-    '<div class="tab-content" id="tab-add">'+renderAddForm()+'</div>'+
-    '<div class="tab-content" id="tab-txns"><div class="section-title"><i class="bx bx-history"></i> Sales</div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Paid</th><th>Earn (88%)</th><th>Fee (12%)</th></tr></thead><tbody id="txnBody"></tbody></table></div></div>'+
-    '<div class="tab-content" id="tab-cashout"><div class="section-title"><i class="bx bx-wallet"></i> Cash Out</div><div class="cashout-box"><h4><i class="bx bx-money-withdraw"></i> Request Cash Out</h4><p>Balance: <strong>'+fmtPrice(totalRev,'RWF')+'</strong></p><div class="min-badge">Minimum: 15,000 RWF</div>'+(totalRev>=15000?'<button class="btn btn-gold" id="cashoutBtn"><i class="bx bx-send"></i> Request Cash Out</button>':'<p style="font-size:.7rem;color:var(--danger)">Need 15,000 RWF minimum.</p>')+'</div></div>';
+        function showLogin() {
+            el('content').innerHTML = '<div class="auth-card"><div class="icon-circle"><i class="bx bx-log-in"></i></div><h2>Publisher Sign In</h2><p class="sub">Login to your publisher account</p><div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="off"></div><div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password" autocomplete="off"></div><button class="btn btn-primary" id="loginBtn">Sign In</button><p class="link-text">New publisher? <a id="showRegister">Create an account</a></p></div>';
+            el('loginBtn').addEventListener('click', async function() {
+                var btn = this; btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Signing in...';
+                try {
+                    var e = el('loginEmail').value.trim(), p = el('loginPass').value;
+                    if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Sign In'; return; }
+                    var cred = await signInWithEmailAndPassword(auth, e, p);
+                    idToken = await cred.user.getIdToken();
+                    userEmail = cred.user.email;
+                    showDash();
+                } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Sign In'; }
+            });
+            el('showRegister').addEventListener('click', function(e) { e.preventDefault(); showRegister(); });
+        }
 
-    renderDocList(docs||[]);renderTxns(earnings.recent||[]);
-    initAddForm();initTabs();
-    el('copyLinkBtn').addEventListener('click',function(){navigator.clipboard.writeText(pubUrl).then(function(){toast('Link copied!')}).catch(function(){toast('Copy failed')})});
-    var cb=el('cashoutBtn');if(cb)cb.addEventListener('click',function(){if(confirm('Request cash out?')){toast('Request sent!');cb.disabled=true;cb.innerHTML='<i class="bx bx-check"></i> Sent'}});
-}
+        function showRegister() {
+            el('content').innerHTML = '<div class="auth-card"><div class="icon-circle"><i class="bx bx-user-plus"></i></div><h2>Join KotWeb Publisher</h2><p class="sub">Get <strong>1,000 RWF bonus</strong> on signup!</p><div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="off"></div><div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 characters" autocomplete="off"></div><button class="btn btn-primary" id="regBtn">Create Account & Claim 1,000 RWF</button><p class="link-text">Already have an account? <a id="showLoginLink">Sign In</a></p></div>';
+            el('regBtn').addEventListener('click', async function() {
+                var btn = this; btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Creating...';
+                try {
+                    var e = el('regEmail').value.trim(), p = el('regPass').value;
+                    if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
+                    if (p.length < 6) { toast('Password: min 6 chars'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
+                    var cred = await createUserWithEmailAndPassword(auth, e, p);
+                    idToken = await cred.user.getIdToken();
+                    userEmail = cred.user.email;
+                    await apiCall(API + '/firebase-register', { uid: cred.user.uid, email: cred.user.email, username: e.split('@')[0] });
+                    showDash();
+                } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Create Account'; }
+            });
+            el('showLoginLink').addEventListener('click', function(e) { e.preventDefault(); showLogin(); });
+        }
 
-function renderAddForm(){return'<div class="auth-card" style="text-align:left;max-width:100%"><div class="step-indicator"><div class="step-dot active" id="sd1">1</div><div class="step-line" id="sl1"></div><div class="step-dot" id="sd2">2</div><div class="step-line" id="sl2"></div><div class="step-dot" id="sd3">3</div><div class="step-line" id="sl3"></div><div class="step-dot" id="sd4">4</div></div><div id="step1"><h3 style="font-size:.95rem;font-weight:700;margin-bottom:4px">📝 Document Details</h3><div class="field"><label>Title *</label><input type="text" id="dTitle" placeholder="Document title"></div><div class="field"><label>Description</label><textarea id="dDesc" placeholder="Brief description..."></textarea></div><div class="nav-btns"><button class="btn btn-primary" id="nextStep2">Next: Set Price →</button></div></div><div id="step2" style="display:none"><h3 style="font-size:.95rem;font-weight:700;margin-bottom:4px">💰 Set Price</h3><div class="field"><label>Price (RWF) *</label><input type="number" id="dPrice" min="1000" max="500000" value="1000"><span class="hint">You earn: <strong id="earnCalc">880 RWF</strong> (88%)</span></div><div class="nav-btns"><button class="btn btn-outline" id="backStep1">← Back</button><button class="btn btn-primary" id="nextStep3">Next: Upload File →</button></div></div><div id="step3" style="display:none"><h3 style="font-size:.95rem;font-weight:700;margin-bottom:4px">📁 Upload File</h3><div class="file-upload-area" id="fileArea"><i class="bx bx-upload"></i><div class="up-text" id="fileText">Click to select file</div><input type="file" id="dFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"></div><div class="nav-btns"><button class="btn btn-outline" id="backStep2">← Back</button><button class="btn btn-primary" id="nextStep4">Next: Screenshot →</button></div></div><div id="step4" style="display:none"><h3 style="font-size:.95rem;font-weight:700;margin-bottom:4px">📸 Screenshot</h3><div class="file-upload-area" id="imgArea"><i class="bx bx-image-add"></i><div class="up-text" id="imgText">Click to upload image</div><input type="file" id="dImage" accept="image/*"></div><img id="imgPreview" style="width:100%;max-height:120px;object-fit:cover;border-radius:10px;margin-top:6px;display:none"><div class="nav-btns"><button class="btn btn-outline" id="backStep3">← Back</button><button class="btn btn-primary" id="saveDoc"><i class="bx bx-save"></i> Publish</button></div></div></div>'}
+        async function showDash() {
+            showLoader('Loading...');
+            el('logoutBtn').style.display = 'inline-flex';
+            el('userBadge').style.display = 'flex';
+            el('pubEmail').textContent = userEmail;
 
-function initAddForm(){addStep=1;goStep(1);
-    el('dPrice').addEventListener('input',function(){var p=parseInt(this.value)||0;var e=Math.floor(p*0.88);var ec=el('earnCalc');if(ec)ec.textContent=fmtPrice(e,'RWF')+' (88%)'});
-    el('fileArea').addEventListener('click',function(e){if(e.target!==el('dFile'))el('dFile').click()});el('dFile').addEventListener('change',function(e){var f=e.target.files[0];if(f){el('fileText').textContent='✅ '+f.name;el('fileArea').classList.add('has-file')}});
-    el('imgArea').addEventListener('click',function(e){if(e.target!==el('dImage'))el('dImage').click()});el('dImage').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){el('imgPreview').src=ev.target.result;el('imgPreview').style.display='block';el('imgText').textContent='✅ '+f.name;el('imgArea').classList.add('has-file')};r.readAsDataURL(f)});
-    el('nextStep2').addEventListener('click',function(){goStep(2)});el('backStep1').addEventListener('click',function(){goStep(1)});
-    el('nextStep3').addEventListener('click',function(){goStep(3)});el('backStep2').addEventListener('click',function(){goStep(2)});
-    el('nextStep4').addEventListener('click',function(){goStep(4)});el('backStep3').addEventListener('click',function(){goStep(3)});
-    el('saveDoc').addEventListener('click',async function(){var btn=this;try{var t=el('dTitle').value.trim(),d=el('dDesc').value.trim(),p=parseInt(el('dPrice').value),im=el('dImage').files[0],fl=el('dFile').files[0];if(!t||!p||!fl){toast('Title, price, file required');return}if(p<1000||p>500000){toast('Price: 1,000-500,000 RWF');return}btn.disabled=true;btn.innerHTML='<i class="bx bx-loader bx-spin"></i> Uploading...';var fd=new FormData();fd.append('file',fl);var up=await fetch(API+'/upload',{method:'POST',headers:{'Authorization':'Bearer '+idToken},body:fd});var ud=await up.json();if(!ud.file_path){toast('Upload failed');btn.disabled=false;btn.innerHTML='<i class="bx bx-save"></i> Publish';return}var imgUrl='';if(im){var ifd=new FormData();ifd.append('image',im);var iu=await fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a',{method:'POST',body:ifd});var id=await iu.json();if(id.success)imgUrl=id.data.url}await apiCall(API+'/documents',{title:t,description:d,price:p,image_url:imgUrl,file_path:ud.file_path});toast('Published!');showDash()}catch(e){toast(e.message);btn.disabled=false;btn.innerHTML='<i class="bx bx-save"></i> Publish'}})
-}
+            var earnings, docs;
+            try { earnings = await apiCall(API + '/earnings'); docs = await apiCall(API + '/documents'); } catch (e) { toast('Login again.'); showLogin(); return; }
 
-window.goStep=function(s){addStep=s;for(var i=1;i<=4;i++){var step=el('step'+i);if(step)step.style.display=i===s?'block':'none';var sd=el('sd'+i);if(sd){sd.classList.remove('active','done');if(i<s)sd.classList.add('done');if(i===s)sd.classList.add('active')}var sl=el('sl'+(i-1));if(sl){sl.classList.remove('done');if(i-1<s)sl.classList.add('done')}}
-    if(s===4){var p=parseInt((el('dPrice').value)||0);var btn=el('saveDoc');if(btn){var e=Math.floor(p*0.88);btn.innerHTML='<i class="bx bx-rocket"></i> Publish for '+fmtPrice(p,'RWF')+' (Earn '+fmtPrice(e,'RWF')+')'}}}
+            var slug = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '');
+            var pubUrl = window.location.origin + '/pub-page.html?p=' + slug;
+            var totalRev = earnings.your_earnings || 0;
 
-function initTabs(){document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active')});var t=el('tab-'+b.dataset.tab);if(t){t.classList.add('active');if(b.dataset.tab==='add')initAddForm()}})})}
+            el('content').innerHTML =
+                '<div class="revenue-card"><div class="rev-label">Total Revenue</div><div class="rev-amount">' + fmtPrice(totalRev, 'RWF') + '</div><div class="rev-sub">' + earnings.total_transactions + ' sales</div>' + (earnings.bonus_claimed ? '<div class="bonus-badge">🎉 +1,000 RWF Bonus</div>' : '') + '</div>' +
+                '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> ' + pubUrl + '</div><button class="btn btn-primary btn-sm" id="copyLinkBtn"><i class="bx bx-copy"></i> Copy</button></div>' +
+                '<div class="stats-row"><div class="stat-card"><div class="stat-val">' + earnings.total_documents + '</div><div class="stat-label">Documents</div></div><div class="stat-card"><div class="stat-val">' + earnings.total_transactions + '</div><div class="stat-label">Sales</div></div></div>' +
+                '<div class="tab-nav"><button class="tab-btn active" data-tab="docs"><i class="bx bx-file"></i> Docs</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>' +
+                '<div class="tab-content active" id="tab-docs"><div class="section-title">My Documents</div><div class="doc-list" id="docList"></div></div>' +
+                '<div class="tab-content" id="tab-add">' + renderAddForm() + '</div>' +
+                '<div class="tab-content" id="tab-txns"><div class="section-title">Sales History</div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Paid</th><th>Earn (88%)</th><th>Fee (12%)</th></tr></thead><tbody id="txnBody"></tbody></table></div></div>' +
+                '<div class="tab-content" id="tab-cashout"><div class="section-title">Cash Out</div><div class="cashout-box"><h4><i class="bx bx-money-withdraw"></i> Request Cash Out</h4><p>Balance: <strong>' + fmtPrice(totalRev, 'RWF') + '</strong></p><div class="min-badge">Min: 15,000 RWF</div>' + (totalRev >= 15000 ? '<button class="btn btn-gold" id="cashoutBtn">Request Cash Out</button>' : '<p style="font-size:.7rem;color:var(--danger)">Need 15,000 RWF minimum.</p>') + '</div></div>';
 
-function renderDocList(docs){var l=el('docList');if(!l)return;if(!docs.length){l.innerHTML='<div class="empty"><i class="bx bx-file" style="font-size:32px;display:block;margin-bottom:6px;color:#d1d5db"></i>No documents yet.</div>';return}
-    l.innerHTML=docs.map(function(d){var link=window.location.origin+'/pub-view.html?doc='+d.id;return'<div class="doc-row">'+(d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'')+'<div class="doc-thumb" style="'+(d.image_url?'display:none':'')+'"><i class="bx bx-file"></i></div><div class="doc-info"><h4>'+d.title+' <span class="badge '+(d.active?'badge-active':'badge-hidden')+'"><i class="bx '+(d.active?'bx-check':'bx-hide')+'"></i> '+(d.active?'Active':'Hidden')+'</span></h4><span>'+fmtPrice(d.price,d.currency)+' · '+(d.clicks||0)+' views</span></div><div class="doc-actions"><button class="btn btn-outline btn-xs" id="share_'+d.id+'"><i class="bx bx-share-alt"></i></button><button class="btn btn-outline btn-xs" id="edit_'+d.id+'"><i class="bx bx-edit"></i></button><button class="btn btn-outline btn-xs" id="toggle_'+d.id+'"><i class="bx '+(d.active?'bx-hide':'bx-show')+'"></i></button><button class="btn btn-danger btn-xs" id="delete_'+d.id+'"><i class="bx bx-trash"></i></button></div></div>'}).join('');
-    docs.forEach(function(d){var link=window.location.origin+'/pub-view.html?doc='+d.id;
-        var sb=el('share_'+d.id);if(sb)sb.addEventListener('click',function(){if(navigator.share)navigator.share({url:link}).catch(function(){});else{navigator.clipboard.writeText(link).then(function(){toast('Link copied!')})}});
-        var eb=el('edit_'+d.id);if(eb)eb.addEventListener('click',function(){editDoc(d.id,d.title,d.description||'',d.price,d.image_url||'')});
-        var tb=el('toggle_'+d.id);if(tb)tb.addEventListener('click',async function(){try{await apiCall(API+'/documents/'+d.id+'/toggle',{},'PUT');showDash()}catch(e){toast(e.message)}});
-        var db=el('delete_'+d.id);if(db)db.addEventListener('click',function(){if(!confirm('Delete?'))return;apiCall(API+'/documents/'+d.id,{},'DELETE').then(function(){toast('Deleted!');showDash()}).catch(function(e){toast(e.message)})});
-    })}
+            renderDocList(docs || []);
+            renderTxns(earnings.recent || []);
+            initAddForm();
+            initTabs();
 
-function renderTxns(txns){var l=el('txnBody');if(!l)return;var real=txns.filter(function(t){return t.payment_method!=='bonus'});if(!real.length){l.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-tertiary);padding:2rem">No sales yet.</td></tr>';return}
-    l.innerHTML=real.map(function(t){var earn=Math.floor((t.amount||0)*0.88);var fee=(t.amount||0)-earn;return'<tr><td>'+(t.customer_name||'Customer')+'</td><td>'+(t.customer_phone||'')+'</td><td>'+fmtPrice(t.amount,t.currency)+'</td><td class="earn-positive">+'+fmtPrice(earn,t.currency)+'</td><td class="fee-text">-'+fmtPrice(fee,t.currency)+'</td></tr>'}).join('')}
+            el('copyLinkBtn').addEventListener('click', function() { navigator.clipboard.writeText(pubUrl).then(function() { toast('Copied!'); }); });
+            var cb = el('cashoutBtn');
+            if (cb) cb.addEventListener('click', function() { if (confirm('Request cash out?')) { toast('Request sent!'); cb.disabled = true; } });
+        }
 
-function editDoc(id,title,desc,price,img){el('editModalContent').innerHTML='<h3>Edit</h3><div class="field"><label>Title</label><input type="text" id="eTitle" value="'+title+'"></div><div class="field"><label>Description</label><textarea id="eDesc">'+desc+'</textarea></div><div class="field"><label>Price</label><input type="number" id="ePrice" value="'+price+'" min="1000" max="500000"></div><button class="btn btn-primary" id="saveEdit">Save</button><button class="btn btn-outline" style="margin-top:6px" id="cancelEdit">Cancel</button>';el('editModal').classList.add('active');
-    el('saveEdit').addEventListener('click',async function(){try{var nt=el('eTitle').value.trim(),nd=el('eDesc').value.trim(),np=parseInt(el('ePrice').value);if(!nt||!np){toast('Title and price required');return}await apiCall(API+'/documents/'+id,{title:nt,description:nd,price:np,file_path:'keep',image_url:img},'POST');el('editModal').classList.remove('active');toast('Updated!');showDash()}catch(e){toast(e.message)}});
-    el('cancelEdit').addEventListener('click',function(){el('editModal').classList.remove('active')})}
-el('editModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});
+        function renderAddForm() {
+            return '<div class="auth-card" style="text-align:left;max-width:100%"><div class="step-indicator"><div class="step-dot active" id="sd1">1</div><div class="step-line" id="sl1"></div><div class="step-dot" id="sd2">2</div><div class="step-line" id="sl2"></div><div class="step-dot" id="sd3">3</div><div class="step-line" id="sl3"></div><div class="step-dot" id="sd4">4</div></div>' +
+                '<div id="step1"><h3>📝 Title & Description</h3><div class="field"><label>Title *</label><input type="text" id="dTitle"></div><div class="field"><label>Description</label><textarea id="dDesc"></textarea></div><div class="nav-btns"><button class="btn btn-primary" id="nextStep2">Next →</button></div></div>' +
+                '<div id="step2" style="display:none"><h3>💰 Price</h3><div class="field"><label>Price (RWF) *</label><input type="number" id="dPrice" min="1000" max="500000" value="1000"><span class="hint">You earn: <strong id="earnCalc">880 RWF</strong> (88%)</span></div><div class="nav-btns"><button class="btn btn-outline" id="backStep1">← Back</button><button class="btn btn-primary" id="nextStep3">Next →</button></div></div>' +
+                '<div id="step3" style="display:none"><h3>📁 File</h3><div class="file-upload-area" id="fileArea"><i class="bx bx-upload"></i><div class="up-text" id="fileText">Click to select file</div><input type="file" id="dFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"></div><div class="nav-btns"><button class="btn btn-outline" id="backStep2">← Back</button><button class="btn btn-primary" id="nextStep4">Next →</button></div></div>' +
+                '<div id="step4" style="display:none"><h3>📸 Screenshot</h3><div class="file-upload-area" id="imgArea"><i class="bx bx-image-add"></i><div class="up-text" id="imgText">Click to upload</div><input type="file" id="dImage" accept="image/*"></div><img id="imgPreview" style="width:100%;max-height:120px;object-fit:cover;border-radius:10px;margin-top:6px;display:none"><div class="nav-btns"><button class="btn btn-outline" id="backStep3">← Back</button><button class="btn btn-primary" id="saveDoc"><i class="bx bx-save"></i> Publish</button></div></div></div>';
+        }
 
-el('logoutBtn').addEventListener('click',async function(){try{await window.FB_signOut(window.FB_AUTH)}catch(e){}clearSession();showLogin()});
-window.FB_onAuth(window.FB_AUTH,function(fbUser){if(fbUser){fbUser.getIdToken().then(function(t){idToken=t;user=fbUser;saveSession();showDash()})}else{clearSession();showLogin()}});
-})();
-</script>
+        function initAddForm() {
+            addStep = 1; goStep(1);
+            el('dPrice').addEventListener('input', function() { var p = parseInt(this.value) || 0; var ec = el('earnCalc'); if (ec) ec.textContent = fmtPrice(Math.floor(p * 0.88), 'RWF') + ' (88%)'; });
+            el('fileArea').addEventListener('click', function(e) { if (e.target !== el('dFile')) el('dFile').click(); });
+            el('dFile').addEventListener('change', function(e) { var f = e.target.files[0]; if (f) { el('fileText').textContent = '✅ ' + f.name; el('fileArea').classList.add('has-file'); } });
+            el('imgArea').addEventListener('click', function(e) { if (e.target !== el('dImage')) el('dImage').click(); });
+            el('dImage').addEventListener('change', function(e) { var f = e.target.files[0]; if (!f) return; var r = new FileReader(); r.onload = function(ev) { el('imgPreview').src = ev.target.result; el('imgPreview').style.display = 'block'; el('imgText').textContent = '✅ ' + f.name; }; r.readAsDataURL(f); });
+            el('nextStep2').addEventListener('click', function() { goStep(2); });
+            el('backStep1').addEventListener('click', function() { goStep(1); });
+            el('nextStep3').addEventListener('click', function() { goStep(3); });
+            el('backStep2').addEventListener('click', function() { goStep(2); });
+            el('nextStep4').addEventListener('click', function() { goStep(4); });
+            el('backStep3').addEventListener('click', function() { goStep(3); });
+            el('saveDoc').addEventListener('click', async function() {
+                var btn = this;
+                try {
+                    var t = el('dTitle').value.trim(), d = el('dDesc').value.trim(), p = parseInt(el('dPrice').value), im = el('dImage').files[0], fl = el('dFile').files[0];
+                    if (!t || !p || !fl) { toast('Title, price, file required'); return; }
+                    if (p < 1000 || p > 500000) { toast('Price: 1,000-500,000'); return; }
+                    btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Uploading...';
+                    var fd = new FormData(); fd.append('file', fl);
+                    var up = await fetch(API + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken }, body: fd });
+                    var ud = await up.json();
+                    if (!ud.file_path) { toast('Upload failed'); btn.disabled = false; btn.innerHTML = '<i class="bx bx-save"></i> Publish'; return; }
+                    var imgUrl = '';
+                    if (im) { var ifd = new FormData(); ifd.append('image', im); var iu = await fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a', { method: 'POST', body: ifd }); var id = await iu.json(); if (id.success) imgUrl = id.data.url; }
+                    await apiCall(API + '/documents', { title: t, description: d, price: p, image_url: imgUrl, file_path: ud.file_path });
+                    toast('Published!'); showDash();
+                } catch (e) { toast(e.message); btn.disabled = false; btn.innerHTML = '<i class="bx bx-save"></i> Publish'; }
+            });
+        }
+
+        function goStep(s) {
+            addStep = s;
+            for (var i = 1; i <= 4; i++) {
+                var step = el('step' + i); if (step) step.style.display = i === s ? 'block' : 'none';
+                var sd = el('sd' + i); if (sd) { sd.classList.remove('active', 'done'); if (i < s) sd.classList.add('done'); if (i === s) sd.classList.add('active'); }
+                var sl = el('sl' + (i - 1)); if (sl) { sl.classList.remove('done'); if (i - 1 < s) sl.classList.add('done'); }
+            }
+            if (s === 4) { var p = parseInt((el('dPrice').value) || 0); var btn = el('saveDoc'); if (btn) btn.innerHTML = '<i class="bx bx-rocket"></i> Publish for ' + fmtPrice(p, 'RWF') + ' (Earn ' + fmtPrice(Math.floor(p * 0.88), 'RWF') + ')'; }
+        }
+
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(function(b) {
+                b.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(function(x) { x.classList.remove('active'); });
+                    b.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(function(x) { x.classList.remove('active'); });
+                    var t = el('tab-' + b.dataset.tab);
+                    if (t) { t.classList.add('active'); if (b.dataset.tab === 'add') initAddForm(); }
+                });
+            });
+        }
+
+        function renderDocList(docs) {
+            var l = el('docList'); if (!l) return;
+            if (!docs.length) { l.innerHTML = '<div class="empty">No documents yet.</div>'; return; }
+            l.innerHTML = docs.map(function(d) {
+                return '<div class="doc-row">' + (d.image_url ? '<img src="' + d.image_url + '" alt="">' : '<div class="doc-thumb"><i class="bx bx-file"></i></div>') + '<div class="doc-info"><h4>' + d.title + '</h4><span>' + fmtPrice(d.price, d.currency) + ' · ' + (d.clicks || 0) + ' views</span></div><div class="doc-actions"><button class="btn btn-outline btn-xs" data-action="share" data-id="' + d.id + '"><i class="bx bx-share-alt"></i></button><button class="btn btn-outline btn-xs" data-action="toggle" data-id="' + d.id + '"><i class="bx bx-hide"></i></button><button class="btn btn-danger btn-xs" data-action="delete" data-id="' + d.id + '" data-title="' + d.title + '"><i class="bx bx-trash"></i></button></div></div>';
+            }).join('');
+            l.querySelectorAll('button').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var action = this.dataset.action, id = this.dataset.id;
+                    if (action === 'share') { var link = window.location.origin + '/pub-view.html?doc=' + id; navigator.clipboard.writeText(link).then(function() { toast('Copied!'); }); }
+                    if (action === 'toggle') { apiCall(API + '/documents/' + id + '/toggle', {}, 'PUT').then(function() { showDash(); }).catch(function(e) { toast(e.message); }); }
+                    if (action === 'delete') { if (!confirm('Delete?')) return; apiCall(API + '/documents/' + id, {}, 'DELETE').then(function() { toast('Deleted!'); showDash(); }).catch(function(e) { toast(e.message); }); }
+                });
+            });
+        }
+
+        function renderTxns(txns) {
+            var l = el('txnBody'); if (!l) return;
+            var real = (txns || []).filter(function(t) { return t.payment_method !== 'bonus'; });
+            if (!real.length) { l.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem">No sales yet.</td></tr>'; return; }
+            l.innerHTML = real.map(function(t) { var earn = Math.floor((t.amount || 0) * 0.88); return '<tr><td>' + (t.customer_name || 'Customer') + '</td><td>' + (t.customer_phone || '') + '</td><td>' + fmtPrice(t.amount) + '</td><td class="earn-positive">+' + fmtPrice(earn) + '</td><td class="fee-text">-' + fmtPrice((t.amount || 0) - earn) + '</td></tr>'; }).join('');
+        }
+
+        el('logoutBtn').addEventListener('click', async function() {
+            await signOut(auth);
+            idToken = null; userEmail = '';
+            el('logoutBtn').style.display = 'none'; el('userBadge').style.display = 'none';
+            showLogin();
+        });
+
+        // Auth state listener
+        onAuthStateChanged(auth, function(fbUser) {
+            if (fbUser) {
+                fbUser.getIdToken().then(function(t) { idToken = t; userEmail = fbUser.email; showDash(); });
+            } else {
+                showLogin();
+            }
+        });
+    </script>
 </body>
 </html>
