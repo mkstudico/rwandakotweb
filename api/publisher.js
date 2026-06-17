@@ -183,18 +183,60 @@ export default async function handler(req, res) {
         }
 
         // ═══════════════════════════════════════
-        // PUB: Earnings
+        // PUB: Earnings (recalculated from payments, not stored balance)
         // ═══════════════════════════════════════
         if (path === '/api/pub/earnings' && method === 'GET') {
             const publisher = await getPublisherId(req);
             if (!publisher) return res.status(401).json({ error: 'Unauthorized' });
-            const { data: pub } = await supabase.from('publishers').select('balance, bonus_claimed').eq('id', publisher.id).single();
-            const { data: payments } = await supabase.from('pub_payments').select('amount, publisher_earnings, platform_fee, customer_name, customer_phone, created_at, payment_method').eq('publisher_id', publisher.id).eq('status', 'completed').order('created_at', { ascending: false });
-            const real = (payments||[]).filter(p => p.payment_method !== 'bonus');
-            const total = real.reduce((s,p) => s + p.amount, 0);
-            const fees = real.reduce((s,p) => s + p.platform_fee, 0);
-            const { count: docCount } = await supabase.from('pub_documents').select('id', { count: 'exact' }).eq('publisher_id', publisher.id);
-            return res.status(200).json({ total_sales: total, your_earnings: pub?.balance || 0, platform_fees: fees, total_documents: docCount||0, total_transactions: real.length, recent: (payments||[]).slice(0, 10), bonus_claimed: pub?.bonus_claimed || false });
+
+            // Get all completed payments for this publisher
+            const { data: payments } = await supabase
+                .from('pub_payments')
+                .select('amount, publisher_earnings, platform_fee, customer_name, customer_phone, created_at, payment_method')
+                .eq('publisher_id', publisher.id)
+                .eq('status', 'completed')
+                .order('created_at', { ascending: false });
+
+            // Get bonus info
+            const { data: pubInfo } = await supabase
+                .from('publishers')
+                .select('bonus_claimed')
+                .eq('id', publisher.id)
+                .single();
+
+            const bonusAmount = (pubInfo?.bonus_claimed) ? 1000 : 0;
+
+            // Filter out bonus transactions for real sales
+            const realPayments = (payments || []).filter(p => p.payment_method !== 'bonus');
+
+            // Calculate total earnings from real payments
+            const realEarnings = realPayments.reduce((sum, p) => sum + (p.publisher_earnings || 0), 0);
+            // Total revenue = real earnings + bonus
+            const totalEarnings = realEarnings + bonusAmount;
+
+            const totalSales = realPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+            const totalFees = realPayments.reduce((sum, p) => sum + (p.platform_fee || 0), 0);
+
+            const { count: docCount } = await supabase
+                .from('pub_documents')
+                .select('id', { count: 'exact' })
+                .eq('publisher_id', publisher.id);
+
+            // Update the stored balance to keep it in sync (fire-and-forget)
+            await supabase
+                .from('publishers')
+                .update({ balance: totalEarnings })
+                .eq('id', publisher.id);
+
+            return res.status(200).json({
+                total_sales: totalSales,
+                your_earnings: totalEarnings,
+                platform_fees: totalFees,
+                total_documents: docCount || 0,
+                total_transactions: realPayments.length,
+                recent: (payments || []).slice(0, 10),
+                bonus_claimed: pubInfo?.bonus_claimed || false
+            });
         }
 
         // ═══════════════════════════════════════
