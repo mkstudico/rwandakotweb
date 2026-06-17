@@ -86,7 +86,9 @@
         var API = '/api/pub';
         var idToken = null;
         var userEmail = '';
+        var firebaseUID = '';
         var addStep = 1;
+        var dashLoaded = false;
 
         function el(id) { return document.getElementById(id); }
         function toast(m) { var t = el('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(function() { t.style.display = 'none'; }, 2500); }
@@ -95,7 +97,7 @@
 
         async function apiCall(path, body, method) {
             var opts = { method: method || (body ? 'POST' : 'GET'), headers: { 'Content-Type': 'application/json' } };
-            if (idToken) opts.headers['Authorization'] = 'Bearer ' + idToken;
+            if (idToken) { opts.headers['Authorization'] = 'Bearer ' + idToken; opts.headers['X-Firebase-UID'] = firebaseUID; }
             if (body) opts.body = JSON.stringify(body);
             var r = await fetch(path, opts);
             var txt = await r.text();
@@ -104,48 +106,80 @@
             return d;
         }
 
+        async function registerWithServer() {
+            if (!firebaseUID || !userEmail) return;
+            try {
+                var username = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '').substring(0, 20);
+                await apiCall(API + '/firebase-register', { uid: firebaseUID, email: userEmail, username: username });
+            } catch (e) { /* ignore - may already exist */ }
+        }
+
         function showLogin() {
-            el('content').innerHTML = '<div class="auth-card"><div class="icon-circle"><i class="bx bx-log-in"></i></div><h2>Publisher Sign In</h2><p class="sub">Login to your publisher account</p><div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="off"></div><div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password" autocomplete="off"></div><button class="btn btn-primary" id="loginBtn">Sign In</button><p class="link-text">New publisher? <a id="showRegister">Create an account</a></p></div>';
+            dashLoaded = false;
+            el('logoutBtn').style.display = 'none';
+            el('userBadge').style.display = 'none';
+            el('content').innerHTML = 
+                '<div class="auth-card"><div class="icon-circle"><i class="bx bx-log-in"></i></div><h2>Publisher Sign In</h2><p class="sub">Login to your publisher account</p>' +
+                '<div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="off"></div>' +
+                '<div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password" autocomplete="off"></div>' +
+                '<button class="btn btn-primary" id="loginBtn">Sign In</button>' +
+                '<p class="link-text">New publisher? <a id="showRegister">Create an account</a></p></div>';
+
             el('loginBtn').addEventListener('click', async function() {
-                var btn = this; btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Signing in...';
+                var btn = this; btn.disabled = true; btn.innerHTML = 'Signing in...';
                 try {
                     var e = el('loginEmail').value.trim(), p = el('loginPass').value;
                     if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Sign In'; return; }
                     var cred = await signInWithEmailAndPassword(auth, e, p);
-                    idToken = await cred.user.getIdToken();
-                    userEmail = cred.user.email;
-                    showDash();
+                    // onAuthStateChanged will handle the rest
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Sign In'; }
             });
             el('showRegister').addEventListener('click', function(e) { e.preventDefault(); showRegister(); });
         }
 
         function showRegister() {
-            el('content').innerHTML = '<div class="auth-card"><div class="icon-circle"><i class="bx bx-user-plus"></i></div><h2>Join KotWeb Publisher</h2><p class="sub">Get <strong>1,000 RWF bonus</strong> on signup!</p><div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="off"></div><div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 characters" autocomplete="off"></div><button class="btn btn-primary" id="regBtn">Create Account & Claim 1,000 RWF</button><p class="link-text">Already have an account? <a id="showLoginLink">Sign In</a></p></div>';
+            dashLoaded = false;
+            el('logoutBtn').style.display = 'none';
+            el('userBadge').style.display = 'none';
+            el('content').innerHTML = 
+                '<div class="auth-card"><div class="icon-circle"><i class="bx bx-user-plus"></i></div><h2>Join KotWeb Publisher</h2><p class="sub">Get <strong>1,000 RWF bonus</strong> on signup!</p>' +
+                '<div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="off"></div>' +
+                '<div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 characters" autocomplete="off"></div>' +
+                '<button class="btn btn-primary" id="regBtn">Create Account & Claim 1,000 RWF</button>' +
+                '<p class="link-text">Already have an account? <a id="showLoginLink">Sign In</a></p></div>';
+
             el('regBtn').addEventListener('click', async function() {
-                var btn = this; btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Creating...';
+                var btn = this; btn.disabled = true; btn.innerHTML = 'Creating...';
                 try {
                     var e = el('regEmail').value.trim(), p = el('regPass').value;
                     if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
                     if (p.length < 6) { toast('Password: min 6 chars'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
                     var cred = await createUserWithEmailAndPassword(auth, e, p);
-                    idToken = await cred.user.getIdToken();
-                    userEmail = cred.user.email;
-                    await apiCall(API + '/firebase-register', { uid: cred.user.uid, email: cred.user.email, username: e.split('@')[0] });
-                    showDash();
+                    // onAuthStateChanged will handle the rest
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Create Account'; }
             });
             el('showLoginLink').addEventListener('click', function(e) { e.preventDefault(); showLogin(); });
         }
 
         async function showDash() {
+            if (dashLoaded) return;
+            dashLoaded = true;
             showLoader('Loading...');
             el('logoutBtn').style.display = 'inline-flex';
             el('userBadge').style.display = 'flex';
             el('pubEmail').textContent = userEmail;
 
+            await registerWithServer();
+
             var earnings, docs;
-            try { earnings = await apiCall(API + '/earnings'); docs = await apiCall(API + '/documents'); } catch (e) { toast('Login again.'); showLogin(); return; }
+            try { 
+                earnings = await apiCall(API + '/earnings'); 
+                docs = await apiCall(API + '/documents'); 
+            } catch (e) { 
+                toast('Error loading data. Please try again.'); 
+                dashLoaded = false;
+                return; 
+            }
 
             var slug = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '');
             var pubUrl = window.location.origin + '/pub-page.html?p=' + slug;
@@ -168,7 +202,7 @@
 
             el('copyLinkBtn').addEventListener('click', function() { navigator.clipboard.writeText(pubUrl).then(function() { toast('Copied!'); }); });
             var cb = el('cashoutBtn');
-            if (cb) cb.addEventListener('click', function() { if (confirm('Request cash out?')) { toast('Request sent!'); cb.disabled = true; } });
+            if (cb) cb.addEventListener('click', function() { if (confirm('Request cash out?')) { toast('Request sent! Admin will review.'); cb.disabled = true; } });
         }
 
         function renderAddForm() {
@@ -198,16 +232,16 @@
                     var t = el('dTitle').value.trim(), d = el('dDesc').value.trim(), p = parseInt(el('dPrice').value), im = el('dImage').files[0], fl = el('dFile').files[0];
                     if (!t || !p || !fl) { toast('Title, price, file required'); return; }
                     if (p < 1000 || p > 500000) { toast('Price: 1,000-500,000'); return; }
-                    btn.disabled = true; btn.innerHTML = '<i class="bx bx-loader bx-spin"></i> Uploading...';
+                    btn.disabled = true; btn.innerHTML = 'Uploading...';
                     var fd = new FormData(); fd.append('file', fl);
-                    var up = await fetch(API + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken }, body: fd });
+                    var up = await fetch(API + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken, 'X-Firebase-UID': firebaseUID }, body: fd });
                     var ud = await up.json();
-                    if (!ud.file_path) { toast('Upload failed'); btn.disabled = false; btn.innerHTML = '<i class="bx bx-save"></i> Publish'; return; }
+                    if (!ud.file_path) { toast('Upload failed'); btn.disabled = false; btn.innerHTML = 'Publish'; return; }
                     var imgUrl = '';
                     if (im) { var ifd = new FormData(); ifd.append('image', im); var iu = await fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a', { method: 'POST', body: ifd }); var id = await iu.json(); if (id.success) imgUrl = id.data.url; }
                     await apiCall(API + '/documents', { title: t, description: d, price: p, image_url: imgUrl, file_path: ud.file_path });
-                    toast('Published!'); showDash();
-                } catch (e) { toast(e.message); btn.disabled = false; btn.innerHTML = '<i class="bx bx-save"></i> Publish'; }
+                    toast('Published!'); dashLoaded = false; showDash();
+                } catch (e) { toast(e.message); btn.disabled = false; btn.innerHTML = 'Publish'; }
             });
         }
 
@@ -218,7 +252,7 @@
                 var sd = el('sd' + i); if (sd) { sd.classList.remove('active', 'done'); if (i < s) sd.classList.add('done'); if (i === s) sd.classList.add('active'); }
                 var sl = el('sl' + (i - 1)); if (sl) { sl.classList.remove('done'); if (i - 1 < s) sl.classList.add('done'); }
             }
-            if (s === 4) { var p = parseInt((el('dPrice').value) || 0); var btn = el('saveDoc'); if (btn) btn.innerHTML = '<i class="bx bx-rocket"></i> Publish for ' + fmtPrice(p, 'RWF') + ' (Earn ' + fmtPrice(Math.floor(p * 0.88), 'RWF') + ')'; }
+            if (s === 4) { var p = parseInt((el('dPrice').value) || 0); var btn = el('saveDoc'); if (btn) btn.innerHTML = 'Publish for ' + fmtPrice(p, 'RWF') + ' (Earn ' + fmtPrice(Math.floor(p * 0.88), 'RWF') + ')'; }
         }
 
         function initTabs() {
@@ -243,8 +277,8 @@
                 btn.addEventListener('click', function() {
                     var action = this.dataset.action, id = this.dataset.id;
                     if (action === 'share') { var link = window.location.origin + '/pub-view.html?doc=' + id; navigator.clipboard.writeText(link).then(function() { toast('Copied!'); }); }
-                    if (action === 'toggle') { apiCall(API + '/documents/' + id + '/toggle', {}, 'PUT').then(function() { showDash(); }).catch(function(e) { toast(e.message); }); }
-                    if (action === 'delete') { if (!confirm('Delete?')) return; apiCall(API + '/documents/' + id, {}, 'DELETE').then(function() { toast('Deleted!'); showDash(); }).catch(function(e) { toast(e.message); }); }
+                    if (action === 'toggle') { apiCall(API + '/documents/' + id + '/toggle', {}, 'PUT').then(function() { dashLoaded = false; showDash(); }).catch(function(e) { toast(e.message); }); }
+                    if (action === 'delete') { if (!confirm('Delete?')) return; apiCall(API + '/documents/' + id, {}, 'DELETE').then(function() { toast('Deleted!'); dashLoaded = false; showDash(); }).catch(function(e) { toast(e.message); }); }
                 });
             });
         }
@@ -258,16 +292,21 @@
 
         el('logoutBtn').addEventListener('click', async function() {
             await signOut(auth);
-            idToken = null; userEmail = '';
-            el('logoutBtn').style.display = 'none'; el('userBadge').style.display = 'none';
-            showLogin();
         });
 
-        // Auth state listener
+        // Auth state listener - this handles everything
         onAuthStateChanged(auth, function(fbUser) {
             if (fbUser) {
-                fbUser.getIdToken().then(function(t) { idToken = t; userEmail = fbUser.email; showDash(); });
+                fbUser.getIdToken().then(function(t) {
+                    idToken = t;
+                    userEmail = fbUser.email || '';
+                    firebaseUID = fbUser.uid;
+                    showDash();
+                });
             } else {
+                idToken = null;
+                userEmail = '';
+                firebaseUID = '';
                 showLogin();
             }
         });
