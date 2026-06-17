@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Publisher Dashboard — KotWeb</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root{--font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,'Helvetica Neue',Arial,sans-serif;--bg-main:#f4f2ee;--bg-surface:#ffffff;--bg-hover:#f9fafb;--bg-input:#eef3f8;--border:#e5e7eb;--text-primary:#191919;--text-secondary:#595856;--text-tertiary:#868482;--primary:#6c47ff;--primary-hover:#5835e8;--success:#057642;--success-bg:#e9f7ef;--danger:#d11124;--danger-bg:#fdecea;--warning:#b85c00;--warning-bg:#fff8f0;--radius-xl:1rem;--radius-full:9999px;--transition-fast:150ms cubic-bezier(0.4,0,0.2,1)}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{font-size:16px}body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);min-height:100vh}
+        button{cursor:pointer;font-family:inherit;border:none}input,textarea{font-family:inherit;font-size:inherit}
+        .topbar{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1rem;height:50px;display:flex;align-items:center;position:sticky;top:0;z-index:50}
+        .topbar-inner{max-width:900px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
+        .logo{font-size:.95rem;font-weight:800;display:flex;align-items:center;gap:6px;color:var(--text-primary)}
+        .logo span{width:30px;height:30px;clip-path:polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%);background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.7rem}
+        .container{max-width:900px;margin:0 auto;padding:1.25rem .85rem 4rem}
+        .login-card{max-width:400px;margin:3rem auto;background:var(--bg-surface);border-radius:var(--radius-xl);padding:2rem 1.5rem;border:1px solid var(--border);text-align:center}
+        .login-card h2{font-size:1.2rem;font-weight:700;margin-bottom:1rem}
+        .field{margin-bottom:12px;text-align:left}
+        .field label{display:block;font-size:.72rem;font-weight:600;color:var(--text-secondary);margin-bottom:3px}
+        .field input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-full);font-size:.82rem;outline:none;background:var(--bg-input);transition:all var(--transition-fast)}
+        .field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,.1)}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 22px;border-radius:var(--radius-full);font-weight:600;font-size:.82rem;transition:all var(--transition-fast);width:100%}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
+        .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-primary)}
+        .btn-sm{padding:6px 12px;font-size:.7rem;width:auto}.btn-danger{background:var(--danger);color:#fff;width:auto}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem}
+        .stat-card{background:var(--bg-surface);border-radius:var(--radius-xl);padding:1rem;border:1px solid var(--border)}
+        .stat-val{font-size:1.3rem;font-weight:700}.stat-label{font-size:.68rem;color:var(--text-secondary)}
+        .section-title{font-size:.9rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+        .doc-list{display:grid;gap:8px}
+        .doc-row{background:var(--bg-surface);border-radius:var(--radius-xl);padding:12px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .doc-row img{width:40px;height:40px;border-radius:6px;object-fit:cover}
+        .doc-info{flex:1;min-width:120px}.doc-info h4{font-size:.8rem;font-weight:600}.doc-info span{font-size:.68rem;color:var(--text-secondary)}
+        .doc-actions{display:flex;gap:4px}
+        .badge{font-size:.62rem;font-weight:600;padding:3px 8px;border-radius:20px}.badge-active{background:var(--success-bg);color:var(--success)}.badge-hidden{background:var(--danger-bg);color:var(--danger)}
+        .txn-list{display:grid;gap:6px}
+        .txn-row{background:var(--bg-surface);border-radius:var(--radius-xl);padding:10px 14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.75rem}
+        .txn-row .txn-info{flex:1}.txn-row .txn-amount{font-weight:700;color:var(--success)}.txn-row .txn-fee{color:var(--text-tertiary);font-size:.68rem}
+        .tab-nav{display:flex;gap:3px;background:#e5e7eb;border-radius:30px;padding:3px;margin-bottom:1rem;overflow-x:auto}
+        .tab-btn{padding:8px 16px;border-radius:28px;font-size:.74rem;font-weight:500;background:transparent;color:var(--text-secondary);white-space:nowrap;transition:all var(--transition-fast)}.tab-btn.active{background:#fff;color:var(--text-primary);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+        .tab-content{display:none}.tab-content.active{display:block}
+        .toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--text-primary);color:#fff;padding:10px 20px;border-radius:30px;font-size:.74rem;z-index:300;animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        @media(max-width:500px){.stats{grid-template-columns:1fr 1fr}.doc-row{flex-direction:column;align-items:flex-start}.doc-actions{width:100%;justify-content:flex-end}}
+    </style>
+</head>
+<body>
+    <header class="topbar"><div class="topbar-inner"><div class="logo"><span>K</span> KotWeb Publisher</div><button class="btn btn-outline btn-sm" id="logoutBtn" style="display:none">Logout</button></div></header>
+    <div class="container" id="content"><div style="text-align:center;padding:3rem">Loading...</div></div>
+    <div class="toast" id="toast" style="display:none"></div>
+    <script>
+(function(){'use strict';
+var API='/api/pub';var token=null;var publisher=null;
+function $(id){return document.getElementById(id)}
+function toast(m){var t=$('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},2500)}
+async function api(path,body,method){var opts={method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'}};if(token)opts.headers['Authorization']='Bearer '+token;if(body)opts.body=JSON.stringify(body);var r=await fetch(path,opts);var d=await r.json();if(!r.ok)throw new Error(d.error||'Request failed');return d}
+function saveAuth(t,p){token=t;publisher=p;localStorage.setItem('pub_auth',JSON.stringify({token:t,publisher:p}))}
+function loadAuth(){try{var d=JSON.parse(localStorage.getItem('pub_auth'));if(d){token=d.token;publisher=d.publisher;return true}}catch(e){}return false}
+function clearAuth(){token=null;publisher=null;localStorage.removeItem('pub_auth')}
+function fmtPrice(n,c){return parseInt(n).toLocaleString()+' '+(c||'RWF')}
+
+function showLogin(){var c=$('content');c.innerHTML='<div class="login-card"><h2>Publisher Login</h2><div class="field"><label>Username or Email</label><input type="text" id="loginUser" placeholder="username or email"></div><div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password"></div><button class="btn btn-primary" id="loginBtn">Sign In</button><p style="font-size:.7rem;color:var(--text-secondary);margin-top:10px;">Don\'t have an account? <a href="#" id="showRegister" style="color:var(--primary);">Register</a></p></div>';
+    $('loginBtn').addEventListener('click',async function(){try{var u=$('loginUser').value.trim(),p=$('loginPass').value;if(!u||!p){toast('Fill all fields');return}var r=await api(API+'/login',{login:u,password:p});saveAuth(r.token,r.publisher);showDash()}catch(e){toast(e.message)}});
+    $('showRegister').addEventListener('click',function(e){e.preventDefault();showRegister()})}
+
+function showRegister(){var c=$('content');c.innerHTML='<div class="login-card"><h2>Register</h2><div class="field"><label>Username</label><input type="text" id="regUser" placeholder="username"></div><div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="email"></div><div class="field"><label>Full Name</label><input type="text" id="regName" placeholder="Your Name"></div><div class="field"><label>Password</label><input type="password" id="regPass" placeholder="min 6 chars"></div><button class="btn btn-primary" id="regBtn">Create Account</button><p style="font-size:.7rem;color:var(--text-secondary);margin-top:10px;">Already have account? <a href="#" id="showLoginLink" style="color:var(--primary);">Sign In</a></p></div>';
+    $('regBtn').addEventListener('click',async function(){try{var u=$('regUser').value.trim(),e=$('regEmail').value.trim(),n=$('regName').value.trim(),p=$('regPass').value;if(!u||!e||!n||!p){toast('Fill all fields');return}var r=await api(API+'/register',{username:u,email:e,name:n,password:p});saveAuth(r.token,r.publisher);showDash()}catch(err){toast(err.message)}});
+    $('showLoginLink').addEventListener('click',function(e){e.preventDefault();showLogin()})}
+
+async function showDash(){if(!publisher)return;var c=$('content');$('logoutBtn').style.display='inline-flex';
+    var earnings=await api(API+'/earnings');var docs=await api(API+'/documents');
+    c.innerHTML='<div class="stats"><div class="stat-card"><div class="stat-val">'+fmtPrice(earnings.your_earnings,'RWF')+'</div><div class="stat-label">Your Earnings (93%)</div></div><div class="stat-card"><div class="stat-val">'+fmtPrice(earnings.platform_fees,'RWF')+'</div><div class="stat-label">Platform Fee (7%)</div></div><div class="stat-card"><div class="stat-val">'+fmtPrice(earnings.total_sales,'RWF')+'</div><div class="stat-label">Total Sales</div></div><div class="stat-card"><div class="stat-val">'+earnings.total_transactions+'</div><div class="stat-label">Transactions</div></div></div>'+
+    '<div class="tab-nav"><button class="tab-btn active" data-tab="docs">My Documents</button><button class="tab-btn" data-tab="add">Add New</button><button class="tab-btn" data-tab="txns">Transactions</button></div>'+
+    '<div class="tab-content active" id="tab-docs"><div class="section-title">My Documents</div><div class="doc-list" id="docList"></div></div>'+
+    '<div class="tab-content" id="tab-add"><div class="login-card" style="text-align:left"><h2>Add Document</h2><div class="field"><label>Title</label><input type="text" id="dTitle"></div><div class="field"><label>Description</label><textarea id="dDesc" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;resize:vertical;min-height:60px;background:var(--bg-input)"></textarea></div><div class="field"><label>Price (RWF)</label><input type="number" id="dPrice" min="100" value="500"></div><div class="field"><label>Preview Image</label><input type="file" id="dImage" accept="image/*" style="font-size:.75rem"></div><div class="field"><label>Document File</label><input type="file" id="dFile" style="font-size:.75rem"></div><button class="btn btn-primary" id="saveDoc">Save Document</button></div></div>'+
+    '<div class="tab-content" id="tab-txns"><div class="section-title">Recent Transactions</div><div class="txn-list" id="txnList"></div></div>';
+
+    renderDocList(docs);renderTxns(earnings.recent||[]);
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active')});$('tab-'+b.dataset.tab).classList.add('active')})});
+    $('saveDoc').addEventListener('click',async function(){try{var t=$('dTitle').value.trim(),d=$('dDesc').value.trim(),p=$('dPrice').value,im=$('dImage').files[0],fl=$('dFile').files[0];if(!t||!p||!fl){toast('Title, price, and file required');return}if(parseInt(p)<100){toast('Min price: 100 RWF');return}toast('Uploading file...');var fd=new FormData();fd.append('file',fl);var up=await fetch(API+'/upload',{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});var ud=await up.json();if(!ud.file_path){toast('Upload failed');return}var imgUrl='';if(im){var ifd=new FormData();ifd.append('image',im);var iu=await fetch('https://api.imgbb.com/1/upload?key=2077df548acf5a4f53658b930c7fe87a',{method:'POST',body:ifd});var id=await iu.json();if(id.success)imgUrl=id.data.url}await api(API+'/documents',{title:t,description:d,price:parseInt(p),image_url:imgUrl,file_path:ud.file_path});toast('Document added!');showDash()}catch(e){toast(e.message)}})}
+
+function renderDocList(docs){var l=$('docList');if(!docs.length){l.innerHTML='<p style="color:var(--text-secondary);text-align:center;padding:1rem">No documents yet</p>';return}
+    l.innerHTML=docs.map(function(d){return'<div class="doc-row">'+(d.image_url?'<img src="'+d.image_url+'" alt="">':'<div style="width:40px;height:40px;background:#e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center"><i class="bx bx-file"></i></div>')+'<div class="doc-info"><h4>'+d.title+' <span class="badge '+(d.active?'badge-active':'badge-hidden')+'">'+(d.active?'Active':'Hidden')+'</span></h4><span>'+fmtPrice(d.price,d.currency)+' · '+(d.clicks||0)+' views</span></div><div class="doc-actions"><button class="btn btn-outline btn-sm" onclick="toggleDoc(\''+d.id+'\')">'+(d.active?'Hide':'Show')+'</button><button class="btn btn-danger btn-sm" onclick="deleteDoc(\''+d.id+'\')">Delete</button></div></div>'}).join('')}
+
+function renderTxns(txns){var l=$('txnList');if(!txns.length){l.innerHTML='<p style="color:var(--text-secondary);text-align:center;padding:1rem">No transactions yet</p>';return}
+    l.innerHTML=txns.map(function(t){return'<div class="txn-row"><div class="txn-info"><strong>'+fmtPrice(t.amount,t.currency)+'</strong> · '+new Date(t.created_at).toLocaleDateString()+'</div><div class="txn-amount">+'+fmtPrice(t.publisher_earnings,t.currency)+'</div><div class="txn-fee">Fee: '+fmtPrice(t.platform_fee,t.currency)+'</div></div>'}).join('')}
+
+window.toggleDoc=async function(id){try{await api(API+'/documents/'+id+'/toggle',{},'PUT');showDash()}catch(e){toast(e.message)}};
+window.deleteDoc=async function(id){if(!confirm('Delete permanently?'))return;try{await api(API+'/documents/'+id,{},'DELETE');showDash()}catch(e){toast(e.message)}};
+
+$('logoutBtn').addEventListener('click',function(){clearAuth();showLogin()});
+if(loadAuth()){showDash()}else{showLogin()}
+})();
+</script>
+</body>
+</html>
