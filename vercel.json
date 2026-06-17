@@ -2,10 +2,6 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/pub/(.*)",
-      "destination": "/publisher/api/handler"
-    },
-    {
       "source": "/api/(.*)",
       "destination": "/api/handler"
     }
