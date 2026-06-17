@@ -1,1 +1,5 @@
-{ "source": "/api/(.*)", "destination": "/api/handler" }
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/publisher/api/handler" }
+  ]
+}
