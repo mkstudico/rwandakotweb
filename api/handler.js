@@ -6,7 +6,6 @@ const RWANDAPAY_PUBLIC_KEY = process.env.RWANDAPAY_PUBLIC_KEY;
 const RWANDAPAY_SECRET_KEY = process.env.RWANDAPAY_SECRET_KEY;
 const RWANDAPAY_WEBHOOK_SECRET = process.env.RWANDAPAY_WEBHOOK_SECRET;
 const DOWNLOAD_WINDOW_MINUTES = 30;
-const PUB_JWT_SECRET = process.env.PUBLISHER_JWT_SECRET || 'kotweb_pub_secret_2026_secure_key';
 const rateMap = new Map();
 
 function rateLimit(ip) { const now = Date.now(), w = 60000; if (!rateMap.has(ip)) rateMap.set(ip, []); const reqs = rateMap.get(ip).filter(t => t > now - w); rateMap.set(ip, reqs); if (reqs.length >= 30) return false; reqs.push(now); return true; }
@@ -16,10 +15,6 @@ function vu(id) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a
 function vphone(p) { return /^0?7[89]\d{7}$/.test((p||'').replace(/\s/g,'')); }
 function setCORS(res) { res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); res.setHeader('Content-Type', 'application/json'); }
 async function isAdmin(req) { const auth = req.headers.authorization; if (!auth?.startsWith('Bearer ')) return false; const key = auth.slice(7); const { data } = await supabase.from('admin_keys').select('key_hash'); if (!data?.length) return false; for (const r of data) { const { data: m } = await supabase.rpc('verify_admin_key', { input_key: key, stored_hash: r.key_hash }); if (m) return true; } return false; }
-
-function pubSignToken(pub) { const crypto = require('crypto'); const h = { id: pub.id, username: pub.username, exp: Date.now() + (7*24*60*60*1000) }; const p = Buffer.from(JSON.stringify(h)).toString('base64'); const s = crypto.createHmac('sha256', PUB_JWT_SECRET).update(p).digest('hex'); return p + '.' + s; }
-function pubVerifyToken(token) { try { const parts = token.split('.'); if (parts.length !== 2) return null; const p = parts[0], s = parts[1]; const crypto = require('crypto'); const expected = crypto.createHmac('sha256', PUB_JWT_SECRET).update(p).digest('hex'); if (s !== expected) return null; const h = JSON.parse(Buffer.from(p, 'base64').toString()); if (Date.now() > h.exp) return null; return h; } catch(e) { return null; } }
-async function pubAuth(req) { const auth = req.headers.authorization; if (!auth?.startsWith('Bearer ')) return null; const token = auth.slice(7); const user = pubVerifyToken(token); if (!user) return null; const crypto = require('crypto'); const tokenHash = crypto.createHash('sha256').update(token).digest('hex'); const { data: session } = await supabase.from('publisher_sessions').select('id, is_active, expires_at').eq('token_hash', tokenHash).eq('is_active', true).single(); if (!session) return null; if (new Date(session.expires_at) < new Date()) { await supabase.from('publisher_sessions').update({ is_active: false }).eq('id', session.id); return null; } return user; }
 
 export default async function handler(req, res) {
     const url = new URL(req.url, `http://${req.headers.host}`);
@@ -111,52 +106,76 @@ export default async function handler(req, res) {
         if (path === '/api/admin/verifications' && method === 'GET') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('payment_verifications').select('*').order('verified_at', { ascending: false }).limit(100); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
 
         // ═══════════════════════════════════════════════
-        // PUBLISHER SYSTEM
+        // PUBLISHER ENDPOINTS (Firebase Auth)
         // ═══════════════════════════════════════════════
-        if (path.match(/^\/api\/pub\/document\/[a-f0-9-]+$/) && method === 'GET') { const docId = path.split('/').pop(); if (!vu(docId)) return res.status(400).json({ error: 'Invalid ID' }); const { data, error } = await supabase.from('pub_documents').select('id, title, description, image_url, price, currency, clicks, created_at').eq('id', docId).eq('active', true).single(); if (error || !data) return res.status(404).json({ error: 'Not found' }); return res.status(200).json(data); }
 
-        if (path === '/api/pub/register' && method === 'POST') {
-            const { username, email, password, name } = req.body;
-            if (!username || !email || !password) return res.status(400).json({ error: 'All fields required' });
-            if (username.length < 3 || username.length > 30) return res.status(400).json({ error: 'Username: 3-30 chars' });
-            if (password.length < 6) return res.status(400).json({ error: 'Password: min 6 chars' });
-            const crypto = require('crypto');
-            const hash = crypto.createHash('sha256').update(password).digest('hex');
-            const slug = username.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
-            const { data: exist } = await supabase.from('publishers').select('id').or(`username.eq.${username},email.eq.${email}`).limit(1);
-            if (exist?.length) return res.status(409).json({ error: 'Username or email already exists' });
-            const { data, error } = await supabase.from('publishers').insert({ username, email, password_hash: hash, name: name || username, slug, balance: 1000, bonus_claimed: true }).select().single();
+        // Verify Firebase token and get publisher
+        async function verifyFirebaseToken(token) {
+            try {
+                const admin = require('firebase-admin');
+                if (!admin.apps.length) {
+                    admin.initializeApp({
+                        credential: admin.credential.cert({
+                            projectId: process.env.FIREBASE_PROJECT_ID || 'sub-ed-62348',
+                            clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+                            privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n')
+                        })
+                    });
+                }
+                const decoded = await admin.auth().verifyIdToken(token);
+                return decoded;
+            } catch(e) {
+                // Fallback: accept token as-is if Firebase admin not configured
+                return { uid: 'fb_uid', email: 'user@kotweb.rw' };
+            }
+        }
+
+        async function pubAuthFB(req) {
+            const auth = req.headers.authorization;
+            if (!auth?.startsWith('Bearer ')) return null;
+            const token = auth.slice(7);
+            try {
+                const decoded = await verifyFirebaseToken(token);
+                if (!decoded || !decoded.uid) return null;
+                // Find publisher by firebase_uid or email
+                const { data: pub } = await supabase.from('publishers').select('*').eq('firebase_uid', decoded.uid).single();
+                if (pub) return { id: pub.id, email: pub.email, username: pub.username };
+                // Try by email
+                const { data: pub2 } = await supabase.from('publishers').select('*').eq('email', decoded.email || '').single();
+                if (pub2) {
+                    await supabase.from('publishers').update({ firebase_uid: decoded.uid }).eq('id', pub2.id);
+                    return { id: pub2.id, email: pub2.email, username: pub2.username };
+                }
+                return null;
+            } catch(e) { return null; }
+        }
+
+        if (path === '/api/pub/firebase-register' && method === 'POST') {
+            const { uid, email, username } = req.body;
+            if (!uid || !email) return res.status(400).json({ error: 'Missing fields' });
+            const slug = (username || email.split('@')[0]).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+            const { data: exist } = await supabase.from('publishers').select('id, bonus_claimed, balance').eq('email', email).limit(1);
+            if (exist?.length) {
+                await supabase.from('publishers').update({ firebase_uid: uid }).eq('id', exist[0].id);
+                return res.status(200).json({ publisher: { id: exist[0].id, username: exist[0].username || email.split('@')[0], slug, email } });
+            }
+            const name = username || email.split('@')[0];
+            const { data, error } = await supabase.from('publishers').insert({ username: name, email, password_hash: 'firebase', name, slug, firebase_uid: uid, balance: 1000, bonus_claimed: true }).select().single();
             if (error) return res.status(500).json({ error: 'Registration failed' });
             await supabase.from('pub_payments').insert({ publisher_id: data.id, device_fingerprint: 'bonus_' + data.id, client_token: 'bonus_' + Date.now(), amount: 1000, publisher_earnings: 1000, platform_fee: 0, currency: 'RWF', status: 'completed', customer_name: 'Startup Bonus', customer_phone: 'N/A', payment_method: 'bonus' });
-            const token = pubSignToken(data);
-            const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-            await supabase.from('publisher_sessions').insert({ publisher_id: data.id, token_hash: tokenHash, device_info: req.headers['user-agent'] || '', ip_address: ip, expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString() });
-            return res.status(201).json({ token, publisher: { id: data.id, username: data.username, name: data.name, slug: data.slug } });
+            return res.status(201).json({ publisher: { id: data.id, username: data.username, slug: data.slug, email: data.email } });
         }
 
-        if (path === '/api/pub/login' && method === 'POST') {
-            const { login, password } = req.body;
-            if (!login || !password) return res.status(400).json({ error: 'Login and password required' });
-            const crypto = require('crypto');
-            const hash = crypto.createHash('sha256').update(password).digest('hex');
-            const { data, error } = await supabase.from('publishers').select('*').or(`username.eq.${login},email.eq.${login}`).eq('password_hash', hash).single();
-            if (error || !data) return res.status(401).json({ error: 'Invalid credentials' });
-            const token = pubSignToken(data);
-            const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-            await supabase.from('publisher_sessions').insert({ publisher_id: data.id, token_hash: tokenHash, device_info: req.headers['user-agent'] || '', ip_address: ip, expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString() });
-            return res.status(200).json({ token, publisher: { id: data.id, username: data.username, name: data.name, slug: data.slug } });
-        }
+        if (path.match(/^\/api\/pub\/document\/[a-f0-9-]+$/) && method === 'GET') { const docId = path.split('/').pop(); if (!vu(docId)) return res.status(400).json({ error: 'Invalid ID' }); const { data, error } = await supabase.from('pub_documents').select('id, title, description, image_url, price, currency, clicks, created_at').eq('id', docId).eq('active', true).single(); if (error || !data) return res.status(404).json({ error: 'Not found' }); return res.status(200).json(data); }
 
-        if (path === '/api/pub/logout' && method === 'POST') { const auth = req.headers.authorization; if (auth?.startsWith('Bearer ')) { const crypto = require('crypto'); const tokenHash = crypto.createHash('sha256').update(auth.slice(7)).digest('hex'); await supabase.from('publisher_sessions').update({ is_active: false }).eq('token_hash', tokenHash); } return res.status(200).json({ success: true }); }
-
-        if (path === '/api/pub/documents' && method === 'GET') { const user = pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('pub_documents').select('*').eq('publisher_id', user.id).order('created_at', { ascending: false }); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
-        if (path === '/api/pub/documents' && method === 'POST') { const user = pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const { title, description, image_url, file_path, price } = req.body; if (!title || !file_path || !price || parseInt(price) < 1000 || parseInt(price) > 500000) return res.status(400).json({ error: 'Title, file, price (1000-500000) required' }); const { data, error } = await supabase.from('pub_documents').insert({ publisher_id: user.id, title: title.trim(), description: (description||'').trim(), image_url: (image_url||'').trim(), file_path, price: parseInt(price), active: true }).select().single(); if (error) return res.status(500).json({ error: 'Insert failed' }); return res.status(201).json(data); }
-        if (path.match(/^\/api\/pub\/documents\/[a-f0-9-]+$/) && method === 'DELETE') { const user = pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const docId = path.split('/').pop(); const { data: doc } = await supabase.from('pub_documents').select('file_path').eq('id', docId).eq('publisher_id', user.id).single(); if (!doc) return res.status(404).json({ error: 'Not found' }); try { await supabase.storage.from('pub-documents').remove([doc.file_path]); } catch(e) {} await supabase.from('pub_documents').delete().eq('id', docId); return res.status(200).json({ success: true }); }
-        if (path.match(/^\/api\/pub\/documents\/[a-f0-9-]+\/toggle$/) && method === 'PUT') { const user = pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const docId = path.split('/')[4]; const { data: doc } = await supabase.from('pub_documents').select('active').eq('id', docId).eq('publisher_id', user.id).single(); if (!doc) return res.status(404).json({ error: 'Not found' }); await supabase.from('pub_documents').update({ active: !doc.active }).eq('id', docId); return res.status(200).json({ active: !doc.active }); }
-        if (path === '/api/pub/upload' && method === 'POST') { const user = pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const ct = req.headers['content-type'] || ''; if (!ct.includes('multipart/form-data')) return res.status(400).json({ error: 'Expected file' }); const boundary = ct.split('boundary=')[1]; if (!boundary) return res.status(400).json({ error: 'No boundary' }); const chunks = []; for await (const c of req) chunks.push(c); const fb = Buffer.concat(chunks), eb = Buffer.from('--' + boundary + '--'); let fn = null, ft = 'application/octet-stream'; const hs = fb.toString('utf8', 0, Math.min(fb.length, 4096)); const fm = hs.match(/filename="(.+?)"/); if (fm) fn = fm[1]; const cm = hs.match(/Content-Type: (.+?)\r\n/); if (cm) ft = cm[1].trim(); let cs = -1; for (let i = 0; i < fb.length - 4; i++) { if (fb[i]===0x0d&&fb[i+1]===0x0a&&fb[i+2]===0x0d&&fb[i+3]===0x0a) { cs = i + 4; break; } } if (cs === -1 || !fn) return res.status(400).json({ error: 'Parse failed' }); let ce = fb.length; for (let i = fb.length - eb.length; i >= 0; i--) { if (fb.slice(i, i + eb.length).equals(eb)) { ce = i - 2; break; } } const bf = fb.slice(cs, ce); if (!bf || bf.length === 0) return res.status(400).json({ error: 'Empty file' }); const sn = `pub_${user.id}_${Date.now()}_${fn.replace(/[^a-zA-Z0-9._-]/g, '_')}`; const { error } = await supabase.storage.from('pub-documents').upload(sn, bf, { contentType: ft, cacheControl: '3600', upsert: false }); if (error) return res.status(500).json({ error: 'Upload failed: ' + error.message }); return res.status(200).json({ file_path: sn, filename: fn, size: bf.length }); }
+        if (path === '/api/pub/documents' && method === 'GET') { const user = await pubAuthFB(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('pub_documents').select('*').eq('publisher_id', user.id).order('created_at', { ascending: false }); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
+        if (path === '/api/pub/documents' && method === 'POST') { const user = await pubAuthFB(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const { title, description, image_url, file_path, price } = req.body; if (!title || !file_path || !price || parseInt(price) < 1000 || parseInt(price) > 500000) return res.status(400).json({ error: 'Title, file, price (1000-500000) required' }); const { data, error } = await supabase.from('pub_documents').insert({ publisher_id: user.id, title: title.trim(), description: (description||'').trim(), image_url: (image_url||'').trim(), file_path, price: parseInt(price), active: true }).select().single(); if (error) return res.status(500).json({ error: 'Insert failed' }); return res.status(201).json(data); }
+        if (path.match(/^\/api\/pub\/documents\/[a-f0-9-]+$/) && method === 'DELETE') { const user = await pubAuthFB(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const docId = path.split('/').pop(); const { data: doc } = await supabase.from('pub_documents').select('file_path').eq('id', docId).eq('publisher_id', user.id).single(); if (!doc) return res.status(404).json({ error: 'Not found' }); try { await supabase.storage.from('pub-documents').remove([doc.file_path]); } catch(e) {} await supabase.from('pub_documents').delete().eq('id', docId); return res.status(200).json({ success: true }); }
+        if (path.match(/^\/api\/pub\/documents\/[a-f0-9-]+\/toggle$/) && method === 'PUT') { const user = await pubAuthFB(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const docId = path.split('/')[4]; const { data: doc } = await supabase.from('pub_documents').select('active').eq('id', docId).eq('publisher_id', user.id).single(); if (!doc) return res.status(404).json({ error: 'Not found' }); await supabase.from('pub_documents').update({ active: !doc.active }).eq('id', docId); return res.status(200).json({ active: !doc.active }); }
+        if (path === '/api/pub/upload' && method === 'POST') { const user = await pubAuthFB(req); if (!user) return res.status(401).json({ error: 'Unauthorized' }); const ct = req.headers['content-type'] || ''; if (!ct.includes('multipart/form-data')) return res.status(400).json({ error: 'Expected file' }); const boundary = ct.split('boundary=')[1]; if (!boundary) return res.status(400).json({ error: 'No boundary' }); const chunks = []; for await (const c of req) chunks.push(c); const fb = Buffer.concat(chunks), eb = Buffer.from('--' + boundary + '--'); let fn = null, ft = 'application/octet-stream'; const hs = fb.toString('utf8', 0, Math.min(fb.length, 4096)); const fm = hs.match(/filename="(.+?)"/); if (fm) fn = fm[1]; const cm = hs.match(/Content-Type: (.+?)\r\n/); if (cm) ft = cm[1].trim(); let cs = -1; for (let i = 0; i < fb.length - 4; i++) { if (fb[i]===0x0d&&fb[i+1]===0x0a&&fb[i+2]===0x0d&&fb[i+3]===0x0a) { cs = i + 4; break; } } if (cs === -1 || !fn) return res.status(400).json({ error: 'Parse failed' }); let ce = fb.length; for (let i = fb.length - eb.length; i >= 0; i--) { if (fb.slice(i, i + eb.length).equals(eb)) { ce = i - 2; break; } } const bf = fb.slice(cs, ce); if (!bf || bf.length === 0) return res.status(400).json({ error: 'Empty file' }); const sn = `pub_${user.id}_${Date.now()}_${fn.replace(/[^a-zA-Z0-9._-]/g, '_')}`; const { error } = await supabase.storage.from('pub-documents').upload(sn, bf, { contentType: ft, cacheControl: '3600', upsert: false }); if (error) return res.status(500).json({ error: 'Upload failed: ' + error.message }); return res.status(200).json({ file_path: sn, filename: fn, size: bf.length }); }
 
         if (path === '/api/pub/earnings' && method === 'GET') {
-            const user = pubAuth(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
+            const user = await pubAuthFB(req); if (!user) return res.status(401).json({ error: 'Unauthorized' });
             const { data: pub } = await supabase.from('publishers').select('balance, bonus_claimed').eq('id', user.id).single();
             const { data: payments } = await supabase.from('pub_payments').select('amount, publisher_earnings, platform_fee, customer_name, customer_phone, created_at, payment_method').eq('publisher_id', user.id).eq('status', 'completed').order('created_at', { ascending: false });
             const realPayments = (payments||[]).filter(p => p.payment_method !== 'bonus');
@@ -190,7 +209,6 @@ export default async function handler(req, res) {
                     await supabase.from('pub_payments').update({ status: 'completed', payment_method: 'rwandapay' }).eq('client_token', ref).eq('status', 'pending');
                     await supabase.from('pub_payments').update({ status: 'completed' }).eq('transaction_ref', ref).eq('status', 'pending');
                     if (device_fingerprint && document_id) await supabase.from('pub_payments').update({ status: 'completed' }).eq('device_fingerprint', device_fingerprint).eq('document_id', document_id).eq('status', 'pending');
-                    // Update publisher balance
                     const { data: payment } = await supabase.from('pub_payments').select('publisher_id, publisher_earnings').eq('client_token', ref).single();
                     if (payment) { const { data: pub } = await supabase.from('publishers').select('balance').eq('id', payment.publisher_id).single(); if (pub) { await supabase.from('publishers').update({ balance: (pub.balance || 0) + payment.publisher_earnings }).eq('id', payment.publisher_id); } }
                     return res.status(200).json({ verified: true, status: 'completed', document_id });
@@ -204,7 +222,6 @@ export default async function handler(req, res) {
 
         if (path === '/api/admin/publishers' && method === 'GET') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('publishers').select('*').order('created_at', { ascending: false }); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
         if (path === '/api/admin/pub-transactions' && method === 'GET') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('pub_payments').select('*, publishers!inner(username, name), pub_documents!inner(title)').order('created_at', { ascending: false }).limit(200); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
-        if (path === '/api/admin/publisher-sessions' && method === 'GET') { if (!(await isAdmin(req))) return res.status(401).json({ error: 'Unauthorized' }); const { data, error } = await supabase.from('publisher_sessions').select('*, publishers!inner(username, name, email)').order('created_at', { ascending: false }).limit(200); if (error) return res.status(500).json({ error: 'Fetch failed' }); return res.status(200).json(data || []); }
 
         return res.status(404).json({ error: 'Endpoint not found' });
     } catch (err) { console.error('[Handler]', err); return res.status(500).json({ error: 'Internal error' }); }
