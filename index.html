@@ -93,12 +93,29 @@
         .card-body{flex:1;min-width:0}
         .card-body h4{font-size:.88rem;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;margin-bottom:3px}
         .card-body .card-desc{font-size:.7rem;color:var(--text-tertiary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+        .card-body .card-owner{font-size:.68rem;color:var(--primary);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:3px}
         .card-footer{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-top:auto}
         .card-footer .price{font-size:.9rem;font-weight:700;color:var(--primary)}
         .card-footer .meta-row{display:flex;align-items:center;gap:.5rem;font-size:.65rem;color:var(--text-tertiary)}
         .card-footer .meta-row span{display:flex;align-items:center;gap:3px}
 
-        /* Table */
+        /* Publisher card */
+        .publisher-card{
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-xl);
+            padding:1rem 1.2rem;
+            display:flex;align-items:center;gap:10px;
+            transition:all var(--transition-fast);
+            text-decoration:none;color:inherit;
+        }
+        .publisher-card:hover{box-shadow:var(--card-hover-shadow);border-color:var(--primary)}
+        .publisher-avatar{width:44px;height:44px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--primary);flex-shrink:0}
+        .publisher-info{flex:1}
+        .publisher-info h4{font-size:.85rem;font-weight:600}
+        .publisher-info span{font-size:.7rem;color:var(--text-secondary)}
+        .publisher-views{font-size:.75rem;font-weight:600;color:var(--primary)}
+
         .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--bg-surface);border:1px solid var(--border);clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
         .table-wrap table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:550px}
         .table-wrap th{text-align:left;padding:10px 12px;font-weight:600;font-size:.68rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.3px;background:var(--bg-hover);border-bottom:1px solid var(--border);white-space:nowrap}
@@ -111,7 +128,6 @@
         .td-status.paid{color:var(--success)}
         .td-status.unpaid{color:var(--text-tertiary)}
 
-        /* Price filter */
         .filter-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
         .filter-row .filter-label{font-size:.7rem;font-weight:600;color:var(--text-secondary);white-space:nowrap}
         .filter-row input{width:80px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-full);font-size:.72rem;background:var(--bg-surface);color:var(--text-primary);outline:none;font-family:var(--font-family)}
@@ -219,7 +235,9 @@
 
             var CLASSES = ['S1','S2','S3','S4','S5','S6'];
             var SUBJECTS = ['Pure-Math','Sub-Math','Physics','Biology','English','French','Computer Science','Economics','Chemistry','Kinyarwanda','History','Geography','Entrepreneurship','GSCS'];
-            var allDocs = [];
+            var allDocs = [];          // combined admin + publisher docs
+            var publisherDocs = [];
+            var topPublishers = [];
             var paidSet = new Set();
             var userPrefs = null;
             var searchTerm = '';
@@ -284,17 +302,16 @@
                 return docs.slice().sort(function(a,b){ return getPopularityScore(b) - getPopularityScore(a); }).slice(0,5);
             }
 
-            function getCategory(fn) { var e=(fn||'').split('.').pop().toLowerCase(); if(['pdf','doc','docx','xls','xlsx','ppt','pptx','txt'].includes(e)) return e; if(['jpg','jpeg','png','gif','svg','webp'].includes(e)) return 'image'; return 'other'; }
-            function getIcon(fn) { var c=getCategory(fn); var m={pdf:'bxs-file-pdf',doc:'bxs-file-doc',docx:'bxs-file-doc',xls:'bx-spreadsheet',xlsx:'bx-spreadsheet',ppt:'bxs-slideshow',pptx:'bxs-slideshow',image:'bx-image-alt'}; return m[c]||'bx-file-blank'; }
-
             function cardHTML(d, tag) {
                 var score = getMatchScore(d);
-                return '<a href="view.html?doc='+d.id+'" class="card" onclick="trackClick(\''+d.id+'\')">' +
+                var link = d.isPublisher ? 'pub-view.html?doc='+d.id : 'view.html?doc='+d.id;
+                var ownerBadge = d.username ? '<div class="card-owner"><i class="bx bx-user-circle"></i> @'+d.username+'</div>' : '';
+                return '<a href="'+link+'" class="card" onclick="trackClick(\''+d.id+'\', '+(d.isPublisher?1:0)+')">' +
                     (tag && score>=3 ? '<span class="card-tag">For You</span>' : '') +
                     '<div class="card-img-wrap">' +
                         (d.image_url ? '<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'bx bx-file card-icon-big\\\'></i>\'">' : '<i class="bx bx-file card-icon-big"></i>') +
                     '</div>' +
-                    '<div class="card-body"><h4>'+d.title+'</h4><p class="card-desc">'+(d.description||'')+'</p></div>' +
+                    '<div class="card-body"><h4>'+d.title+'</h4><p class="card-desc">'+(d.description||'')+'</p>'+ownerBadge+'</div>' +
                     '<div class="card-footer">' +
                         '<span class="price">'+formatPrice(d.price,d.currency)+'</span>' +
                         '<div class="meta-row"><span><i class="bx bx-show" style="font-size:11px;"></i> '+(d.clicks||0)+'</span></div>' +
@@ -303,8 +320,10 @@
             }
 
             function tableRow(d) {
-                return '<tr onclick="window.location.href=\'view.html?doc='+d.id+'\';trackClick(\''+d.id+'\');">' +
-                    '<td><span class="td-title">'+(d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+' '+d.title+'</span></td>' +
+                var link = d.isPublisher ? 'pub-view.html?doc='+d.id : 'view.html?doc='+d.id;
+                var owner = d.username ? ' @'+d.username : '';
+                return '<tr onclick="window.location.href=\''+link+'\';trackClick(\''+d.id+'\', '+(d.isPublisher?1:0)+')">' +
+                    '<td><span class="td-title">'+(d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+' '+d.title+owner+'</span></td>' +
                     '<td>'+(d.clicks||0)+'</td>' +
                     '<td>'+formatPrice(d.price,d.currency)+'</td>' +
                     '<td class="td-status '+(paidSet.has(d.id)?'paid':'unpaid')+'">'+(paidSet.has(d.id)?'Owned':'Available')+'</td>' +
@@ -323,6 +342,21 @@
                     return;
                 }
 
+                var topPubHtml = '';
+                if (topPublishers.length) {
+                    topPubHtml = '<div class="section">' +
+                        '<div class="section-header"><div class="section-title"><i class="bx bx-star"></i> Top Publishers</div></div>' +
+                        '<div style="display:grid;gap:8px;">' +
+                            topPublishers.map(function(p, i) {
+                                return '<a href="pub-page.html?p='+p.username+'" class="publisher-card">' +
+                                    '<div class="publisher-avatar"><i class="bx bx-user"></i></div>' +
+                                    '<div class="publisher-info"><h4>@'+p.username+'</h4><span>'+p.name+'</span></div>' +
+                                    '<div class="publisher-views"><i class="bx bx-show"></i> '+(p.totalViews||0)+'</div>' +
+                                '</a>';
+                            }).join('') +
+                        '</div></div>';
+                }
+
                 content.innerHTML =
                     '<div class="section">' +
                         '<div class="section-header"><div class="section-title"><i class="bx bx-time-five"></i> Recent</div><span class="section-badge">'+recent.length+' docs</span></div>' +
@@ -332,6 +366,7 @@
                         '<div class="section-header"><div class="section-title"><i class="bx bx-bulb"></i> Suggested For You</div><span class="section-badge">'+suggested.length+' docs</span></div>' +
                         '<div class="card-grid">'+suggested.map(function(d){ return cardHTML(d,true); }).join('')+'</div>' +
                     '</div>' +
+                    topPubHtml +
                     '<div class="section">' +
                         '<div class="section-header"><div class="section-title"><i class="bx bx-grid-alt"></i> All Documents</div><span class="section-badge">'+docs.length+' docs</span></div>' +
                         '<div class="card-grid">'+docs.map(function(d){ return cardHTML(d,false); }).join('')+'</div>' +
@@ -347,7 +382,6 @@
                         '<div class="table-wrap"><table><thead><tr><th>Document</th><th>Views</th><th>Price</th><th>Status</th></tr></thead><tbody>'+docs.map(tableRow).join('')+'</tbody></table></div>' +
                     '</div>';
 
-                // Attach price filter listeners
                 var pmin = $('priceMin');
                 var pmax = $('priceMax');
                 if (pmin && pmax) {
@@ -364,7 +398,15 @@
                 }
             }
 
-            window.trackClick = function(id) { addSeen(id); fetch('/api/documents/'+id+'/click',{method:'POST'}).catch(function(){}); };
+            window.trackClick = function(id, isPub) {
+                addSeen(id);
+                if (isPub) {
+                    // Track click on publisher document
+                    fetch('/api/documents/'+id+'/click', {method:'POST'}).catch(function(){});
+                } else {
+                    fetch('/api/documents/'+id+'/click', {method:'POST'}).catch(function(){});
+                }
+            };
 
             $('searchInput').addEventListener('input', function() {
                 clearTimeout(debounceTimer);
@@ -418,7 +460,8 @@
                     '<h4><i class="bx bx-sparkles" style="color:var(--primary);"></i> New For You</h4>' +
                     '<p class="popup-sub">Fresh documents you haven\'t seen yet</p>' +
                     '<div class="mini-list">'+unseen.map(function(d) {
-                        return '<a href="view.html?doc='+d.id+'" class="mini-card" onclick="trackClick(\''+d.id+'\')">' +
+                        var link = d.isPublisher ? 'pub-view.html?doc='+d.id : 'view.html?doc='+d.id;
+                        return '<a href="'+link+'" class="mini-card" onclick="trackClick(\''+d.id+'\', '+(d.isPublisher?1:0)+')">' +
                             (d.image_url?'<img src="'+d.image_url+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'') +
                             '<div class="mc-icon" style="'+(d.image_url?'display:none':'')+'"><i class="bx bx-file"></i></div>' +
                             '<div class="mc-info"><h5>'+d.title+'</h5><span>'+formatPrice(d.price,d.currency)+' · New</span></div>' +
@@ -430,7 +473,19 @@
             }
 
             (async function() {
-                try { allDocs = await apiCall('/api/documents'); } catch(e) { allDocs = []; }
+                try {
+                    var adminDocs = await apiCall('/api/documents');
+                    var pubDocs = await apiCall('/api/pub/discover');
+                    topPublishers = await apiCall('/api/pub/top-publishers');
+                    
+                    // Tag each doc with isPublisher flag
+                    adminDocs = adminDocs.map(function(d) { d.isPublisher = false; return d; });
+                    pubDocs = pubDocs.map(function(d) { d.isPublisher = true; return d; });
+                    
+                    // Combine: admin first, then publisher
+                    allDocs = adminDocs.concat(pubDocs);
+                } catch(e) { allDocs = []; }
+
                 userPrefs = getPrefs();
                 if (!userPrefs) { showOnboarding(); }
                 else { setTimeout(function(){ showUnseenPopup(); }, 1500); }
