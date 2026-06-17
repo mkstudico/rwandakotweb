@@ -71,7 +71,7 @@
 </head>
 <body>
     <header class="topbar"><div class="topbar-inner"><a href="index.html" class="logo"><span>K</span> KotWeb Publisher</a><div class="user-badge" id="userBadge" style="display:none"><i class="bx bx-user-circle"></i> <span id="pubEmail"></span></div><button class="btn btn-outline btn-sm" id="logoutBtn" style="display:none">Logout</button></div></header>
-    <div class="container" id="content"><div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">Loading...</p></div></div>
+    <div class="container" id="content"><div style="text-align:center;padding:3rem;color:var(--text-tertiary)"><div class="spinner"></div><p style="font-size:.8rem">Loading…</p></div></div>
     <div class="toast" id="toast"></div>
     <div class="modal-overlay" id="editModal"><div class="modal" id="editModalContent"></div></div>
 
@@ -97,7 +97,7 @@
 
         async function apiCall(path, body, method) {
             var opts = { method: method || (body ? 'POST' : 'GET'), headers: { 'Content-Type': 'application/json' } };
-            if (idToken) { opts.headers['Authorization'] = 'Bearer ' + idToken; opts.headers['X-Firebase-UID'] = firebaseUID; }
+            if (idToken) { opts.headers['Authorization'] = 'Bearer ' + idToken; }
             if (body) opts.body = JSON.stringify(body);
             var r = await fetch(path, opts);
             var txt = await r.text();
@@ -111,7 +111,7 @@
             try {
                 var username = userEmail.split('@')[0].replace(/[^a-z0-9]/g, '').substring(0, 20);
                 await apiCall(API + '/firebase-register', { uid: firebaseUID, email: userEmail, username: username });
-            } catch (e) { /* ignore - may already exist */ }
+            } catch (e) { /* ignore */ }
         }
 
         function showLogin() {
@@ -126,12 +126,11 @@
                 '<p class="link-text">New publisher? <a id="showRegister">Create an account</a></p></div>';
 
             el('loginBtn').addEventListener('click', async function() {
-                var btn = this; btn.disabled = true; btn.innerHTML = 'Signing in...';
+                var btn = this; btn.disabled = true; btn.innerHTML = 'Signing in…';
                 try {
                     var e = el('loginEmail').value.trim(), p = el('loginPass').value;
                     if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Sign In'; return; }
-                    var cred = await signInWithEmailAndPassword(auth, e, p);
-                    // onAuthStateChanged will handle the rest
+                    await signInWithEmailAndPassword(auth, e, p);
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Sign In'; }
             });
             el('showRegister').addEventListener('click', function(e) { e.preventDefault(); showRegister(); });
@@ -149,13 +148,12 @@
                 '<p class="link-text">Already have an account? <a id="showLoginLink">Sign In</a></p></div>';
 
             el('regBtn').addEventListener('click', async function() {
-                var btn = this; btn.disabled = true; btn.innerHTML = 'Creating...';
+                var btn = this; btn.disabled = true; btn.innerHTML = 'Creating…';
                 try {
                     var e = el('regEmail').value.trim(), p = el('regPass').value;
                     if (!e || !p) { toast('Fill all fields'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
                     if (p.length < 6) { toast('Password: min 6 chars'); btn.disabled = false; btn.innerHTML = 'Create Account'; return; }
-                    var cred = await createUserWithEmailAndPassword(auth, e, p);
-                    // onAuthStateChanged will handle the rest
+                    await createUserWithEmailAndPassword(auth, e, p);
                 } catch (err) { toast(err.message); btn.disabled = false; btn.innerHTML = 'Create Account'; }
             });
             el('showLoginLink').addEventListener('click', function(e) { e.preventDefault(); showLogin(); });
@@ -164,7 +162,7 @@
         async function showDash() {
             if (dashLoaded) return;
             dashLoaded = true;
-            showLoader('Loading...');
+            showLoader('Loading…');
             el('logoutBtn').style.display = 'inline-flex';
             el('userBadge').style.display = 'flex';
             el('pubEmail').textContent = userEmail;
@@ -176,7 +174,7 @@
                 earnings = await apiCall(API + '/earnings'); 
                 docs = await apiCall(API + '/documents'); 
             } catch (e) { 
-                toast('Error loading data. Please try again.'); 
+                toast('Error loading data.'); 
                 dashLoaded = false;
                 return; 
             }
@@ -189,8 +187,9 @@
                 '<div class="revenue-card"><div class="rev-label">Total Revenue</div><div class="rev-amount">' + fmtPrice(totalRev, 'RWF') + '</div><div class="rev-sub">' + earnings.total_transactions + ' sales</div>' + (earnings.bonus_claimed ? '<div class="bonus-badge">🎉 +1,000 RWF Bonus</div>' : '') + '</div>' +
                 '<div class="pub-link-box"><div class="pub-link"><i class="bx bx-link"></i> ' + pubUrl + '</div><button class="btn btn-primary btn-sm" id="copyLinkBtn"><i class="bx bx-copy"></i> Copy</button></div>' +
                 '<div class="stats-row"><div class="stat-card"><div class="stat-val">' + earnings.total_documents + '</div><div class="stat-label">Documents</div></div><div class="stat-card"><div class="stat-val">' + earnings.total_transactions + '</div><div class="stat-label">Sales</div></div></div>' +
-                '<div class="tab-nav"><button class="tab-btn active" data-tab="docs"><i class="bx bx-file"></i> Docs</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>' +
-                '<div class="tab-content active" id="tab-docs"><div class="section-title">My Documents</div><div class="doc-list" id="docList"></div></div>' +
+                '<div class="tab-nav"><button class="tab-btn active" data-tab="guide"><i class="bx bx-book"></i> Guide</button><button class="tab-btn" data-tab="docs"><i class="bx bx-file"></i> Docs</button><button class="tab-btn" data-tab="add"><i class="bx bx-plus-circle"></i> Add</button><button class="tab-btn" data-tab="txns"><i class="bx bx-receipt"></i> Sales</button><button class="tab-btn" data-tab="cashout"><i class="bx bx-wallet"></i> Cash Out</button></div>' +
+                '<div class="tab-content active" id="tab-guide">' + renderGuide() + '</div>' +
+                '<div class="tab-content" id="tab-docs"><div class="section-title">My Documents</div><div class="doc-list" id="docList"></div></div>' +
                 '<div class="tab-content" id="tab-add">' + renderAddForm() + '</div>' +
                 '<div class="tab-content" id="tab-txns"><div class="section-title">Sales History</div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Paid</th><th>Earn (88%)</th><th>Fee (12%)</th></tr></thead><tbody id="txnBody"></tbody></table></div></div>' +
                 '<div class="tab-content" id="tab-cashout"><div class="section-title">Cash Out</div><div class="cashout-box"><h4><i class="bx bx-money-withdraw"></i> Request Cash Out</h4><p>Balance: <strong>' + fmtPrice(totalRev, 'RWF') + '</strong></p><div class="min-badge">Min: 15,000 RWF</div>' + (totalRev >= 15000 ? '<button class="btn btn-gold" id="cashoutBtn">Request Cash Out</button>' : '<p style="font-size:.7rem;color:var(--danger)">Need 15,000 RWF minimum.</p>') + '</div></div>';
@@ -202,7 +201,11 @@
 
             el('copyLinkBtn').addEventListener('click', function() { navigator.clipboard.writeText(pubUrl).then(function() { toast('Copied!'); }); });
             var cb = el('cashoutBtn');
-            if (cb) cb.addEventListener('click', function() { if (confirm('Request cash out?')) { toast('Request sent! Admin will review.'); cb.disabled = true; } });
+            if (cb) cb.addEventListener('click', function() { if (confirm('Request cash out?')) { toast('Request sent!'); cb.disabled = true; } });
+        }
+
+        function renderGuide() {
+            return '<div class="guide-card"><h4><i class="bx bx-rocket"></i> Welcome!</h4><ul><li><i class="bx bx-user-plus"></i> Your account is ready. Share your page link.</li><li><i class="bx bx-upload"></i> Upload documents in the <strong>Add</strong> tab.</li><li><i class="bx bx-share-alt"></i> Customers pay via MTN/Airtel, you earn 88%.</li><li><i class="bx bx-wallet"></i> Cash out when you reach 15,000 RWF.</li></ul></div>';
         }
 
         function renderAddForm() {
@@ -232,9 +235,9 @@
                     var t = el('dTitle').value.trim(), d = el('dDesc').value.trim(), p = parseInt(el('dPrice').value), im = el('dImage').files[0], fl = el('dFile').files[0];
                     if (!t || !p || !fl) { toast('Title, price, file required'); return; }
                     if (p < 1000 || p > 500000) { toast('Price: 1,000-500,000'); return; }
-                    btn.disabled = true; btn.innerHTML = 'Uploading...';
+                    btn.disabled = true; btn.innerHTML = 'Uploading…';
                     var fd = new FormData(); fd.append('file', fl);
-                    var up = await fetch(API + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken, 'X-Firebase-UID': firebaseUID }, body: fd });
+                    var up = await fetch(API + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken }, body: fd });
                     var ud = await up.json();
                     if (!ud.file_path) { toast('Upload failed'); btn.disabled = false; btn.innerHTML = 'Publish'; return; }
                     var imgUrl = '';
@@ -290,11 +293,8 @@
             l.innerHTML = real.map(function(t) { var earn = Math.floor((t.amount || 0) * 0.88); return '<tr><td>' + (t.customer_name || 'Customer') + '</td><td>' + (t.customer_phone || '') + '</td><td>' + fmtPrice(t.amount) + '</td><td class="earn-positive">+' + fmtPrice(earn) + '</td><td class="fee-text">-' + fmtPrice((t.amount || 0) - earn) + '</td></tr>'; }).join('');
         }
 
-        el('logoutBtn').addEventListener('click', async function() {
-            await signOut(auth);
-        });
+        el('logoutBtn').addEventListener('click', async function() { await signOut(auth); });
 
-        // Auth state listener - this handles everything
         onAuthStateChanged(auth, function(fbUser) {
             if (fbUser) {
                 fbUser.getIdToken().then(function(t) {
@@ -304,9 +304,7 @@
                     showDash();
                 });
             } else {
-                idToken = null;
-                userEmail = '';
-                firebaseUID = '';
+                idToken = null; userEmail = ''; firebaseUID = '';
                 showLogin();
             }
         });
